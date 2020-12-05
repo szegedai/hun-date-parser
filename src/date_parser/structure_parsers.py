@@ -6,23 +6,18 @@ from .patterns import R_MULTI, R_TOLIG, R_TOL, R_IG
 
 
 def match_multi_match(s: str) -> List[str]:
-    """
-
-    :param s:
-    :return:
-    """
     match = re.match(R_MULTI, s)
 
     if match:
         groups = match.groups()
-        groups = [m for m in groups if m]
+        groups = [m.rstrip().lstrip() for m in groups if m]
 
         return groups
 
     return [s]
 
 
-def match_interval(s: str) -> Dict[str, str]:
+def match_interval(s: str) -> Dict:
     match = re.match(R_TOLIG, s)
     if match:
         groups = match.groups()
