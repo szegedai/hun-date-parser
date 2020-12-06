@@ -1,5 +1,7 @@
+from datetime import datetime
+
 from src.date_parser.date_parsers import Year, Month, Day
-from src.date_parser.date_parsers import match_iso_date, match_named_month
+from src.date_parser.date_parsers import match_iso_date, match_named_month, match_relative_day
 
 
 def test_match_iso_date():
@@ -30,6 +32,22 @@ def test_named_month():
 
     for inp, exp in tf:
         out = match_named_month(inp)
+        date_parts = []
+        for e in out:
+            date_parts.append(e['date_parts'])
+        assert date_parts == exp
+
+
+def test_match_relative_day():
+    now = datetime(2020, 10, 1)
+    tf = [('ma', [[Year(2020), Month(10), Day(1)]]),
+          ('ma-holnap', [[Year(2020), Month(10), Day(1)], [Year(2020), Month(10), Day(2)]]),
+          ('holnapután reggel nyolc', [[Year(2020), Month(10), Day(3)]]),
+          ('legyen ma reggel', [[Year(2020), Month(10), Day(1)]]),
+          ('miért nem jöttél tegnap? na majd ma', [[Year(2020), Month(10), Day(1)], [Year(2020), Month(9), Day(30)]])]
+
+    for inp, exp in tf:
+        out = match_relative_day(inp, now)
         date_parts = []
         for e in out:
             date_parts.append(e['date_parts'])

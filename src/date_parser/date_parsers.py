@@ -1,8 +1,10 @@
 import re
 from collections import namedtuple
 from typing import Tuple, Union, List, Dict
+from datetime import datetime, timedelta
 
-from .patterns import R_ISO_DATE, R_NAMED_MONTH
+from .patterns import (R_ISO_DATE, R_NAMED_MONTH, R_TODAY, R_TOMORROW, R_NTOMORROW, R_YESTERDAY, R_NYESTERDAY,
+                       R_NDAYS_FROM_NOW, R_WEEKDAY)
 from .utils import remove_accent
 
 Year = namedtuple('Year', ['x'])
@@ -60,3 +62,47 @@ def match_named_month(s: str) -> Dict:
         res.append(group_res)
 
     return res
+
+
+def match_relative_day(s: str, now: datetime) -> Dict:
+    groups = [*re.findall(R_TODAY, s),
+              *re.findall(R_TOMORROW, s),
+              *re.findall(R_NTOMORROW, s),
+              *re.findall(R_YESTERDAY, s),
+              *re.findall(R_NYESTERDAY, s)]
+
+    res = []
+    for group in groups:
+
+        if type(group) != str:
+            group = [m for m in group if m][0]
+
+        if 'ma' in group or 'má' in group:
+            res.append({'match': group, 'date_parts': [Year(now.year), Month(now.month), Day(now.day)]})
+        elif 'holnapu' in group:
+            tom2 = now + timedelta(days=2)
+            res.append({'match': group, 'date_parts': [Year(tom2.year), Month(tom2.month), Day(tom2.day)]})
+        elif 'holnap' in group:
+            tom = now + timedelta(days=1)
+            res.append({'match': group, 'date_parts': [Year(tom.year), Month(tom.month), Day(tom.day)]})
+        elif 'tegnapel' in group:
+            yes2 = now - timedelta(days=2)
+            res.append({'match': group, 'date_parts': [Year(yes2.year), Month(yes2.month), Day(yes2.day)]})
+        elif 'tegnap' in group:
+            yes = now - timedelta(days=1)
+            res.append({'match': group, 'date_parts': [Year(yes.year), Month(yes.month), Day(yes.day)]})
+
+    return res
+
+
+def match_relative_day(s: str, now: datetime) -> Dict:
+    groups = re.findall(R_WEEKDAY, s)
+
+    res = []
+    for group in groups:
+
+        if type(group) != str:
+            group = [m for m in group if m][0]
+
+        if 'hetfo' in remove_accent(group):
+            res.append({'match': group, 'date_parts': [Year(now.year), Month(now.month), Day(now.day)]})
