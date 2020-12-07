@@ -1,7 +1,7 @@
 from datetime import datetime
 
-from src.date_parser.date_parsers import Year, Month, Day
-from src.date_parser.date_parsers import match_iso_date, match_named_month, match_relative_day
+from src.date_parser.date_parsers import Year, Month, Week, Day
+from src.date_parser.date_parsers import match_iso_date, match_named_month, match_relative_day, match_weekday
 
 
 def test_match_iso_date():
@@ -40,6 +40,7 @@ def test_named_month():
 
 def test_match_relative_day():
     now = datetime(2020, 10, 1)
+
     tf = [('ma', [[Year(2020), Month(10), Day(1)]]),
           ('ma-holnap', [[Year(2020), Month(10), Day(1)], [Year(2020), Month(10), Day(2)]]),
           ('holnapután reggel nyolc', [[Year(2020), Month(10), Day(3)]]),
@@ -48,6 +49,22 @@ def test_match_relative_day():
 
     for inp, exp in tf:
         out = match_relative_day(inp, now)
+        date_parts = []
+        for e in out:
+            date_parts.append(e['date_parts'])
+        assert date_parts == exp
+
+def test_match_relative_day():
+    now = datetime(2020, 12, 7) # monday
+
+    tf = [('múlt vasárnap', [[Year(2020), Month(12), Day(6)]]),
+          ('ezen a heten hetfon', [[Year(2020), Month(12), Day(7)]]),
+          ('jövő kedden', [[Year(2020), Month(12), Day(15)]]),
+          ('előző szombaton ', [[Year(2020), Month(12), Day(5)]]),
+          ('miért nem jöttél tegnap? na majd ma', [])]
+
+    for inp, exp in tf:
+        out = match_weekday(inp, now)
         date_parts = []
         for e in out:
             date_parts.append(e['date_parts'])
