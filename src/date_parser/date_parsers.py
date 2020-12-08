@@ -1,19 +1,10 @@
 import re
-from collections import namedtuple
 from typing import Tuple, Union, List, Dict
 from datetime import datetime, timedelta
 
 from .patterns import (R_ISO_DATE, R_NAMED_MONTH, R_TODAY, R_TOMORROW, R_NTOMORROW, R_YESTERDAY, R_NYESTERDAY,
-                       R_NDAYS_FROM_NOW, R_WEEKDAY)
-from .utils import remove_accent, next_weekday
-
-Year = namedtuple('Year', ['x'])
-Month = namedtuple('Month', ['x'])
-Week = namedtuple('Week', ['x'])
-Day = namedtuple('Day', ['x'])
-Hour = namedtuple('Hour', ['x'])
-Minute = namedtuple('Minute', ['x'])
-Second = namedtuple('Second', ['x'])
+                       R_NDAYS_FROM_NOW, R_WEEKDAY, R_WEEK)
+from .utils import remove_accent, Year, Month, Week, Day
 
 
 def match_iso_date(s: str) -> Dict:
@@ -99,25 +90,15 @@ def match_relative_day(s: str, now: datetime) -> Dict:
 def match_weekday(s: str, now: datetime) -> Dict:
     groups = re.findall(R_WEEKDAY, s)
 
-    print(groups)
-
     res = []
     for group in groups:
         date_parts = {'match': group, 'date_parts': []}
         week, day = group
         n_weeks = 0
 
-        # TODO: make separate function for this with only week matching regex
-        if 'ezen' in week:
-            y, w = now.isocalendar()[0:2]
-            date_parts['date_parts'].extend([Year(y), Week(w)])
-        elif 'jovo' in remove_accent(week):
-            y, w = (now + timedelta(days=7)).isocalendar()[0:2]
-            date_parts['date_parts'].extend([Year(y), Week(w)])
+        if 'jovo' in remove_accent(week):
             n_weeks = 1
         elif 'mult' in remove_accent(week) or 'elozo' in remove_accent(week):
-            y, w = (now - timedelta(days=7)).isocalendar()[0:2]
-            date_parts['date_parts'].extend([Year(y), Week(w)])
             n_weeks = -1
 
         get_day_of_week = lambda w, d: ((now - timedelta(days=now.weekday())) + timedelta(days=w*7)) + timedelta(days=d)
@@ -143,6 +124,28 @@ def match_weekday(s: str, now: datetime) -> Dict:
         elif 'vas' in remove_accent(day):
             day = get_day_of_week(n_weeks, 6)
             date_parts['date_parts'] = [Year(day.year), Month(day.month), Day(day.day)]
+
+        res.append(date_parts)
+
+    return res
+
+
+def match_week(s: str, now: datetime) -> Dict:
+    groups = re.findall(R_WEEK, s)
+
+    res = []
+    for group in groups:
+        date_parts = {'match': group, 'date_parts': []}
+
+        if 'ez' in group:
+            y, w = now.isocalendar()[0:2]
+            date_parts['date_parts'].extend([Year(y), Week(w)])
+        elif 'jovo' in remove_accent(group):
+            y, w = (now + timedelta(days=7)).isocalendar()[0:2]
+            date_parts['date_parts'].extend([Year(y), Week(w)])
+        elif 'mult' in remove_accent(group) or 'elozo' in remove_accent(group):
+            y, w = (now - timedelta(days=7)).isocalendar()[0:2]
+            date_parts['date_parts'].extend([Year(y), Week(w)])
 
         res.append(date_parts)
 

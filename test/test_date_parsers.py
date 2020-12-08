@@ -1,7 +1,8 @@
 from datetime import datetime
 
 from src.date_parser.date_parsers import Year, Month, Week, Day
-from src.date_parser.date_parsers import match_iso_date, match_named_month, match_relative_day, match_weekday
+from src.date_parser.date_parsers import (match_iso_date, match_named_month, match_relative_day, match_weekday,
+                                          match_week)
 
 
 def test_match_iso_date():
@@ -65,6 +66,22 @@ def test_match_relative_day():
 
     for inp, exp in tf:
         out = match_weekday(inp, now)
+        date_parts = []
+        for e in out:
+            date_parts.append(e['date_parts'])
+        assert date_parts == exp
+
+def test_match_relative_week():
+    now = datetime(2020, 12, 7)
+
+    tf = [('múlthéten', [[Year(2020), Week(49)]]),
+          ('múlt hét kedden', [[Year(2020), Week(49)]]),
+          ('ezen a heten hetfon', [[Year(2020), Week(50)]]),
+          ('jövőhéten', [[Year(2020), Week(51)]]),
+          ('legyen ma', [])]
+
+    for inp, exp in tf:
+        out = match_week(inp, now)
         date_parts = []
         for e in out:
             date_parts.append(e['date_parts'])

@@ -1,11 +1,16 @@
 from datetime import datetime
 
 from src.date_parser.structure_parsers import match_multi_match, match_interval
-from src.date_parser.date_parsers import match_named_month, match_iso_date
+from src.date_parser.date_parsers import (match_named_month, match_iso_date, match_weekday, match_relative_day,
+                                          match_week)
 
 
 def match_rules(sentence: str):
-    return match_named_month(sentence) + match_iso_date(sentence)
+    return [*match_named_month(sentence),
+            *match_iso_date(sentence),
+            *match_relative_day(sentence, datetime.now()),
+            *match_weekday(sentence, datetime.now()),
+            *match_week(sentence, datetime.now())]
 
 
 class DateExtractor:
@@ -42,3 +47,5 @@ class DateExtractor:
 if __name__ == '__main__':
     de = DateExtractor()
     print(de.parse_date('most januárban, februárban vagy 2020-10-12-tol 2020-11-01-ig'))
+    print(de.parse_date('most kedden, múlthét vasárnap'))
+    print(de.parse_date('ma reggel nyolckor'))
