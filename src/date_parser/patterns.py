@@ -24,5 +24,5 @@ R_NDAYS_FROM_NOW = r'(([\w]*) nap m[úu]lva)'
 R_AT = r'([:\w ]*-?kor)'
 
 # hour+minute parsers
-R_DIGI = r'\b([0-2][0-9]):([0-9][0-9])'
+R_DIGI = r'\b([0-2]?[0-9]):([0-9][0-9])'
 R_HWORDS = r'([0-2][0-9])(?: ?óra|-?kor| ?h) ?(?:([0-9][0-9])(?:(?: ?perc| ?p)[\w]*))? ?(?:([0-9][0-9])(?:(?: ?m[áa]sodperc| ?mp)[\w]*))?'
