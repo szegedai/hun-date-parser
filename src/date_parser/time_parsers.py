@@ -16,9 +16,13 @@ def match_digi_clock(s: str) -> Dict:
 
     res = []
     for group in match:
-        group = [int(m.lstrip('0')) for m in group if m]
-        h, m = group
+        group = [int(m.lstrip('0')) for m in group if m.lstrip('0')]
 
-        res.append({'match': group, 'date_parts': [Hour(h), Minute(m)]})
+        if len(group) == 2:
+            h, m = group
+            res.append({'match': group, 'date_parts': [Hour(h), Minute(m)]})
+        elif len(group) == 1:
+            res.append({'match': group, 'date_parts': [Hour(group[0])]})
 
     return res
+

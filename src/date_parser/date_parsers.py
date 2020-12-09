@@ -18,7 +18,7 @@ def match_iso_date(s: str) -> Dict:
     res = []
     if match:
         for group in match:
-            group = [int(m.lstrip('0')) for m in group if m]
+            group = [int(m.lstrip('0')) for m in group if m.lstrip('0')]
 
             if len(group) == 1:
                 res.append({'match': group, 'date_parts': [Year(group[0])]})
