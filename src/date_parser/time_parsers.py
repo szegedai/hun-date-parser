@@ -2,9 +2,10 @@ import re
 
 from typing import Dict
 
-from .patterns import R_AT, R_DIGI, R_HWORDS, R_HOUR_MIN
+from .patterns import R_AT, R_DIGI, R_HWORDS, R_HOUR_MIN, R_HOUR_MIN_REV
 from .utils import remove_accent, word_to_num, Year, Month, Week, Day, Hour, Minute, Second, Interval, Daypart
 
+NAN = -1
 
 def match_digi_clock(s: str) -> Dict:
     """
@@ -33,12 +34,29 @@ def match_time_words(s: str) -> Dict:
     :return: tuple of date parts
     """
     group = re.findall(R_HOUR_MIN, s)
-    group = [m for m in group if ''.join(m)][0]
+    group = [m for m in group if ''.join(m)]
+
+    group_rev = re.findall(R_HOUR_MIN_REV, s)
+    group_rev = [m for m in group_rev if ''.join(m)]
+
+    print(group_rev, group)
+
+    if not (group or group_rev):
+        return []
+    elif group and not group_rev:
+        daypart, hour_modifier, hour, minute = group[0]
+    elif not group and group_rev:
+        minute, daypart, hour_modifier, hour, is_before = group_rev[0]
+        minute += (' ' + is_before)
+    elif group_rev[0].count('') < group[0].count(''):
+        minute, daypart, hour_modifier, hour, is_before = group_rev[0]
+        minute += (' ' + is_before)
+    else:
+        daypart, hour_modifier, hour, minute = group[0]
 
     res = []
     am = True
     date_parts = []
-    daypart, hour_modifier, hour, minute = group
 
     if daypart and hour:
         if 'reggel' in daypart or 'delelott' in remove_accent(daypart) or 'hajnal' in daypart:
@@ -61,7 +79,7 @@ def match_time_words(s: str) -> Dict:
                 hour_num = hour_num-1 if hour_num-1 >= 0 else 23
                 minute_num = 15
 
-        if hour_num == -1:
+        if hour_num == NAN:
             return []
         else:
             if hour_num < 12 and not am:
@@ -73,7 +91,9 @@ def match_time_words(s: str) -> Dict:
                 hour_num = hour_num if hour_num >= 0 else 23
                 date_parts.extend([Hour(hour_num), Minute(60-(minute_num % 60))])
             elif 'elott' in remove_accent(minute) and hour_modifier:
-                minute_num -= word_to_num(minute)
+                n_minutes_before = word_to_num(minute)
+                if n_minutes_before != NAN:
+                    minute_num -= n_minutes_before
                 if minute_num < 0:
                     hour_num += (minute_num // 60)
                     hour_num = hour_num if hour_num >= 0 else 23
