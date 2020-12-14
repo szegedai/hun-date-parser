@@ -23,7 +23,9 @@ def test_word_to_num():
           ('ötvenöt perckor', 55),
           ('55 perckor', 55),
           ('8 húsz perckor', 8),
-          ('8', 8)]
+          ('8', 8),
+          ('előtt nyolcvan perccel', 80),
+          ('ma reggel nyolc óra', 8)]
 
     for inp, exp in tf:
         assert word_to_num(inp) == exp

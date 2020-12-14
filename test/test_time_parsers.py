@@ -18,7 +18,9 @@ def test_match_relative_week():
 
 
 def test_match_time_words():
-    tf = [('reggel nyolc előtt hat perccel', [[Hour(8), Minute(6)]]),  # TODO: add this functionality
+    tf = [('reggel nyolc előtt hat perccel', [[Hour(7), Minute(54)]]),
+          ('reggel nyolc előtt nyolcvan perccel', [[Hour(6), Minute(40)]]),
+          ('este 8 előtt 12 perccel', [[Hour(19), Minute(48)]]),
           ('nyolc óra nyolc perckor', [[Hour(8), Minute(8)]]),
           ('ma reggel hat óra', [[Hour(6)]]),
           ('ma reggel', [[Daypart(1)]]),

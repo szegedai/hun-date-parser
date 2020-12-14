@@ -57,12 +57,18 @@ def match_time_words(s: str) -> Dict:
             if hour_num < 12 and not am:
                 hour_num += 12
 
-            date_parts.append(Hour(hour_num))
-
         if minute:
             minute_num = word_to_num(minute)
+            print(minute_num)
             if minute_num != -1:
-                date_parts.append(Minute(minute_num))
+                if 'elott' in remove_accent(minute):
+                    hour_num -= (minute_num // 60) + 1
+                    hour_num = hour_num if hour_num >= 0 else 23
+                    date_parts.extend([Hour(hour_num), Minute(60-(minute_num % 60))])
+                else:
+                    date_parts.extend([Hour(hour_num), Minute(minute_num)])
+        else:
+            date_parts.append(Hour(hour_num))
 
         res.append({'match': group, 'date_parts': date_parts})
 

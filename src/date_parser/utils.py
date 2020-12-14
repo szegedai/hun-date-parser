@@ -36,7 +36,7 @@ def word_to_num(s: str):
         if w.isdigit():
             return int(w)
 
-    _s = copy(s)
+    _s = '<DEL>' + remove_accent(copy(s))
     res = {'dec': None, 'num': None}
     missing = 0
 
@@ -55,14 +55,14 @@ def word_to_num(s: str):
     for i, dec in enumerate(decs):
         if type(dec) == tuple:
             for syn in dec:
-                if syn in remove_accent(_s):
+                if syn in _s:
                     res['dec'] = (i+1) * 10
-                    _s = _s[len(syn):]
+                    _s = _s.replace(syn, '<DEL>')
                     break
         else:
-            if dec in remove_accent(_s):
+            if dec in _s:
                 res['dec'] = (i + 1) * 10
-                _s = _s[len(syn):]
+                _s = _s.replace(dec, '<DEL>')
                 break
 
     if not res['dec']:
@@ -70,7 +70,7 @@ def word_to_num(s: str):
         res['dec'] = 0
 
     for i, num in enumerate(nums):
-        if num in remove_accent(_s):
+        if '<DEL>' + num in _s or ' ' + num in _s:
             res['num'] = i
 
     if res['num'] is None:
