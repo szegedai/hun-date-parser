@@ -32,7 +32,13 @@ def test_match_time_words():
           ('húsz óra negyvenkilenc perckor', [[Hour(20), Minute(49)]]),
           ('20 óra negyvenkilenc perckor', [[Hour(20), Minute(49)]]),
           ('20 óra 49 perckor', [[Hour(20), Minute(49)]]),
-          ('este 8-kor', [[Hour(20)]])]
+          ('este 8-kor', [[Hour(20)]]),
+          ('este háromnegyed 8-kor', [[Hour(19), Minute(45)]]),
+          ('este negyed 8-kor', [[Hour(19), Minute(15)]]),
+          ('háromnegyed nyolckor', [[Hour(7), Minute(45)]]),
+          ('este negyed 8 előtt 6 perccel', [[Hour(19), Minute(9)]]),
+          ('este háromnegyed 8 előtt két perccel', [[Hour(19), Minute(43)]]),
+          ('este fél 8 előtt harminckilenc perccel', [[Hour(18), Minute(51)]])]
 
     for inp, exp in tf:
         out = match_time_words(inp)

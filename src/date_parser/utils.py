@@ -50,7 +50,7 @@ def word_to_num(s: str):
             'nyolcvan',
             'kilencven']
 
-    nums = ['nulla', 'egy', 'ketto', 'harom', 'negy', 'ot', 'hat', 'het', 'nyolc', 'kilenc']
+    nums = ['nulla', 'egy', ('ketto', 'ket'), 'harom', 'negy', 'ot', 'hat', 'het', 'nyolc', 'kilenc']
 
     for i, dec in enumerate(decs):
         if type(dec) == tuple:
@@ -70,8 +70,13 @@ def word_to_num(s: str):
         res['dec'] = 0
 
     for i, num in enumerate(nums):
-        if '<DEL>' + num in _s or ' ' + num in _s:
-            res['num'] = i
+        if type(num) == tuple:
+            for num_syn in num:
+                if '<DEL>' + num_syn in _s or ' ' + num_syn in _s:
+                    res['num'] = i
+        else:
+            if '<DEL>' + num in _s or ' ' + num in _s:
+                res['num'] = i
 
     if res['num'] is None:
         missing += 1

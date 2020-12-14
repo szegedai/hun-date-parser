@@ -35,12 +35,10 @@ def match_time_words(s: str) -> Dict:
     group = re.findall(R_HOUR_MIN, s)
     group = [m for m in group if ''.join(m)][0]
 
-    print(group)
-
     res = []
     am = True
     date_parts = []
-    daypart, hour, minute = group
+    daypart, hour_modifier, hour, minute = group
 
     if daypart and hour:
         if 'reggel' in daypart or 'delelott' in remove_accent(daypart) or 'hajnal' in daypart:
@@ -50,6 +48,18 @@ def match_time_words(s: str) -> Dict:
 
     if hour:
         hour_num = word_to_num(hour)
+        minute_num = word_to_num(minute)
+
+        if hour_modifier:
+            if 'haromnegyed' in remove_accent(hour_modifier):
+                hour_num = hour_num-1 if hour_num-1 >= 0 else 23
+                minute_num = 45
+            elif 'fel' in remove_accent(hour_modifier):
+                hour_num = hour_num-1 if hour_num-1 >= 0 else 23
+                minute_num = 30
+            elif 'negyed' in remove_accent(hour_modifier):
+                hour_num = hour_num-1 if hour_num-1 >= 0 else 23
+                minute_num = 15
 
         if hour_num == -1:
             return []
@@ -57,16 +67,20 @@ def match_time_words(s: str) -> Dict:
             if hour_num < 12 and not am:
                 hour_num += 12
 
-        if minute:
-            minute_num = word_to_num(minute)
-            print(minute_num)
-            if minute_num != -1:
-                if 'elott' in remove_accent(minute):
-                    hour_num -= (minute_num // 60) + 1
+        if minute or hour_modifier:
+            if 'elott' in remove_accent(minute) and not hour_modifier:
+                hour_num -= (minute_num // 60) + 1
+                hour_num = hour_num if hour_num >= 0 else 23
+                date_parts.extend([Hour(hour_num), Minute(60-(minute_num % 60))])
+            elif 'elott' in remove_accent(minute) and hour_modifier:
+                minute_num -= word_to_num(minute)
+                if minute_num < 0:
+                    hour_num += (minute_num // 60)
                     hour_num = hour_num if hour_num >= 0 else 23
-                    date_parts.extend([Hour(hour_num), Minute(60-(minute_num % 60))])
-                else:
-                    date_parts.extend([Hour(hour_num), Minute(minute_num)])
+                    minute_num = minute_num % 60
+                date_parts.extend([Hour(hour_num), Minute(minute_num)])
+            else:
+                date_parts.extend([Hour(hour_num), Minute(minute_num)])
         else:
             date_parts.append(Hour(hour_num))
 

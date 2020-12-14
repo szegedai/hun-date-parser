@@ -5,7 +5,6 @@ def test_remove_accent():
     tf = [('aáéeíiő', 'aaeeiio')]
 
     for inp, exp in tf:
-        print(inp, exp)
         assert remove_accent(inp) == exp
 
 
@@ -25,7 +24,9 @@ def test_word_to_num():
           ('8 húsz perckor', 8),
           ('8', 8),
           ('előtt nyolcvan perccel', 80),
-          ('ma reggel nyolc óra', 8)]
+          ('ma reggel nyolc óra', 8),
+          ('két órakor', 2),
+          ('délután két órakor', 2)]
 
     for inp, exp in tf:
         assert word_to_num(inp) == exp
