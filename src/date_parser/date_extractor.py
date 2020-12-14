@@ -7,16 +7,17 @@ from copy import copy
 from src.date_parser.structure_parsers import match_multi_match, match_interval
 from src.date_parser.date_parsers import (match_named_month, match_iso_date, match_weekday, match_relative_day,
                                           match_week)
-from src.date_parser.time_parsers import match_digi_clock
+from src.date_parser.time_parsers import match_digi_clock, match_time_words
 
 
 def match_rules(sentence: str):
     matches = [*match_named_month(sentence),
-            *match_iso_date(sentence),
-            *match_relative_day(sentence, datetime.now()),
-            *match_weekday(sentence, datetime.now()),
-            *match_week(sentence, datetime.now()),
-            *match_digi_clock(sentence)]
+               *match_iso_date(sentence),
+               *match_relative_day(sentence, datetime.now()),
+               *match_weekday(sentence, datetime.now()),
+               *match_week(sentence, datetime.now()),
+               *match_digi_clock(sentence),
+               *match_time_words(sentence)]
 
     matches = list(chain(*[m['date_parts'] for m in matches]))
 
@@ -66,3 +67,5 @@ if __name__ == '__main__':
     print(de.parse_date('most januárban, februárban vagy 2020-10-12-tol 2020-11-01-ig'))
     print(de.parse_date('most kedden, múlthét vasárnap'))
     print(de.parse_date('ma reggel 7:30-tól holnap 8:20-ig'))
+    print()
+    print(de.parse_date('ma délután három óra negyvenhat perckor'))

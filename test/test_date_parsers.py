@@ -55,6 +55,7 @@ def test_match_relative_day():
             date_parts.append(e['date_parts'])
         assert date_parts == exp
 
+
 def test_match_relative_day():
     now = datetime(2020, 12, 7) # monday
 
@@ -70,6 +71,7 @@ def test_match_relative_day():
         for e in out:
             date_parts.append(e['date_parts'])
         assert date_parts == exp
+
 
 def test_match_relative_week():
     now = datetime(2020, 12, 7)

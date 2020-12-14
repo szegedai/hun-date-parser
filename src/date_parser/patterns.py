@@ -26,3 +26,6 @@ R_AT = r'([:\w ]*-?kor)'
 # hour+minute parsers
 R_DIGI = r'\b([0-2]?[0-9]):([0-9][0-9])'
 R_HWORDS = r'([0-2][0-9])(?: ?óra|-?kor| ?h) ?(?:([0-9][0-9])(?:(?: ?perc| ?p)[\w]*))? ?(?:([0-9][0-9])(?:(?: ?m[áa]sodperc| ?mp)[\w]*))?'
+R_HOUR_MIN = r'(?:.*(hajnal[i]?|reggel|d[eé]lel[oőö]tt|d[eé]lut[aá]n|este|[eé]jjel))? ?(?:(?:([0-9]{1,2}|nulla|egy|kett[oöő]|h[aá]rom|n[eé]gy|[öo]t|hat|h[eé]t|nyolc|kilenc|t[ií]z|tizenegy|tizenkett[oő]|tizenh[aá]rom|tizenn[eé]gy|tizen[oö]t|tizenhat|tizenh[eé]t|tizennyolc|tizenkilenc|h[uú]sz|huszonegy|huszonkett[oöő]|huszonh[aá]rom)(?:.{0,4})\b(?:[oó]ra)?)?(.*(?:perc)?)?)?'
+#R_MIN = r'(.*)(?:perc)'
+#R_SEC = r'(.*)(?: ?m[áa]sodperc| ?mp)'
