@@ -26,8 +26,8 @@ jobs:
       run: |
         python -m mypy --ignore-missing-imports src
     - name: Static analysis with flake8
-        run: |
-          python -m flake8 --max-line-length=120 --per-file-ignores='patterns.py:E501' src
+      run: |
+        python -m flake8 --max-line-length=120 --per-file-ignores='patterns.py:E501' src
     - name: Test with pytest
       run: |
         pytest
