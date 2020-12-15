@@ -1,13 +1,14 @@
 import re
 
-from typing import Dict
+from typing import Dict, List, Any
 
-from .patterns import R_AT, R_DIGI, R_HWORDS, R_HOUR_MIN, R_HOUR_MIN_REV
-from .utils import remove_accent, word_to_num, Year, Month, Week, Day, Hour, Minute, Second, Interval, Daypart
+from .patterns import R_DIGI, R_HOUR_MIN, R_HOUR_MIN_REV
+from .utils import remove_accent, word_to_num, Hour, Minute, Daypart
 
 NAN = -1
 
-def match_digi_clock(s: str) -> Dict:
+
+def match_digi_clock(s: str) -> List[Dict[str, Any]]:
     """
     Match digi clock format.
     :param s: textual input
@@ -28,7 +29,7 @@ def match_digi_clock(s: str) -> Dict:
     return res
 
 
-def match_time_words(s: str) -> Dict:
+def match_time_words(s: str) -> List[Dict[str, Any]]:
     """
     :param s: textual input
     :return: tuple of date parts
@@ -38,8 +39,6 @@ def match_time_words(s: str) -> Dict:
 
     group_rev = re.findall(R_HOUR_MIN_REV, s)
     group_rev = [m for m in group_rev if ''.join(m)]
-
-    print(group_rev, group)
 
     if not (group or group_rev):
         return []

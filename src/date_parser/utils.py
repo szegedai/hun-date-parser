@@ -37,7 +37,7 @@ def word_to_num(s: str):
             return int(w)
 
     _s = '<DEL>' + remove_accent(copy(s))
-    res = {'dec': None, 'num': None}
+    res = {'dec': -1, 'num': -1}
     missing = 0
 
     decs = [('tizen', 'tiz'),
@@ -65,7 +65,7 @@ def word_to_num(s: str):
                 _s = _s.replace(dec, '<DEL>')
                 break
 
-    if not res['dec']:
+    if res['dec'] == -1:
         missing += 1
         res['dec'] = 0
 
@@ -75,10 +75,10 @@ def word_to_num(s: str):
                 if '<DEL>' + num_syn in _s or ' ' + num_syn in _s:
                     res['num'] = i
         else:
-            if '<DEL>' + num in _s or ' ' + num in _s:
+            if '<DEL>' + str(num) in _s or ' ' + str(num) in _s:
                 res['num'] = i
 
-    if res['num'] is None:
+    if res['num'] == -1:
         missing += 1
         res['num'] = 0
 
