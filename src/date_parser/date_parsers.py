@@ -1,13 +1,13 @@
 import re
-from typing import Tuple, Union, List, Dict
+from typing import Dict, List, Any
 from datetime import datetime, timedelta
 
 from .patterns import (R_ISO_DATE, R_NAMED_MONTH, R_TODAY, R_TOMORROW, R_NTOMORROW, R_YESTERDAY, R_NYESTERDAY,
-                       R_NDAYS_FROM_NOW, R_WEEKDAY, R_WEEK)
+                       R_WEEKDAY, R_WEEK)
 from .utils import remove_accent, Year, Month, Week, Day
 
 
-def match_iso_date(s: str) -> Dict:
+def match_iso_date(s: str) -> List[Dict[str, Any]]:
     """
     Match ISO date-like format.
     :param s: textual input
@@ -30,7 +30,7 @@ def match_iso_date(s: str) -> Dict:
     return res
 
 
-def match_named_month(s: str) -> Dict:
+def match_named_month(s: str) -> List[Dict[str, Any]]:
     """
     Match named month and day
     :param s: textual input
@@ -56,7 +56,7 @@ def match_named_month(s: str) -> Dict:
     return res
 
 
-def match_relative_day(s: str, now: datetime) -> Dict:
+def match_relative_day(s: str, now: datetime) -> List[Dict[str, Any]]:
     groups = [*re.findall(R_TODAY, s),
               *re.findall(R_TOMORROW, s),
               *re.findall(R_NTOMORROW, s),
@@ -87,7 +87,7 @@ def match_relative_day(s: str, now: datetime) -> Dict:
     return res
 
 
-def match_weekday(s: str, now: datetime) -> Dict:
+def match_weekday(s: str, now: datetime) -> List[Dict[str, Any]]:
     groups = re.findall(R_WEEKDAY, s)
 
     res = []
@@ -101,7 +101,8 @@ def match_weekday(s: str, now: datetime) -> Dict:
         elif 'mult' in remove_accent(week) or 'elozo' in remove_accent(week):
             n_weeks = -1
 
-        get_day_of_week = lambda w, d: ((now - timedelta(days=now.weekday())) + timedelta(days=w*7)) + timedelta(days=d)
+        def get_day_of_week(w, d):
+            return ((now - timedelta(days=now.weekday())) + timedelta(days=w * 7)) + timedelta(days=d)
 
         if 'hetfo' in remove_accent(day):
             day = get_day_of_week(n_weeks, 0)
@@ -130,7 +131,7 @@ def match_weekday(s: str, now: datetime) -> Dict:
     return res
 
 
-def match_week(s: str, now: datetime) -> Dict:
+def match_week(s: str, now: datetime) -> List[Dict[str, Any]]:
     groups = re.findall(R_WEEK, s)
 
     res = []
