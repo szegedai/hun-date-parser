@@ -68,4 +68,4 @@ if __name__ == '__main__':
     print(de.parse_date('most kedden, múlthét vasárnap'))
     print(de.parse_date('ma reggel 7:30-tól holnap 8:20-ig'))
     print()
-    print(de.parse_date('ma délután három óra negyvenhat perckor'))
+    print(de.parse_date('legyen mondjuk holnap 6 után hat perccel'))

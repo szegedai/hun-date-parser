@@ -40,6 +40,8 @@ def match_time_words(s: str) -> List[Dict[str, Any]]:
     group_rev = re.findall(R_HOUR_MIN_REV, s)
     group_rev = [m for m in group_rev if ''.join(m)]
 
+    print(group, group_rev)
+
     if not (group or group_rev):
         return []
     elif group and not group_rev:
@@ -98,8 +100,18 @@ def match_time_words(s: str) -> List[Dict[str, Any]]:
                     hour_num = hour_num if hour_num >= 0 else 23
                     minute_num = minute_num % 60
                 date_parts.extend([Hour(hour_num), Minute(minute_num)])
+            elif hour_modifier:
+                n_minutes_after = word_to_num(minute)
+                if n_minutes_after != NAN:
+                    minute_num += n_minutes_after
+                if minute_num > 59:
+                    hour_num += (minute_num // 60)
+                    hour_num = hour_num if hour_num <= 23 else 0
+                    minute_num = minute_num % 60
+                date_parts.extend([Hour(hour_num), Minute(minute_num)])
             else:
                 date_parts.extend([Hour(hour_num), Minute(minute_num)])
+
         else:
             date_parts.append(Hour(hour_num))
 
