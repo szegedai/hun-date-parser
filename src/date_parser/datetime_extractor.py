@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from calendar import monthrange
 from itertools import chain
 
 from typing import Dict, List, Union
@@ -24,34 +25,49 @@ daypart_mapping = [
 def assamble_datetime(now: datetime, dateparts: List[Union[Year, Month, Week, Day, Daypart, Hour, Minute]], bottom: bool = True):
     res_dt = []
 
+    pre_first = True
     for date_type in [Year, Month, Week, Day, Daypart, Hour, Minute]:
         dp_match = [pot_dp for pot_dp in dateparts if isinstance(pot_dp, date_type)]
 
         if date_type == Year:
             if dp_match:
+                pre_first = False
                 res_dt.append(dp_match[0].x)
             else:
                 res_dt.append(now.year)
 
         if date_type == Month:
             if dp_match:
+                pre_first = False
                 res_dt.append(dp_match[0].x)
-            else:
+            elif pre_first:
                 res_dt.append(now.month)
+            elif bottom:
+                res_dt.append(0)
+            else:
+                res_dt.append(12)
 
         if date_type == Week:
             if dp_match:
+                pre_first = False
                 week2dt = monday_of_calenderweek(res_dt[0], dp_match[0].x) + timedelta(days=(0 if bottom else 6))
                 res_dt = [week2dt.year, week2dt.month, week2dt.day]
 
         if date_type == Day and len(res_dt) == 2:
             if dp_match:
+                pre_first = False
                 res_dt.append(dp_match[0].x)
-            else:
+            elif pre_first:
                 res_dt.append(now.day)
+            elif bottom:
+                res_dt.append(1)
+            else:
+                mr = monthrange(res_dt[0], res_dt[1])
+                res_dt.append(mr[1])
 
         if date_type == Daypart:
             if dp_match:
+                pre_first = False
                 dp = dp_match[0].x
                 if bottom:
                     res_dt.append(daypart_mapping[dp][0])
@@ -61,7 +77,10 @@ def assamble_datetime(now: datetime, dateparts: List[Union[Year, Month, Week, Da
 
         if date_type == Hour and len(res_dt) == 3:
             if dp_match:
+                pre_first = False
                 res_dt.append(dp_match[0].x)
+            elif pre_first:
+                res_dt.append(now.hour)
             elif bottom:
                 res_dt.append(0)
             elif not bottom:
@@ -69,7 +88,10 @@ def assamble_datetime(now: datetime, dateparts: List[Union[Year, Month, Week, Da
 
         if date_type == Minute:
             if dp_match:
+                pre_first = False
                 res_dt.append(dp_match[0].x)
+            elif pre_first:
+                res_dt.append(now.minute)
             elif bottom:
                 res_dt.append(0)
             elif not bottom:
@@ -146,8 +168,9 @@ if __name__ == '__main__':
           'ezen a héten',
           'jövő kedden',
           'múlt szombat délután háromkor',
-          'holnap éjjel']
-
+          'holnap éjjel',
+          'jövő januárban',
+          'holnaptól']
 
     for s in ss:
         print()
