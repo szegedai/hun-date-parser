@@ -1,5 +1,6 @@
 from collections import namedtuple
 from copy import copy
+from datetime import date, timedelta
 
 Year = namedtuple('Year', ['x'])
 Month = namedtuple('Month', ['x'])
@@ -86,3 +87,9 @@ def word_to_num(s: str):
         return res['dec'] + res['num']
     else:
         return -1
+
+
+def monday_of_calenderweek(year, week):
+    first = date(year, 1, 1)
+    base = 1 if first.isocalendar()[1] == 1 else 8
+    return first + timedelta(days=base - first.isocalendar()[2] + 7 * (week - 1))

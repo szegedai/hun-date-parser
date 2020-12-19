@@ -40,8 +40,6 @@ def match_time_words(s: str) -> List[Dict[str, Any]]:
     group_rev = re.findall(R_HOUR_MIN_REV, s)
     group_rev = [m for m in group_rev if ''.join(m)]
 
-    print(group, group_rev)
-
     if not (group or group_rev):
         return []
     elif group and not group_rev:
