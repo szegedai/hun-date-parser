@@ -105,12 +105,12 @@ def assamble_datetime(now: datetime, dateparts: List[Union[Year, Month, Week, Da
     return datetime(*res_dt)
 
 
-def match_rules(sentence: str):
+def match_rules(now: datetime, sentence: str):
     matches = [*match_named_month(sentence),
                *match_iso_date(sentence),
-               *match_relative_day(sentence, datetime.now()),
-               *match_weekday(sentence, datetime.now()),
-               *match_week(sentence, datetime.now()),
+               *match_relative_day(sentence, now),
+               *match_weekday(sentence, now),
+               *match_week(sentence, now),
                *match_digi_clock(sentence),
                *match_time_words(sentence)]
 
@@ -134,7 +134,7 @@ class DatetimeExtractor:
         self.now = now
 
     def _get_implicit_intervall(self, sentence_part: str):
-        matches = match_rules(sentence_part)
+        matches = match_rules(self.now, sentence_part)
 
         return [{'start_date': matches, 'end_date': matches}]
 
