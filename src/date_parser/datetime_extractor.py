@@ -11,7 +11,6 @@ from src.date_parser.date_parsers import (match_named_month, match_iso_date, mat
 from src.date_parser.time_parsers import match_digi_clock, match_time_words
 from src.date_parser.utils import Year, Month, Week, Day, Daypart, Hour, Minute, monday_of_calenderweek
 
-
 daypart_mapping = [
     (3, 5),
     (6, 9),
@@ -22,7 +21,8 @@ daypart_mapping = [
 ]
 
 
-def assamble_datetime(now: datetime, dateparts: List[Union[Year, Month, Week, Day, Daypart, Hour, Minute]], bottom: bool = True):
+def assamble_datetime(now: datetime, dateparts: List[Union[Year, Month, Week, Day, Daypart, Hour, Minute]],
+                      bottom: bool = True):
     res_dt = []
 
     pre_first = True
