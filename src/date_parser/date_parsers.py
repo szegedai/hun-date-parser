@@ -21,11 +21,14 @@ def match_iso_date(s: str) -> List[Dict[str, Any]]:
             group = [int(m.lstrip('0')) for m in group if m.lstrip('0')]
 
             if len(group) == 1:
-                res.append({'match': group, 'date_parts': [Year(group[0])]})
+                res.append({'match': group, 'date_parts': [Year(group[0], 'match_iso_date')]})
             elif len(group) == 2:
-                res.append({'match': group, 'date_parts': [Year(group[0]), Month(group[1])]})
+                res.append({'match': group,
+                            'date_parts': [Year(group[0], 'match_iso_date'), Month(group[1], 'match_iso_date')]})
             elif len(group) == 3:
-                res.append({'match': group, 'date_parts': [Year(group[0]), Month(group[1]), Day(group[2])]})
+                res.append({'match': group,
+                            'date_parts': [Year(group[0], 'match_iso_date'), Month(group[1], 'match_iso_date'),
+                                           Day(group[2], 'match_iso_date')]})
 
     return res
 
@@ -45,17 +48,17 @@ def match_named_month(s: str, now: datetime) -> List[Dict[str, Any]]:
         group_res = {'match': group, 'date_parts': []}
         if group[0]:
             if 'jovo' in remove_accent(group[0]):
-                group_res['date_parts'].append(Year(now.year + 1))
+                group_res['date_parts'].append(Year(now.year + 1, 'named_month'))
             elif 'tavaly' in remove_accent(group[0]):
-                group_res['date_parts'].append(Year(now.year - 1))
+                group_res['date_parts'].append(Year(now.year - 1, 'named_month'))
 
         for i, month in enumerate(months):
             if month in remove_accent(group[1]):
-                group_res['date_parts'].append(Month(i + 1))
+                group_res['date_parts'].append(Month(i + 1, 'named_month'))
                 break
 
         if group[2]:
-            group_res['date_parts'].append(Day(int(group[2])))
+            group_res['date_parts'].append(Day(int(group[2]), 'named_month'))
 
         res.append(group_res)
 
@@ -76,19 +79,19 @@ def match_relative_day(s: str, now: datetime) -> List[Dict[str, Any]]:
             group = [m for m in group if m][0]
 
         if 'ma' in group or 'má' in group:
-            res.append({'match': group, 'date_parts': [Year(now.year), Month(now.month), Day(now.day)]})
+            res.append({'match': group, 'date_parts': [Year(now.year, 'relative_day'), Month(now.month, 'relative_day'), Day(now.day, 'relative_day')]})
         elif 'holnapu' in group:
             tom2 = now + timedelta(days=2)
-            res.append({'match': group, 'date_parts': [Year(tom2.year), Month(tom2.month), Day(tom2.day)]})
+            res.append({'match': group, 'date_parts': [Year(tom2.year, 'relative_day'), Month(tom2.month, 'relative_day'), Day(tom2.day, 'relative_day')]})
         elif 'holnap' in group:
             tom = now + timedelta(days=1)
-            res.append({'match': group, 'date_parts': [Year(tom.year), Month(tom.month), Day(tom.day)]})
+            res.append({'match': group, 'date_parts': [Year(tom.year, 'relative_day'), Month(tom.month, 'relative_day'), Day(tom.day, 'relative_day')]})
         elif 'tegnapel' in group:
             yes2 = now - timedelta(days=2)
-            res.append({'match': group, 'date_parts': [Year(yes2.year), Month(yes2.month), Day(yes2.day)]})
+            res.append({'match': group, 'date_parts': [Year(yes2.year, 'relative_day'), Month(yes2.month, 'relative_day'), Day(yes2.day, 'relative_day')]})
         elif 'tegnap' in group:
             yes = now - timedelta(days=1)
-            res.append({'match': group, 'date_parts': [Year(yes.year), Month(yes.month), Day(yes.day)]})
+            res.append({'match': group, 'date_parts': [Year(yes.year, 'relative_day'), Month(yes.month, 'relative_day'), Day(yes.day, 'relative_day')]})
 
     return res
 
@@ -112,25 +115,25 @@ def match_weekday(s: str, now: datetime) -> List[Dict[str, Any]]:
 
         if 'hetfo' in remove_accent(day):
             day = get_day_of_week(n_weeks, 0)
-            date_parts['date_parts'] = [Year(day.year), Month(day.month), Day(day.day)]
+            date_parts['date_parts'] = [Year(day.year, 'weekday'), Month(day.month, 'weekday'), Day(day.day, 'weekday')]
         elif 'kedd' in remove_accent(day):
             day = get_day_of_week(n_weeks, 1)
-            date_parts['date_parts'] = [Year(day.year), Month(day.month), Day(day.day)]
+            date_parts['date_parts'] = [Year(day.year, 'weekday'), Month(day.month, 'weekday'), Day(day.day, 'weekday')]
         elif 'szerda' in remove_accent(day):
             day = get_day_of_week(n_weeks, 2)
-            date_parts['date_parts'] = [Year(day.year), Month(day.month), Day(day.day)]
+            date_parts['date_parts'] = [Year(day.year, 'weekday'), Month(day.month, 'weekday'), Day(day.day, 'weekday')]
         elif 'csut' in remove_accent(day):
             day = get_day_of_week(n_weeks, 3)
-            date_parts['date_parts'] = [Year(day.year), Month(day.month), Day(day.day)]
+            date_parts['date_parts'] = [Year(day.year, 'weekday'), Month(day.month, 'weekday'), Day(day.day, 'weekday')]
         elif 'pent' in remove_accent(day):
             day = get_day_of_week(n_weeks, 4)
-            date_parts['date_parts'] = [Year(day.year), Month(day.month), Day(day.day)]
+            date_parts['date_parts'] = [Year(day.year, 'weekday'), Month(day.month, 'weekday'), Day(day.day, 'weekday')]
         elif 'szom' in remove_accent(day):
             day = get_day_of_week(n_weeks, 5)
-            date_parts['date_parts'] = [Year(day.year), Month(day.month), Day(day.day)]
+            date_parts['date_parts'] = [Year(day.year, 'weekday'), Month(day.month, 'weekday'), Day(day.day, 'weekday')]
         elif 'vas' in remove_accent(day):
             day = get_day_of_week(n_weeks, 6)
-            date_parts['date_parts'] = [Year(day.year), Month(day.month), Day(day.day)]
+            date_parts['date_parts'] = [Year(day.year, 'weekday'), Month(day.month, 'weekday'), Day(day.day, 'weekday')]
 
         res.append(date_parts)
 
@@ -146,13 +149,13 @@ def match_week(s: str, now: datetime) -> List[Dict[str, Any]]:
 
         if 'ez' in group:
             y, w = now.isocalendar()[0:2]
-            date_parts['date_parts'].extend([Year(y), Week(w)])
+            date_parts['date_parts'].extend([Year(y, 'week'), Week(w, 'week')])
         elif 'jovo' in remove_accent(group):
             y, w = (now + timedelta(days=7)).isocalendar()[0:2]
-            date_parts['date_parts'].extend([Year(y), Week(w)])
+            date_parts['date_parts'].extend([Year(y, 'week'), Week(w, 'week')])
         elif 'mult' in remove_accent(group) or 'elozo' in remove_accent(group):
             y, w = (now - timedelta(days=7)).isocalendar()[0:2]
-            date_parts['date_parts'].extend([Year(y), Week(w)])
+            date_parts['date_parts'].extend([Year(y, 'week'), Week(w, 'week')])
 
         res.append(date_parts)
 

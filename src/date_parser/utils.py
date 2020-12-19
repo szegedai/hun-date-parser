@@ -2,14 +2,14 @@ from collections import namedtuple
 from copy import copy
 from datetime import date, timedelta
 
-Year = namedtuple('Year', ['x'])
-Month = namedtuple('Month', ['x'])
-Week = namedtuple('Week', ['x'])
-Day = namedtuple('Day', ['x'])
-Daypart = namedtuple('Daypart', ['x'])
-Hour = namedtuple('Hour', ['x'])
-Minute = namedtuple('Minute', ['x'])
-Second = namedtuple('Second', ['x'])
+Year = namedtuple('Year', ['x', 'rule'])
+Month = namedtuple('Month', ['x', 'rule'])
+Week = namedtuple('Week', ['x', 'rule'])
+Day = namedtuple('Day', ['x', 'rule'])
+Daypart = namedtuple('Daypart', ['x', 'rule'])
+Hour = namedtuple('Hour', ['x', 'rule'])
+Minute = namedtuple('Minute', ['x', 'rule'])
+Second = namedtuple('Second', ['x', 'rule'])
 
 Interval = namedtuple('Interval', ['x', 'y'])
 

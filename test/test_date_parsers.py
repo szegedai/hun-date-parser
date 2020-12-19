@@ -6,11 +6,13 @@ from src.date_parser.date_parsers import (match_iso_date, match_named_month, mat
 
 
 def test_match_iso_date():
-    tf = [('2020-01-15', [[Year(2020), Month(1), Day(15)]]),
-          ('legyen 2020-01 elején', [[Year(2020), Month(1)]]),
-          ('2001-ben történt', [[Year(2001)]]),
-          ('2020-12-30-án', [[Year(2020), Month(12), Day(30)]]),
-          ('2020-12-30-án 2020.12.29', [[Year(2020), Month(12), Day(30)], [Year(2020), Month(12), Day(29)]])]
+    fn = 'match_iso_date'
+    tf = [('2020-01-15', [[Year(2020, fn), Month(1, fn), Day(15, fn)]]),
+          ('legyen 2020-01 elején', [[Year(2020, fn), Month(1, fn)]]),
+          ('2001-ben történt', [[Year(2001, fn)]]),
+          ('2020-12-30-án', [[Year(2020, fn), Month(12, fn), Day(30, fn)]]),
+          ('2020-12-30-án 2020.12.29',
+           [[Year(2020, fn), Month(12, fn), Day(30, fn)], [Year(2020, fn), Month(12, fn), Day(29, fn)]])]
 
     for inp, exp in tf:
         out = match_iso_date(inp)
@@ -21,21 +23,22 @@ def test_match_iso_date():
 
 
 def test_named_month():
+    fn = 'named_month'
     now = datetime(2020, 10, 1)
 
-    tf = [('jan 20-án', [[Month(1), Day(20)]]),
-          ('2020 febr. 4', [[Month(2), Day(4)]]),
-          ('január', [[Month(1)]]),
-          (' február ', [[Month(2)]]),
+    tf = [('jan 20-án', [[Month(1, fn), Day(20, fn)]]),
+          ('2020 febr. 4', [[Month(2, fn), Day(4, fn)]]),
+          ('január', [[Month(1, fn)]]),
+          (' február ', [[Month(2, fn)]]),
           ('janos', []),
           ('', []),
-          ('2020 július', [[Month(7)]]),
-          ('2020 június - augusztus 30', [[Month(6)], [Month(8), Day(30)]]),
-          ('június 20 - július 30', [[Month(6), Day(20)], [Month(7), Day(30)]]),
-          ('tavaly február ', [[Year(2019), Month(2)]]),
-          ('legyen jövő február 12-én', [[Year(2021), Month(2), Day(12)]]),
-          ('legyen jövő év február 12-én', [[Year(2021), Month(2), Day(12)]]),
-          ('legyen jövőre február 12-én', [[Year(2021), Month(2), Day(12)]])]
+          ('2020 július', [[Month(7, fn)]]),
+          ('2020 június - augusztus 30', [[Month(6, fn)], [Month(8, fn), Day(30, fn)]]),
+          ('június 20 - július 30', [[Month(6, fn), Day(20, fn)], [Month(7, fn), Day(30, fn)]]),
+          ('tavaly február ', [[Year(2019, fn), Month(2, fn)]]),
+          ('legyen jövő február 12-én', [[Year(2021, fn), Month(2, fn), Day(12, fn)]]),
+          ('legyen jövő év február 12-én', [[Year(2021, fn), Month(2, fn), Day(12, fn)]]),
+          ('legyen jövőre február 12-én', [[Year(2021, fn), Month(2, fn), Day(12, fn)]])]
 
     for inp, exp in tf:
         out = match_named_month(inp, now)
@@ -46,13 +49,14 @@ def test_named_month():
 
 
 def test_match_relative_day():
+    fn = 'relative_day'
     now = datetime(2020, 10, 1)
 
-    tf = [('ma', [[Year(2020), Month(10), Day(1)]]),
-          ('ma-holnap', [[Year(2020), Month(10), Day(1)], [Year(2020), Month(10), Day(2)]]),
-          ('holnapután reggel nyolc', [[Year(2020), Month(10), Day(3)]]),
-          ('legyen ma reggel', [[Year(2020), Month(10), Day(1)]]),
-          ('miért nem jöttél tegnap? na majd ma', [[Year(2020), Month(10), Day(1)], [Year(2020), Month(9), Day(30)]])]
+    tf = [('ma', [[Year(2020, fn), Month(10, fn), Day(1, fn)]]),
+          ('ma-holnap', [[Year(2020, fn), Month(10, fn), Day(1, fn)], [Year(2020, fn), Month(10, fn), Day(2, fn)]]),
+          ('holnapután reggel nyolc', [[Year(2020, fn), Month(10, fn), Day(3, fn)]]),
+          ('legyen ma reggel', [[Year(2020, fn), Month(10, fn), Day(1, fn)]]),
+          ('miért nem jöttél tegnap? na majd ma', [[Year(2020, fn), Month(10, fn), Day(1, fn)], [Year(2020, fn), Month(9, fn), Day(30, fn)]])]
 
     for inp, exp in tf:
         out = match_relative_day(inp, now)
@@ -62,13 +66,14 @@ def test_match_relative_day():
         assert date_parts == exp
 
 
-def test_match_relative_day():
-    now = datetime(2020, 12, 7) # monday
+def test_match_weekday():
+    fn = 'weekday'
+    now = datetime(2020, 12, 7)  # monday
 
-    tf = [('múlt vasárnap', [[Year(2020), Month(12), Day(6)]]),
-          ('ezen a heten hetfon', [[Year(2020), Month(12), Day(7)]]),
-          ('jövő kedden', [[Year(2020), Month(12), Day(15)]]),
-          ('előző szombaton ', [[Year(2020), Month(12), Day(5)]]),
+    tf = [('múlt vasárnap', [[Year(2020, fn), Month(12, fn), Day(6, fn)]]),
+          ('ezen a heten hetfon', [[Year(2020, fn), Month(12, fn), Day(7, fn)]]),
+          ('jövő kedden', [[Year(2020, fn), Month(12, fn), Day(15, fn)]]),
+          ('előző szombaton ', [[Year(2020, fn), Month(12, fn), Day(5, fn)]]),
           ('miért nem jöttél tegnap? na majd ma', [])]
 
     for inp, exp in tf:
@@ -79,13 +84,14 @@ def test_match_relative_day():
         assert date_parts == exp
 
 
-def test_match_relative_week():
+def test_match_match_week():
+    fn = 'week'
     now = datetime(2020, 12, 7)
 
-    tf = [('múlthéten', [[Year(2020), Week(49)]]),
-          ('múlt hét kedden', [[Year(2020), Week(49)]]),
-          ('ezen a heten hetfon', [[Year(2020), Week(50)]]),
-          ('jövőhéten', [[Year(2020), Week(51)]]),
+    tf = [('múlthéten', [[Year(2020, fn), Week(49, fn)]]),
+          ('múlt hét kedden', [[Year(2020, fn), Week(49, fn)]]),
+          ('ezen a heten hetfon', [[Year(2020, fn), Week(50, fn)]]),
+          ('jövőhéten', [[Year(2020, fn), Week(51, fn)]]),
           ('legyen ma', [])]
 
     for inp, exp in tf:
