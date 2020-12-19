@@ -30,7 +30,7 @@ def match_iso_date(s: str) -> List[Dict[str, Any]]:
     return res
 
 
-def match_named_month(s: str) -> List[Dict[str, Any]]:
+def match_named_month(s: str, now: datetime) -> List[Dict[str, Any]]:
     """
     Match named month and day
     :param s: textual input
@@ -40,16 +40,22 @@ def match_named_month(s: str) -> List[Dict[str, Any]]:
     months = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'szep', 'okt', 'nov', 'dec']
 
     res = []
-    groups = [(m, d.lstrip('0')) if d else [m] for m, d in groups]
+    groups = [(mod, m, d.lstrip('0')) if d else (mod, m, '') for mod, m, d in groups]
     for group in groups:
         group_res = {'match': group, 'date_parts': []}
+        if group[0]:
+            if 'jovo' in remove_accent(group[0]):
+                group_res['date_parts'].append(Year(now.year + 1))
+            elif 'tavaly' in remove_accent(group[0]):
+                group_res['date_parts'].append(Year(now.year - 1))
+
         for i, month in enumerate(months):
-            if month in remove_accent(group[0]):
+            if month in remove_accent(group[1]):
                 group_res['date_parts'].append(Month(i + 1))
                 break
 
-        if len(group) == 2:
-            group_res['date_parts'].append(Day(int(group[1])))
+        if group[2]:
+            group_res['date_parts'].append(Day(int(group[2])))
 
         res.append(group_res)
 

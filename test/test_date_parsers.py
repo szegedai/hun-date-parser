@@ -21,6 +21,8 @@ def test_match_iso_date():
 
 
 def test_named_month():
+    now = datetime(2020, 10, 1)
+
     tf = [('jan 20-án', [[Month(1), Day(20)]]),
           ('2020 febr. 4', [[Month(2), Day(4)]]),
           ('január', [[Month(1)]]),
@@ -29,10 +31,14 @@ def test_named_month():
           ('', []),
           ('2020 július', [[Month(7)]]),
           ('2020 június - augusztus 30', [[Month(6)], [Month(8), Day(30)]]),
-          ('június 20 - július 30', [[Month(6), Day(20)], [Month(7), Day(30)]])]
+          ('június 20 - július 30', [[Month(6), Day(20)], [Month(7), Day(30)]]),
+          ('tavaly február ', [[Year(2019), Month(2)]]),
+          ('legyen jövő február 12-én', [[Year(2021), Month(2), Day(12)]]),
+          ('legyen jövő év február 12-én', [[Year(2021), Month(2), Day(12)]]),
+          ('legyen jövőre február 12-én', [[Year(2021), Month(2), Day(12)]])]
 
     for inp, exp in tf:
-        out = match_named_month(inp)
+        out = match_named_month(inp, now)
         date_parts = []
         for e in out:
             date_parts.append(e['date_parts'])
