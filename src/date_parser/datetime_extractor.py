@@ -106,7 +106,7 @@ def assamble_datetime(now: datetime, dateparts: List[Union[Year, Month, Week, Da
 
 
 def match_rules(now: datetime, sentence: str):
-    matches = [*match_named_month(sentence),
+    matches = [*match_named_month(sentence, now),
                *match_iso_date(sentence),
                *match_relative_day(sentence, now),
                *match_weekday(sentence, now),
@@ -170,11 +170,12 @@ if __name__ == '__main__':
           'múlt szombat délután háromkor',
           'holnap éjjel',
           'jövő januárban',
-          'holnaptól']
+          '2020 decemberétől']
 
     for s in ss:
         print()
+        print(s)
         pd = de.parse_datetime(s)[0]
 
-        print(s)
+
         print(pd)
