@@ -146,8 +146,8 @@ class DatetimeExtractor:
             interval = match_interval(sentence_part)
 
             if interval:
-                interval['start_date'] = match_rules(interval['start_date'])
-                interval['end_date'] = match_rules(interval['end_date'])
+                interval['start_date'] = match_rules(self.now, interval['start_date'])
+                interval['end_date'] = match_rules(self.now, interval['end_date'])
                 parsed_dates.append(interval)
             else:
                 parsed_dates += self._get_implicit_intervall(sentence_part)
