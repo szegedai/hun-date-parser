@@ -21,9 +21,12 @@ daypart_mapping = [
 ]
 
 
-def assamble_datetime(now: datetime, dateparts: List[Union[Year, Month, Week, Day, Daypart, Hour, Minute]],
+def assamble_datetime(now: datetime, dateparts: Union[List[Union[Year, Month, Week, Day, Daypart, Hour, Minute]], str],
                       bottom: bool = True):
     res_dt = []
+
+    if dateparts == 'OPEN':
+        return 'OPEN'
 
     pre_first = True
     for date_type in [Year, Month, Week, Day, Daypart, Hour, Minute]:
@@ -120,6 +123,9 @@ def match_rules(now: datetime, sentence: str):
 
 
 def extend_start_end(interval: Dict):
+    if interval['start_date'] == 'OPEN' or interval['end_date'] == 'OPEN':
+        return interval
+
     interval_ = copy(interval)
     for dp in interval['start_date']:
         if type(dp) not in [type(d) for d in interval['end_date']]:
@@ -146,8 +152,8 @@ class DatetimeExtractor:
             interval = match_interval(sentence_part)
 
             if interval:
-                interval['start_date'] = match_rules(self.now, interval['start_date'])
-                interval['end_date'] = match_rules(self.now, interval['end_date'])
+                interval['start_date'] = 'OPEN' if interval['start_date'] == 'OPEN' else match_rules(self.now, interval['start_date'])
+                interval['end_date'] = 'OPEN' if interval['end_date'] == 'OPEN' else match_rules(self.now, interval['end_date'])
                 parsed_dates.append(interval)
             else:
                 parsed_dates += self._get_implicit_intervall(sentence_part)
@@ -170,12 +176,11 @@ if __name__ == '__main__':
           'múlt szombat délután háromkor',
           'holnap éjjel',
           'jövő januárban',
-          '2020 decemberétől']
+          '2020 decemberétől',
+          '2020 decemberéig']
 
     for s in ss:
         print()
         print(s)
         pd = de.parse_datetime(s)[0]
-
-
         print(pd)
