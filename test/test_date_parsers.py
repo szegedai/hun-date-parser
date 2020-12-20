@@ -56,7 +56,8 @@ def test_match_relative_day():
           ('ma-holnap', [[Year(2020, fn), Month(10, fn), Day(1, fn)], [Year(2020, fn), Month(10, fn), Day(2, fn)]]),
           ('holnapután reggel nyolc', [[Year(2020, fn), Month(10, fn), Day(3, fn)]]),
           ('legyen ma reggel', [[Year(2020, fn), Month(10, fn), Day(1, fn)]]),
-          ('miért nem jöttél tegnap? na majd ma', [[Year(2020, fn), Month(10, fn), Day(1, fn)], [Year(2020, fn), Month(9, fn), Day(30, fn)]])]
+          ('miért nem jöttél tegnap? na majd ma',
+           [[Year(2020, fn), Month(10, fn), Day(1, fn)], [Year(2020, fn), Month(9, fn), Day(30, fn)]])]
 
     for inp, exp in tf:
         out = match_relative_day(inp, now)

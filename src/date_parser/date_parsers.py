@@ -79,19 +79,26 @@ def match_relative_day(s: str, now: datetime) -> List[Dict[str, Any]]:
             group = [m for m in group if m][0]
 
         if 'ma' in group or 'má' in group:
-            res.append({'match': group, 'date_parts': [Year(now.year, 'relative_day'), Month(now.month, 'relative_day'), Day(now.day, 'relative_day')]})
+            res.append({'match': group, 'date_parts': [Year(now.year, 'relative_day'), Month(now.month, 'relative_day'),
+                                                       Day(now.day, 'relative_day')]})
         elif 'holnapu' in group:
             tom2 = now + timedelta(days=2)
-            res.append({'match': group, 'date_parts': [Year(tom2.year, 'relative_day'), Month(tom2.month, 'relative_day'), Day(tom2.day, 'relative_day')]})
+            res.append({'match': group,
+                        'date_parts': [Year(tom2.year, 'relative_day'), Month(tom2.month, 'relative_day'),
+                                       Day(tom2.day, 'relative_day')]})
         elif 'holnap' in group:
             tom = now + timedelta(days=1)
-            res.append({'match': group, 'date_parts': [Year(tom.year, 'relative_day'), Month(tom.month, 'relative_day'), Day(tom.day, 'relative_day')]})
+            res.append({'match': group, 'date_parts': [Year(tom.year, 'relative_day'), Month(tom.month, 'relative_day'),
+                                                       Day(tom.day, 'relative_day')]})
         elif 'tegnapel' in group:
             yes2 = now - timedelta(days=2)
-            res.append({'match': group, 'date_parts': [Year(yes2.year, 'relative_day'), Month(yes2.month, 'relative_day'), Day(yes2.day, 'relative_day')]})
+            res.append({'match': group,
+                        'date_parts': [Year(yes2.year, 'relative_day'), Month(yes2.month, 'relative_day'),
+                                       Day(yes2.day, 'relative_day')]})
         elif 'tegnap' in group:
             yes = now - timedelta(days=1)
-            res.append({'match': group, 'date_parts': [Year(yes.year, 'relative_day'), Month(yes.month, 'relative_day'), Day(yes.day, 'relative_day')]})
+            res.append({'match': group, 'date_parts': [Year(yes.year, 'relative_day'), Month(yes.month, 'relative_day'),
+                                                       Day(yes.day, 'relative_day')]})
 
     return res
 
