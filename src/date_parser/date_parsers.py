@@ -3,8 +3,8 @@ from typing import Dict, List, Any
 from datetime import datetime, timedelta
 
 from .patterns import (R_ISO_DATE, R_NAMED_MONTH, R_TODAY, R_TOMORROW, R_NTOMORROW, R_YESTERDAY, R_NYESTERDAY,
-                       R_WEEKDAY, R_WEEK)
-from .utils import remove_accent, Year, Month, Week, Day
+                       R_WEEKDAY, R_WEEK, R_YEAR)
+from .utils import remove_accent, word_to_num, Year, Month, Week, Day
 
 
 def match_iso_date(s: str) -> List[Dict[str, Any]]:
@@ -156,6 +156,35 @@ def match_week(s: str, now: datetime) -> List[Dict[str, Any]]:
         elif 'mult' in remove_accent(group) or 'elozo' in remove_accent(group):
             y, w = (now - timedelta(days=7)).isocalendar()[0:2]
             date_parts['date_parts'].extend([Year(y, 'week'), Week(w, 'week')])
+
+        res.append(date_parts)
+
+    return res
+
+
+def match_named_year(s: str, now: datetime) -> List[Dict[str, Any]]:
+    groups = re.findall(R_YEAR, s)
+
+    res = []
+    for group in groups:
+        date_parts = {'match': group, 'date_parts': []}
+
+        if 'tavalyelott' in remove_accent(group):
+            date_parts['date_parts'] = [Year(now.year - 2, 'named_year')]
+        elif 'tavaly' in remove_accent(group):
+            date_parts['date_parts'] = [Year(now.year - 1, 'named_year')]
+        elif 'iden' in remove_accent(group):
+            date_parts['date_parts'] = [Year(now.year, 'named_year')]
+        elif 'jovo' in remove_accent(group):
+            date_parts['date_parts'] = [Year(now.year + 1, 'named_year')]
+        elif 'mulva' in remove_accent(group):
+            num_after = word_to_num(group)
+            if num_after != -1:
+                date_parts['date_parts'] = [Year(now.year + num_after, 'named_year')]
+        elif 'ezelott' in remove_accent(group) or 'korabban' in remove_accent(group):
+            num_before = word_to_num(group)
+            if num_before != -1:
+                date_parts['date_parts'] = [Year(now.year - num_before, 'named_year')]
 
         res.append(date_parts)
 

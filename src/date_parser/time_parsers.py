@@ -64,6 +64,12 @@ def match_time_words(s: str) -> List[Dict[str, Any]]:
             am = False
 
     if hour:
+        # this is made redundant by the change in the patterns
+        non_hours = ['ev', 'perc']
+        for nh in non_hours:
+            if f' {nh}' in remove_accent(hour) or remove_accent(hour).startswith(nh):
+                return []
+
         hour_num = word_to_num(hour)
         minute_num = word_to_num(minute)
 
@@ -85,6 +91,12 @@ def match_time_words(s: str) -> List[Dict[str, Any]]:
                 hour_num += 12
 
         if minute or hour_modifier:
+            # this is made redundant by the change in the patterns
+            non_minutes = ['ev', 'ora']
+            for nm in non_minutes:
+                if f' {nm}' in remove_accent(minute) or remove_accent(minute).startswith(nm):
+                    return []
+
             if 'elott' in remove_accent(minute) and not hour_modifier:
                 hour_num -= (minute_num // 60) + 1
                 hour_num = hour_num if hour_num >= 0 else 23

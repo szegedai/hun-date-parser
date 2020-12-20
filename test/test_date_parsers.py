@@ -2,7 +2,7 @@ from datetime import datetime
 
 from src.date_parser.date_parsers import Year, Month, Week, Day
 from src.date_parser.date_parsers import (match_iso_date, match_named_month, match_relative_day, match_weekday,
-                                          match_week)
+                                          match_week, match_named_year)
 
 
 def test_match_iso_date():
@@ -96,6 +96,26 @@ def test_match_match_week():
 
     for inp, exp in tf:
         out = match_week(inp, now)
+        date_parts = []
+        for e in out:
+            date_parts.append(e['date_parts'])
+        assert date_parts == exp
+
+
+def test_match_named_year():
+    fn = 'named_year'
+    now = datetime(2020, 12, 7)
+
+    tf = [('tavaly', [[Year(2019, fn)]]),
+          ('múlt hét kedden', []),
+          ('legyen meg még idén légyszi', [[Year(2020, fn)]]),
+          ('kb két év múlva', [[Year(2022, fn)]]),
+          ('tavalyelőtt történt', [[Year(2018, fn)]]),
+          ('40 év múlva', [[Year(2060, fn)]]),
+          ('kb három évvel ezelőtt', [[Year(2017, fn)]])]
+
+    for inp, exp in tf:
+        out = match_named_year(inp, now)
         date_parts = []
         for e in out:
             date_parts.append(e['date_parts'])

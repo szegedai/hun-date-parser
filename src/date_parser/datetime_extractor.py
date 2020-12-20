@@ -7,7 +7,7 @@ from copy import copy
 
 from src.date_parser.structure_parsers import match_multi_match, match_interval
 from src.date_parser.date_parsers import (match_named_month, match_iso_date, match_weekday, match_relative_day,
-                                          match_week)
+                                          match_week, match_named_year)
 from src.date_parser.time_parsers import match_digi_clock, match_time_words
 from src.date_parser.utils import Year, Month, Week, Day, Daypart, Hour, Minute, monday_of_calenderweek
 
@@ -25,8 +25,12 @@ def assamble_datetime(now: datetime, dateparts: Union[List[Union[Year, Month, We
                       bottom: bool = True):
     res_dt = []
 
+    print(dateparts)
+
     if dateparts == 'OPEN':
-        return 'OPEN'
+        return None
+    if not dateparts:
+        return None
 
     pre_first = True
     for date_type in [Year, Month, Week, Day, Daypart, Hour, Minute]:
@@ -46,7 +50,7 @@ def assamble_datetime(now: datetime, dateparts: Union[List[Union[Year, Month, We
             elif pre_first:
                 res_dt.append(now.month)
             elif bottom:
-                res_dt.append(0)
+                res_dt.append(1)
             else:
                 res_dt.append(12)
 
@@ -114,6 +118,7 @@ def match_rules(now: datetime, sentence: str):
                *match_relative_day(sentence, now),
                *match_weekday(sentence, now),
                *match_week(sentence, now),
+               *match_named_year(sentence, now),
                *match_digi_clock(sentence),
                *match_time_words(sentence)]
 
@@ -177,7 +182,9 @@ if __name__ == '__main__':
           'holnap éjjel',
           'jövő januárban',
           '2020 decemberétől',
-          '2020 decemberéig']
+          '2020 decemberéig',
+          'ennek a kezdete kb 20 évvel ezelőtt volt lesz',
+          'két évvel ezelőtt']
 
     for s in ss:
         print()

@@ -46,7 +46,9 @@ def test_match_time_words():
           ('délután fél négy után hat perccel', [[Hour(15, fn), Minute(36, fn)]]),
           ('6 óra után 3 perccel', [[Hour(6, fn), Minute(3, fn)]]),
           ('ezen a héten', []),
-          ('2020 december', [])]
+          ('2020 december', []),
+          ('kb húsz év múlva', []),
+          ('kb húsz évvel ezelőtt', [])]
 
     for inp, exp in tf:
         out = match_time_words(inp)
