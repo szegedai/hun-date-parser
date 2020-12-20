@@ -7,7 +7,7 @@ from copy import copy
 
 from src.date_parser.structure_parsers import match_multi_match, match_interval
 from src.date_parser.date_parsers import (match_named_month, match_iso_date, match_weekday, match_relative_day,
-                                          match_week)
+                                          match_week, match_named_year)
 from src.date_parser.time_parsers import match_digi_clock, match_time_words
 from src.date_parser.utils import Year, Month, Week, Day, Daypart, Hour, Minute, monday_of_calenderweek
 
@@ -21,9 +21,16 @@ daypart_mapping = [
 ]
 
 
-def assamble_datetime(now: datetime, dateparts: List[Union[Year, Month, Week, Day, Daypart, Hour, Minute]],
+def assamble_datetime(now: datetime, dateparts: Union[List[Union[Year, Month, Week, Day, Daypart, Hour, Minute]], str],
                       bottom: bool = True):
     res_dt = []
+
+    print(dateparts)
+
+    if dateparts == 'OPEN':
+        return None
+    if not dateparts:
+        return None
 
     pre_first = True
     for date_type in [Year, Month, Week, Day, Daypart, Hour, Minute]:
@@ -32,31 +39,31 @@ def assamble_datetime(now: datetime, dateparts: List[Union[Year, Month, Week, Da
         if date_type == Year:
             if dp_match:
                 pre_first = False
-                res_dt.append(dp_match[0].x)
+                res_dt.append(dp_match[0][0])
             else:
                 res_dt.append(now.year)
 
         if date_type == Month:
             if dp_match:
                 pre_first = False
-                res_dt.append(dp_match[0].x)
+                res_dt.append(dp_match[0][0])
             elif pre_first:
                 res_dt.append(now.month)
             elif bottom:
-                res_dt.append(0)
+                res_dt.append(1)
             else:
                 res_dt.append(12)
 
         if date_type == Week:
             if dp_match:
                 pre_first = False
-                week2dt = monday_of_calenderweek(res_dt[0], dp_match[0].x) + timedelta(days=(0 if bottom else 6))
+                week2dt = monday_of_calenderweek(res_dt[0], dp_match[0][0]) + timedelta(days=(0 if bottom else 6))
                 res_dt = [week2dt.year, week2dt.month, week2dt.day]
 
         if date_type == Day and len(res_dt) == 2:
             if dp_match:
                 pre_first = False
-                res_dt.append(dp_match[0].x)
+                res_dt.append(dp_match[0][0])
             elif pre_first:
                 res_dt.append(now.day)
             elif bottom:
@@ -68,17 +75,18 @@ def assamble_datetime(now: datetime, dateparts: List[Union[Year, Month, Week, Da
         if date_type == Daypart:
             if dp_match:
                 pre_first = False
-                dp = dp_match[0].x
+                dp = dp_match[0][0]
                 if bottom:
                     res_dt.append(daypart_mapping[dp][0])
                 else:
-                    next_day = datetime(*res_dt) + timedelta(days=1)
+                    y, m, d, h, mi, se = res_dt
+                    next_day = datetime(y, m, d, h, mi, se) + timedelta(days=1)
                     res_dt = [next_day.year, next_day.month, next_day.day, daypart_mapping[dp][1]]
 
         if date_type == Hour and len(res_dt) == 3:
             if dp_match:
                 pre_first = False
-                res_dt.append(dp_match[0].x)
+                res_dt.append(dp_match[0][0])
             elif pre_first:
                 res_dt.append(now.hour)
             elif bottom:
@@ -89,7 +97,7 @@ def assamble_datetime(now: datetime, dateparts: List[Union[Year, Month, Week, Da
         if date_type == Minute:
             if dp_match:
                 pre_first = False
-                res_dt.append(dp_match[0].x)
+                res_dt.append(dp_match[0][0])
             elif pre_first:
                 res_dt.append(now.minute)
             elif bottom:
@@ -102,15 +110,17 @@ def assamble_datetime(now: datetime, dateparts: List[Union[Year, Month, Week, Da
     else:
         res_dt.append(59)
 
-    return datetime(*res_dt)
+    y, m, d, h, mi, se = res_dt
+    return datetime(y, m, d, h, mi, se)
 
 
 def match_rules(now: datetime, sentence: str):
-    matches = [*match_named_month(sentence),
+    matches = [*match_named_month(sentence, now),
                *match_iso_date(sentence),
                *match_relative_day(sentence, now),
                *match_weekday(sentence, now),
                *match_week(sentence, now),
+               *match_named_year(sentence, now),
                *match_digi_clock(sentence),
                *match_time_words(sentence)]
 
@@ -120,6 +130,9 @@ def match_rules(now: datetime, sentence: str):
 
 
 def extend_start_end(interval: Dict):
+    if interval['start_date'] == 'OPEN' or interval['end_date'] == 'OPEN':
+        return interval
+
     interval_ = copy(interval)
     for dp in interval['start_date']:
         if type(dp) not in [type(d) for d in interval['end_date']]:
@@ -146,8 +159,10 @@ class DatetimeExtractor:
             interval = match_interval(sentence_part)
 
             if interval:
-                interval['start_date'] = match_rules(self.now, interval['start_date'])
-                interval['end_date'] = match_rules(self.now, interval['end_date'])
+                interval['start_date'] = 'OPEN' if interval['start_date'] == 'OPEN' else match_rules(self.now, interval[
+                    'start_date'])
+                interval['end_date'] = 'OPEN' if interval['end_date'] == 'OPEN' else match_rules(self.now,
+                                                                                                 interval['end_date'])
                 parsed_dates.append(interval)
             else:
                 parsed_dates += self._get_implicit_intervall(sentence_part)
@@ -170,11 +185,13 @@ if __name__ == '__main__':
           'múlt szombat délután háromkor',
           'holnap éjjel',
           'jövő januárban',
-          'holnaptól']
+          '2020 decemberétől',
+          '2020 decemberéig',
+          'ennek a kezdete kb 20 évvel ezelőtt volt lesz',
+          'két évvel ezelőtt']
 
     for s in ss:
         print()
-        pd = de.parse_datetime(s)[0]
-
         print(s)
+        pd = de.parse_datetime(s)[0]
         print(pd)

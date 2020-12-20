@@ -1,17 +1,15 @@
-from collections import namedtuple
+from typing import NamedTuple
 from copy import copy
 from datetime import date, timedelta
 
-Year = namedtuple('Year', ['x'])
-Month = namedtuple('Month', ['x'])
-Week = namedtuple('Week', ['x'])
-Day = namedtuple('Day', ['x'])
-Daypart = namedtuple('Daypart', ['x'])
-Hour = namedtuple('Hour', ['x'])
-Minute = namedtuple('Minute', ['x'])
-Second = namedtuple('Second', ['x'])
-
-Interval = namedtuple('Interval', ['x', 'y'])
+Year = NamedTuple('Year', [('x', int), ('rule', str)])
+Month = NamedTuple('Month', [('x', int), ('rule', str)])
+Week = NamedTuple('Week', [('x', int), ('rule', str)])
+Day = NamedTuple('Day', [('x', int), ('rule', str)])
+Daypart = NamedTuple('Daypart', [('x', int), ('rule', str)])
+Hour = NamedTuple('Hour', [('x', int), ('rule', str)])
+Minute = NamedTuple('Minute', [('x', int), ('rule', str)])
+Second = NamedTuple('Second', [('x', int), ('rule', str)])
 
 
 def remove_accent(s: str):

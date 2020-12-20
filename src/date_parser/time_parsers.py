@@ -22,9 +22,9 @@ def match_digi_clock(s: str) -> List[Dict[str, Any]]:
 
         if len(group) == 2:
             h, m = group
-            res.append({'match': group, 'date_parts': [Hour(h), Minute(m)]})
+            res.append({'match': group, 'date_parts': [Hour(h, 'digi_clock'), Minute(m, 'digi_clock')]})
         elif len(group) == 1:
-            res.append({'match': group, 'date_parts': [Hour(group[0])]})
+            res.append({'match': group, 'date_parts': [Hour(group[0], 'digi_clock')]})
 
     return res
 
@@ -64,6 +64,12 @@ def match_time_words(s: str) -> List[Dict[str, Any]]:
             am = False
 
     if hour:
+        # this is made redundant by the change in the patterns
+        non_hours = ['ev', 'perc']
+        for nh in non_hours:
+            if f' {nh}' in remove_accent(hour) or remove_accent(hour).startswith(nh):
+                return []
+
         hour_num = word_to_num(hour)
         minute_num = word_to_num(minute)
 
@@ -85,10 +91,16 @@ def match_time_words(s: str) -> List[Dict[str, Any]]:
                 hour_num += 12
 
         if minute or hour_modifier:
+            # this is made redundant by the change in the patterns
+            non_minutes = ['ev', 'ora']
+            for nm in non_minutes:
+                if f' {nm}' in remove_accent(minute) or remove_accent(minute).startswith(nm):
+                    return []
+
             if 'elott' in remove_accent(minute) and not hour_modifier:
                 hour_num -= (minute_num // 60) + 1
                 hour_num = hour_num if hour_num >= 0 else 23
-                date_parts.extend([Hour(hour_num), Minute(60-(minute_num % 60))])
+                date_parts.extend([Hour(hour_num, 'time_words'), Minute(60-(minute_num % 60), 'time_words')])
             elif 'elott' in remove_accent(minute) and hour_modifier:
                 n_minutes_before = word_to_num(minute)
                 if n_minutes_before != NAN:
@@ -97,7 +109,7 @@ def match_time_words(s: str) -> List[Dict[str, Any]]:
                     hour_num += (minute_num // 60)
                     hour_num = hour_num if hour_num >= 0 else 23
                     minute_num = minute_num % 60
-                date_parts.extend([Hour(hour_num), Minute(minute_num)])
+                date_parts.extend([Hour(hour_num, 'time_words'), Minute(minute_num, 'time_words')])
             elif hour_modifier:
                 n_minutes_after = word_to_num(minute)
                 if n_minutes_after != NAN:
@@ -106,27 +118,27 @@ def match_time_words(s: str) -> List[Dict[str, Any]]:
                     hour_num += (minute_num // 60)
                     hour_num = hour_num if hour_num <= 23 else 0
                     minute_num = minute_num % 60
-                date_parts.extend([Hour(hour_num), Minute(minute_num)])
+                date_parts.extend([Hour(hour_num, 'time_words'), Minute(minute_num, 'time_words')])
             else:
-                date_parts.extend([Hour(hour_num), Minute(minute_num)])
+                date_parts.extend([Hour(hour_num, 'time_words'), Minute(minute_num, 'time_words')])
 
         else:
-            date_parts.append(Hour(hour_num))
+            date_parts.append(Hour(hour_num, 'time_words'))
 
         res.append({'match': group, 'date_parts': date_parts})
 
     elif daypart:
         if 'hajnal' in daypart:
-            res.append({'match': group, 'date_parts': [Daypart(0)]})
+            res.append({'match': group, 'date_parts': [Daypart(0, 'time_words')]})
         elif 'reggel' in daypart:
-            res.append({'match': group, 'date_parts': [Daypart(1)]})
+            res.append({'match': group, 'date_parts': [Daypart(1, 'time_words')]})
         elif 'delelott' in remove_accent(daypart):
-            res.append({'match': group, 'date_parts': [Daypart(2)]})
+            res.append({'match': group, 'date_parts': [Daypart(2, 'time_words')]})
         elif 'delutan' in remove_accent(daypart):
-            res.append({'match': group, 'date_parts': [Daypart(3)]})
+            res.append({'match': group, 'date_parts': [Daypart(3, 'time_words')]})
         elif 'este' in daypart:
-            res.append({'match': group, 'date_parts': [Daypart(4)]})
+            res.append({'match': group, 'date_parts': [Daypart(4, 'time_words')]})
         elif 'ejjel' in remove_accent(daypart):
-            res.append({'match': group, 'date_parts': [Daypart(5)]})
+            res.append({'match': group, 'date_parts': [Daypart(5, 'time_words')]})
 
     return res
