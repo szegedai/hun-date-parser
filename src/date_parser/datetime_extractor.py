@@ -39,14 +39,14 @@ def assamble_datetime(now: datetime, dateparts: Union[List[Union[Year, Month, We
         if date_type == Year:
             if dp_match:
                 pre_first = False
-                res_dt.append(dp_match[0].x)
+                res_dt.append(dp_match[0][0])
             else:
                 res_dt.append(now.year)
 
         if date_type == Month:
             if dp_match:
                 pre_first = False
-                res_dt.append(dp_match[0].x)
+                res_dt.append(dp_match[0][0])
             elif pre_first:
                 res_dt.append(now.month)
             elif bottom:
@@ -57,13 +57,13 @@ def assamble_datetime(now: datetime, dateparts: Union[List[Union[Year, Month, We
         if date_type == Week:
             if dp_match:
                 pre_first = False
-                week2dt = monday_of_calenderweek(res_dt[0], dp_match[0].x) + timedelta(days=(0 if bottom else 6))
+                week2dt = monday_of_calenderweek(res_dt[0], dp_match[0][0]) + timedelta(days=(0 if bottom else 6))
                 res_dt = [week2dt.year, week2dt.month, week2dt.day]
 
         if date_type == Day and len(res_dt) == 2:
             if dp_match:
                 pre_first = False
-                res_dt.append(dp_match[0].x)
+                res_dt.append(dp_match[0][0])
             elif pre_first:
                 res_dt.append(now.day)
             elif bottom:
@@ -75,17 +75,18 @@ def assamble_datetime(now: datetime, dateparts: Union[List[Union[Year, Month, We
         if date_type == Daypart:
             if dp_match:
                 pre_first = False
-                dp = dp_match[0].x
+                dp = dp_match[0][0]
                 if bottom:
                     res_dt.append(daypart_mapping[dp][0])
                 else:
-                    next_day = datetime(*res_dt) + timedelta(days=1)
+                    y, m, d, h, mi, se = res_dt
+                    next_day = datetime(y, m, d, h, mi, se) + timedelta(days=1)
                     res_dt = [next_day.year, next_day.month, next_day.day, daypart_mapping[dp][1]]
 
         if date_type == Hour and len(res_dt) == 3:
             if dp_match:
                 pre_first = False
-                res_dt.append(dp_match[0].x)
+                res_dt.append(dp_match[0][0])
             elif pre_first:
                 res_dt.append(now.hour)
             elif bottom:
@@ -96,7 +97,7 @@ def assamble_datetime(now: datetime, dateparts: Union[List[Union[Year, Month, We
         if date_type == Minute:
             if dp_match:
                 pre_first = False
-                res_dt.append(dp_match[0].x)
+                res_dt.append(dp_match[0][0])
             elif pre_first:
                 res_dt.append(now.minute)
             elif bottom:
@@ -109,7 +110,8 @@ def assamble_datetime(now: datetime, dateparts: Union[List[Union[Year, Month, We
     else:
         res_dt.append(59)
 
-    return datetime(*res_dt)
+    y, m, d, h, mi, se = res_dt
+    return datetime(y, m, d, h, mi, se)
 
 
 def match_rules(now: datetime, sentence: str):
