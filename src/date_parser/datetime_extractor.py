@@ -9,7 +9,7 @@ from src.date_parser.structure_parsers import match_multi_match, match_interval
 from src.date_parser.date_parsers import (match_named_month, match_iso_date, match_weekday, match_relative_day,
                                           match_week, match_named_year)
 from src.date_parser.time_parsers import match_digi_clock, match_time_words
-from src.date_parser.utils import Year, Month, Week, Day, Daypart, Hour, Minute, monday_of_calenderweek
+from src.utils import Year, Month, Week, Day, Daypart, Hour, Minute, monday_of_calenderweek
 
 daypart_mapping = [
     (3, 5),
