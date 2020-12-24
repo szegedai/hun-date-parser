@@ -3,7 +3,7 @@ from datetime import time
 from src.utils import num_to_word
 
 hours_word = {
-    0: 'éjfélkor',
+    0: 'nulla',
     1: 'hajnali egy',
     2: 'hajnali kettő',
     3: 'hajnali három',
@@ -15,7 +15,7 @@ hours_word = {
     9: 'reggel kilenc',
     10: 'délelőtt tíz',
     11: 'délelőtt tizenegy',
-    12: 'délben',
+    12: 'tizenkét',
     13: 'délután egy',
     14: 'délután kettő',
     15: 'délután három',
@@ -46,7 +46,12 @@ def time2relitivetexttime(t: time, resolution: int):
         second_res = num_to_word(second)
 
     if resolution == 1:
-        return f"{hour_rep} óra"
+        if hour == 0:
+            return 'éjfél'
+        elif hour == 12:
+            return 'dél'
+        else:
+            return f"{hour_rep} óra"
     elif resolution == 2:
         return f"{hour_rep} óra {minute_res} perc"
     elif resolution == 3:
@@ -82,6 +87,6 @@ def time2digi(t: time, resolution: int):
     if resolution == 1:
         return f'{t.hour}'
     if resolution == 2:
-        return f'{t.hour}:{t.minute}'
+        return f'{str(t.hour).zfill(2)}:{str(t.minute).zfill(2)}'
     if resolution == 3:
-        return f'{t.hour}:{t.minute}:{t.second}'
+        return f'{str(t.hour).zfill(2)}:{str(t.minute).zfill(2)}:{str(t.second).zfill(2)}'

@@ -10,6 +10,21 @@ days = [
     ['vasárnap']
 ]
 
+months = [
+    'január',
+    'február',
+    'március',
+    'április',
+    'május',
+    'június',
+    'július',
+    'augusztus',
+    'szeptember',
+    'október',
+    'november',
+    'december'
+]
+
 
 def is_day_of(d):
     return days[d.weekday()][-1]
@@ -31,6 +46,10 @@ def date2text(d: date, now: date):
     elif till_next_week + 7 < day_diff <= till_next_week + 14:
         resp += 'két hét múlva ' + is_day_of(d)
     else:
-        resp += f'ekkor: {d.year}-{d.month}-{d.day}, {is_day_of(d)}'
+        resp += f'{d.year}-{d.month}-{d.day}'
 
     return resp
+
+
+def date2full_text(d: date):
+    return f'{d.year} {months[d.month - 1]} {d.day}'
