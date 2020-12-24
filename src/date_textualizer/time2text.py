@@ -149,7 +149,3 @@ def time2lifelike(t: time):
         return f'{get_daypart(h_)} {get_h_rep(h_)} óra előtt {60 - m} perccel'.lstrip()
     else:
         return ''
-
-
-if __name__ == '__main__':
-    print(time2lifelike(time(23, 44)))

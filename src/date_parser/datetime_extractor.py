@@ -174,24 +174,3 @@ class DatetimeExtractor:
                         for parsed_date in parsed_dates]
 
         return parsed_dates
-
-
-if __name__ == '__main__':
-    de = DatetimeExtractor(datetime.now())
-
-    ss = ['találkozzunk szombaton háromnegyed nyolc előtt két perccel',
-          'ezen a héten',
-          'jövő kedden',
-          'múlt szombat délután háromkor',
-          'holnap éjjel',
-          'jövő januárban',
-          '2020 decemberétől',
-          '2020 decemberéig',
-          'ennek a kezdete kb 20 évvel ezelőtt volt lesz',
-          'két évvel ezelőtt']
-
-    for s in ss:
-        print()
-        print(s)
-        pd = de.parse_datetime(s)[0]
-        print(pd)
