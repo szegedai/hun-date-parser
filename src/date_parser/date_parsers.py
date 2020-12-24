@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 
 from .patterns import (R_ISO_DATE, R_NAMED_MONTH, R_TODAY, R_TOMORROW, R_NTOMORROW, R_YESTERDAY, R_NYESTERDAY,
                        R_WEEKDAY, R_WEEK, R_YEAR)
-from .utils import remove_accent, word_to_num, Year, Month, Week, Day
+from src.utils import remove_accent, word_to_num, Year, Month, Week, Day
 
 
 def match_iso_date(s: str) -> List[Dict[str, Any]]:

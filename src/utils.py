@@ -87,6 +87,35 @@ def word_to_num(s: str):
         return -1
 
 
+def num_to_word(num: int):
+    assert 0 <= num < 60
+
+    decs = ['tizen',
+            'huszon',
+            'harminc',
+            'negyven',
+            'ötven']
+
+    nums = ['nulla', 'egy', 'kettő', 'három', 'négy', 'öt', 'hat', 'hét', 'nyolc', 'kilenc']
+
+    if num == 0:
+        return 'nulla'
+    if num == 10:
+        return 'tíz'
+    if num == 20:
+        return 'húsz'
+
+    res = ''
+
+    if num // 10:
+        res += decs[(num // 10) - 1]
+
+    if num % 10:
+        res += nums[(num % 10)]
+
+    return res
+
+
 def monday_of_calenderweek(year, week):
     first = date(year, 1, 1)
     base = 1 if first.isocalendar()[1] == 1 else 8

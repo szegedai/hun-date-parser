@@ -3,7 +3,7 @@ import re
 from typing import Dict, List, Any
 
 from .patterns import R_DIGI, R_HOUR_MIN, R_HOUR_MIN_REV
-from .utils import remove_accent, word_to_num, Hour, Minute, Daypart
+from src.utils import remove_accent, word_to_num, Hour, Minute, Daypart
 
 NAN = -1
 

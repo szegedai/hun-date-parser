@@ -9,7 +9,7 @@ from src.date_parser.structure_parsers import match_multi_match, match_interval
 from src.date_parser.date_parsers import (match_named_month, match_iso_date, match_weekday, match_relative_day,
                                           match_week, match_named_year)
 from src.date_parser.time_parsers import match_digi_clock, match_time_words
-from src.date_parser.utils import Year, Month, Week, Day, Daypart, Hour, Minute, monday_of_calenderweek
+from src.utils import Year, Month, Week, Day, Daypart, Hour, Minute, monday_of_calenderweek
 
 daypart_mapping = [
     (3, 5),
@@ -143,7 +143,7 @@ def extend_start_end(interval: Dict):
 
 class DatetimeExtractor:
 
-    def __init__(self, now: datetime):
+    def __init__(self, now: datetime = datetime.now()):
         self.now = now
 
     def _get_implicit_intervall(self, sentence_part: str):
@@ -174,24 +174,3 @@ class DatetimeExtractor:
                         for parsed_date in parsed_dates]
 
         return parsed_dates
-
-
-if __name__ == '__main__':
-    de = DatetimeExtractor(datetime.now())
-
-    ss = ['találkozzunk szombaton háromnegyed nyolc előtt két perccel',
-          'ezen a héten',
-          'jövő kedden',
-          'múlt szombat délután háromkor',
-          'holnap éjjel',
-          'jövő januárban',
-          '2020 decemberétől',
-          '2020 decemberéig',
-          'ennek a kezdete kb 20 évvel ezelőtt volt lesz',
-          'két évvel ezelőtt']
-
-    for s in ss:
-        print()
-        print(s)
-        pd = de.parse_datetime(s)[0]
-        print(pd)

@@ -1,4 +1,4 @@
-from src.date_parser.utils import word_to_num, remove_accent
+from src.utils import word_to_num, num_to_word, remove_accent
 
 
 def test_remove_accent():
@@ -30,3 +30,14 @@ def test_word_to_num():
 
     for inp, exp in tf:
         assert word_to_num(inp) == exp
+
+
+def test_num_to_word():
+    tf = [(1, 'egy'),
+          (23, 'huszonhárom'),
+          (50, 'ötven'),
+          (55, 'ötvenöt'),
+          (0, 'nulla')]
+
+    for inp, exp in tf:
+        assert num_to_word(inp) == exp
