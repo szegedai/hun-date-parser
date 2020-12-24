@@ -29,6 +29,25 @@ hours_word = {
     23: 'este tizenegy',
 }
 
+dayparts = {
+    0: 'éjjel',
+    3: 'hajnal',
+    6: 'reggel',
+    10: 'délelőtt',
+    12: 'délután',
+    18: 'este',
+    22: 'éjjel',
+    24: 'éjjel'
+}
+
+
+def get_daypart(h: int):
+    if h == 12:
+        return ''
+    for i, (k, v) in enumerate(dayparts.items()):
+        if k <= h <= list(dayparts)[i+1]:
+            return v
+
 
 def time2relitivetexttime(t: time, resolution: int):
     assert 1 <= resolution <= 3
@@ -90,3 +109,47 @@ def time2digi(t: time, resolution: int):
         return f'{str(t.hour).zfill(2)}:{str(t.minute).zfill(2)}'
     if resolution == 3:
         return f'{str(t.hour).zfill(2)}:{str(t.minute).zfill(2)}:{str(t.second).zfill(2)}'
+
+
+def time2lifelike(t: time):
+
+    def get_h_rep(h):
+        if h % 12 != 0:
+            return h % 12
+        else:
+            return 12
+
+    h, m = t.hour, t.minute
+
+    h_ = h + 1 if h <= 23 else 0
+
+    if m == 0:
+        return f'{get_daypart(h)} {get_h_rep(h)} óra'.lstrip()
+    elif 0 < m < 10:
+        return f'{get_daypart(h)} {get_h_rep(h)} óra után {m} perccel'.lstrip()
+    elif 10 <= m < 15:
+        return f'{get_daypart(h_)} negyed {get_h_rep(h_)} előtt {15 - m} perccel'.lstrip()
+    elif m == 15:
+        return f'{get_daypart(h_)} negyed {get_h_rep(h_)}'.lstrip()
+    elif 15 < m <= 20:
+        return f'{get_daypart(h_)} negyed {get_h_rep(h_)} után {m - 15} perccel'.lstrip()
+    elif 20 < m < 30:
+        return f'{get_daypart(h_)} fél {get_h_rep(h_)} előtt {30 - m} perccel'.lstrip()
+    elif m == 30:
+        return f'{get_daypart(h_)} fél {get_h_rep(h_)}'.lstrip()
+    elif 30 < m <= 40:
+        return f'{get_daypart(h_)} fél {get_h_rep(h_)} után {m - 30} perccel'.lstrip()
+    elif 40 < m < 45:
+        return f'{get_daypart(h_)} háromnegyed {get_h_rep(h_)} előtt {45 - m} perccel'.lstrip()
+    elif m == 45:
+        return f'{get_daypart(h_)} háromnegyed {get_h_rep(h_)}'.lstrip()
+    elif 45 < m <= 50:
+        return f'{get_daypart(h_)} háromnegyed {get_h_rep(h_)} után {m - 45} perccel'.lstrip()
+    elif 50 < m:
+        return f'{get_daypart(h_)} {get_h_rep(h_)} óra előtt {60 - m} perccel'.lstrip()
+    else:
+        return ''
+
+
+if __name__ == '__main__':
+    print(time2lifelike(time(23, 44)))
