@@ -1,7 +1,7 @@
 <h1 align="center">Hungarian Date Parser</h1>
 
 <p align="center">
-    <i>A tool for extracting datetime intervals from Hungarian sentences.</i>
+    <i>A tool for extracting datetime intervals from Hungarian sentences and turning datetime objects into Hungarian text.</i>
 </p>
 
 
@@ -59,7 +59,7 @@ datetime_textualizer.generate_candidates(datetime(2020, 12, 20, 18, 34), time_pr
 
 ## :pencil: License
 
-This project is licensed under [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0) license.
+This project is licensed under [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0) license. Feel free to use it in your own projects.
 
 ## :wrench: Contribute
 
