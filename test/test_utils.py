@@ -1,4 +1,4 @@
-from src.utils import word_to_num, num_to_word, remove_accent
+from hun_date_parser.utils import word_to_num, num_to_word, remove_accent
 
 
 def test_remove_accent():

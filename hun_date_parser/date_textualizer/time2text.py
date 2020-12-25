@@ -1,6 +1,6 @@
 from datetime import time
 
-from src.utils import num_to_word
+from hun_date_parser.utils import num_to_word
 
 hours_word = {
     0: 'nulla',

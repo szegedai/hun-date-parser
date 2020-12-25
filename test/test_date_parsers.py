@@ -1,8 +1,8 @@
 from datetime import datetime
 
-from src.date_parser.date_parsers import Year, Month, Week, Day
-from src.date_parser.date_parsers import (match_iso_date, match_named_month, match_relative_day, match_weekday,
-                                          match_week, match_named_year)
+from hun_date_parser.date_parser.date_parsers import Year, Month, Week, Day
+from hun_date_parser.date_parser.date_parsers import (match_iso_date, match_named_month, match_relative_day, match_weekday,
+                                                      match_week, match_named_year)
 
 
 def test_match_iso_date():

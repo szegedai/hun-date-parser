@@ -1,6 +1,6 @@
 from datetime import time
 
-from src.date_textualizer.time2text import time2lifelike
+from hun_date_parser.date_textualizer.time2text import time2lifelike
 
 
 def test_time2lifelike():

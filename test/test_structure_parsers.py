@@ -1,4 +1,4 @@
-from src.date_parser.structure_parsers import match_interval, match_multi_match
+from hun_date_parser.date_parser.structure_parsers import match_interval, match_multi_match
 
 
 def test_match_interval():

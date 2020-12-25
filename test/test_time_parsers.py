@@ -1,5 +1,5 @@
-from src.utils import Daypart, Hour, Minute
-from src.date_parser.time_parsers import match_digi_clock, match_time_words
+from hun_date_parser.utils import Daypart, Hour, Minute
+from hun_date_parser.date_parser.time_parsers import match_digi_clock, match_time_words
 
 
 def test_match_digi_clock():
