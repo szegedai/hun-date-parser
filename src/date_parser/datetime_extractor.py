@@ -25,8 +25,6 @@ def assamble_datetime(now: datetime, dateparts: Union[List[Union[Year, Month, We
                       bottom: bool = True):
     res_dt = []
 
-    print(dateparts)
-
     if dateparts == 'OPEN':
         return None
     if not dateparts:
@@ -78,10 +76,12 @@ def assamble_datetime(now: datetime, dateparts: Union[List[Union[Year, Month, We
                 dp = dp_match[0][0]
                 if bottom:
                     res_dt.append(daypart_mapping[dp][0])
-                else:
-                    y, m, d, h, mi, se = res_dt
-                    next_day = datetime(y, m, d, h, mi, se) + timedelta(days=1)
+                elif dp == 5:
+                    y, m, d = res_dt
+                    next_day = datetime(y, m, d) + timedelta(days=1)
                     res_dt = [next_day.year, next_day.month, next_day.day, daypart_mapping[dp][1]]
+                else:
+                    res_dt.append(daypart_mapping[dp][1])
 
         if date_type == Hour and len(res_dt) == 3:
             if dp_match:
@@ -143,7 +143,7 @@ def extend_start_end(interval: Dict):
 
 class DatetimeExtractor:
 
-    def __init__(self, now: datetime = datetime.now()):
+    def __init__(self, now: datetime):
         self.now = now
 
     def _get_implicit_intervall(self, sentence_part: str):
