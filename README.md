@@ -7,9 +7,9 @@
 
 <div align="center">
     <img src="https://img.shields.io/github/stars/nsoma97/hun-date-parser" alt="Stars Badge"/>
-    <img src="https://img.shields.io/github/issues/nsoma97/hun-date-parse" alt="Issues Badge"/>
-    <img src="https://img.shields.io/github/license/nsoma97/hun-date-parse?color=2b9348" alt="License Badge"/>
-    <img src="https://img.shields.io/github/workflow/status/nsoma97/hun-date-parse/datetime-parser-cicd" alt="Tests"/>
+    <img src="https://img.shields.io/github/issues/nsoma97/hun-date-parser" alt="Issues Badge"/>
+    <img src="https://img.shields.io/github/license/nsoma97/hun-date-parser?color=2b9348" alt="License Badge"/>
+    <img src="https://img.shields.io/github/workflow/status/nsoma97/hun-date-parser/Datetime Parser Pipeline" alt="Tests"/>
 </div>
 
 <br>
