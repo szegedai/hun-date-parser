@@ -24,6 +24,17 @@ daypart_mapping = [
 ]
 
 
+def text2datetime(input_sentence: str, now: datetime = datetime.now()):
+    """
+    Returns the list of datetime intervals found in the input sentence.
+    :param input_sentence: Input sentence string.
+    :param now: Current timestamp to calculate relative dates.
+    :return: list of datetime interval dictionaries
+    """
+    datetime_extractor = DatetimeExtractor(now=now)
+    return datetime_extractor.parse_datetime(sentence=input_sentence)
+
+
 def assamble_datetime(now: datetime, dateparts: Union[List[Union[Year, Month, Week, Day, Daypart, Hour, Minute]], str],
                       bottom: bool = True) -> Union[datetime, None]:
     """
