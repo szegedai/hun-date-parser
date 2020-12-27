@@ -1,3 +1,5 @@
+"""This module handles combined date and time parsing."""
+
 from datetime import datetime, timedelta
 from calendar import monthrange
 from itertools import chain
@@ -23,7 +25,14 @@ daypart_mapping = [
 
 
 def assamble_datetime(now: datetime, dateparts: Union[List[Union[Year, Month, Week, Day, Daypart, Hour, Minute]], str],
-                      bottom: bool = True):
+                      bottom: bool = True) -> Union[datetime, None]:
+    """
+    Assambles parsed date and time classes into datetime instance.
+    :param now: Current timestamp to calculate relative dates.
+    :param dateparts: List of date and time classes.
+    :param bottom: True if the bottom of the interval should be returned, False otherwise
+    :return: datetime instance
+    """
     res_dt = []
 
     if dateparts == 'OPEN':
@@ -115,7 +124,13 @@ def assamble_datetime(now: datetime, dateparts: Union[List[Union[Year, Month, We
     return datetime(y, m, d, h, mi, se)
 
 
-def match_rules(now: datetime, sentence: str):
+def match_rules(now: datetime, sentence: str) -> List:
+    """
+    Matches all rules against input text.
+    :param now: Current timestamp to calculate relative dates.
+    :param sentence: Input sentence.
+    :return: Parsed date and time classes.
+    """
     matches = [*match_named_month(sentence, now),
                *match_iso_date(sentence),
                *match_relative_day(sentence, now),
@@ -130,7 +145,12 @@ def match_rules(now: datetime, sentence: str):
     return matches
 
 
-def extend_start_end(interval: Dict):
+def extend_start_end(interval: Dict) -> Dict:
+    """
+    Heuristic to add missing date and time classes in case of interval.
+    :param interval: Dictionary with start and end dateparts.
+    :return: Extended dictionary with start and end dateparts.
+    """
     if interval['start_date'] == 'OPEN' or interval['end_date'] == 'OPEN':
         return interval
 
@@ -143,8 +163,14 @@ def extend_start_end(interval: Dict):
 
 
 class DatetimeExtractor:
+    """
+    This class handles combined date and time parsing.
+    """
 
-    def __init__(self, now: datetime = datetime.now()):
+    def __init__(self, now: datetime = datetime.now()) -> None:
+        """
+        :param now: Current timestamp to calculate relative dates.
+        """
         self.now = now
 
     def _get_implicit_intervall(self, sentence_part: str):
@@ -152,7 +178,12 @@ class DatetimeExtractor:
 
         return [{'start_date': matches, 'end_date': matches}]
 
-    def parse_datetime(self, sentence: str):
+    def parse_datetime(self, sentence: str) -> List[Dict[str, datetime]]:
+        """
+        Extracts list of datetime intervals from input sentence.
+        :param sentence: Input sentence string.
+        :return: list of datetime interval dictionaries
+        """
         sentence_parts = match_multi_match(sentence)
         parsed_dates = []
 
