@@ -1,7 +1,8 @@
 from datetime import datetime
 
-from src.date_textualizer.date2text import date2text, date2full_text
-from src.date_textualizer.time2text import time2absolutetexttime, time2digi, time2relitivetexttime, time2lifelike
+from hun_date_parser.date_textualizer.date2text import date2text, date2full_text
+from hun_date_parser.date_textualizer.time2text import time2absolutetexttime, time2digi, time2relitivetexttime, \
+    time2lifelike
 
 
 class DatetimeTextualizer:

@@ -5,11 +5,12 @@ from itertools import chain
 from typing import Dict, List, Union
 from copy import copy
 
-from src.date_parser.structure_parsers import match_multi_match, match_interval
-from src.date_parser.date_parsers import (match_named_month, match_iso_date, match_weekday, match_relative_day,
-                                          match_week, match_named_year)
-from src.date_parser.time_parsers import match_digi_clock, match_time_words
-from src.utils import Year, Month, Week, Day, Daypart, Hour, Minute, monday_of_calenderweek
+from hun_date_parser.date_parser.structure_parsers import match_multi_match, match_interval
+from hun_date_parser.date_parser.date_parsers import (match_named_month, match_iso_date, match_weekday,
+                                                      match_relative_day,
+                                                      match_week, match_named_year)
+from hun_date_parser.date_parser.time_parsers import match_digi_clock, match_time_words
+from hun_date_parser.utils import Year, Month, Week, Day, Daypart, Hour, Minute, monday_of_calenderweek
 
 daypart_mapping = [
     (3, 5),
@@ -24,8 +25,6 @@ daypart_mapping = [
 def assamble_datetime(now: datetime, dateparts: Union[List[Union[Year, Month, Week, Day, Daypart, Hour, Minute]], str],
                       bottom: bool = True):
     res_dt = []
-
-    print(dateparts)
 
     if dateparts == 'OPEN':
         return None
@@ -78,10 +77,12 @@ def assamble_datetime(now: datetime, dateparts: Union[List[Union[Year, Month, We
                 dp = dp_match[0][0]
                 if bottom:
                     res_dt.append(daypart_mapping[dp][0])
-                else:
-                    y, m, d, h, mi, se = res_dt
-                    next_day = datetime(y, m, d, h, mi, se) + timedelta(days=1)
+                elif dp == 5:
+                    y, m, d = res_dt
+                    next_day = datetime(y, m, d) + timedelta(days=1)
                     res_dt = [next_day.year, next_day.month, next_day.day, daypart_mapping[dp][1]]
+                else:
+                    res_dt.append(daypart_mapping[dp][1])
 
         if date_type == Hour and len(res_dt) == 3:
             if dp_match:

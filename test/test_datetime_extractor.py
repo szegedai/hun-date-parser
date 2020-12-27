@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from src.date_parser.datetime_extractor import DatetimeExtractor, assamble_datetime
+from hun_date_parser.date_parser.datetime_extractor import DatetimeExtractor, assamble_datetime
 
 
 def test_datetime_extractor():
