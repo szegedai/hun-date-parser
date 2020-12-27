@@ -6,9 +6,6 @@ on:
   pull_request:
     branches: [ main ]
 
-variables:
-  COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO }}
-
 jobs:
   build:
 
@@ -36,3 +33,5 @@ jobs:
         pytest --cov hun_date_parser
     - name: Coverage report
       run: python -m coveralls
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO }}
