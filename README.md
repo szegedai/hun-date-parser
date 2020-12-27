@@ -17,45 +17,45 @@
 <br>
 
 
-Install and try the package with `pip install hun-date-parser`.
+Install and try the package with `pip install hun-date-parser`
 
 ## :fire: Usage
 
-If not specified otherwise, relative dates (eg.: tomorrow, next week, etc.) are calculated relative to the current datetime, at the time when the DatetimeExtractor is instanciated.
+If not specified otherwise, relative dates (eg.: tomorrow, next week, etc.) are calculated relative to the current datetime, at the time when the function is called. The `now` parameter can be used for parsing relative datetimes relative to any timestamp other than the current time.
 
 ```python
-from hun_date_parser import DatetimeExtractor
+from hun_date_parser import text2datetime
+from datetime import datetime
 
-datetime_extractor = DatetimeExtractor()
+text2datetime('találkozzunk jövő kedd délután!', now=datetime(2020, 12, 27))
+# [{'start_date': datetime.datetime(2020, 12, 29, 12, 0), 'end_date': datetime.datetime(2020, 12, 29, 17, 59, 59)}]
 
-datetime_extractor.parse_datetime('találkozzunk jövő kedd délután!')
-# {'start_date': datetime.datetime(2020, 12, 29, 12, 0), 'end_date': datetime.datetime(2020, 12, 29, 17, 59, 59)}
+text2datetime('találkozzunk jövő héten szombaton háromnegyed nyolc előtt két perccel', now=datetime(2020, 12, 27))
+# [{'start_date': datetime.datetime(2022, 1, 3, 7, 43), 'end_date': datetime.datetime(2022, 1, 9, 7, 43, 59)}]
 
-datetime_extractor.parse_datetime('találkozzunk szombaton háromnegyed nyolc előtt két perccel')
-# {'start_date': datetime.datetime(2020, 12, 26, 7, 43), 'end_date': datetime.datetime(2020, 12, 26, 7, 43, 59)}
+text2datetime('találkozzunk jövő héten szombaton este háromnegyed nyolc előtt két perccel', now=datetime(2020, 12, 27))
+# [{'start_date': datetime.datetime(2022, 1, 3, 19, 43), 'end_date': datetime.datetime(2022, 1, 9, 19, 43, 59)}]
 ```
 The date parser is also capable of parsing explicit intervals from the text even when only one side of the interval is specified.
 ```python
-datetime_extractor.parse_datetime('2020 decemberétől 2021 januárig')
-# {'start_date': datetime.datetime(2020, 12, 1, 0, 0), 'end_date': datetime.datetime(2021, 1, 31, 23, 59, 59)}
+from hun_date_parser import text2datetime
+from datetime import datetime
 
+text2datetime('2020 decemberétől 2021 januárig', now=datetime(2020, 12, 27))
+# [{'start_date': datetime.datetime(2020, 12, 1, 0, 0), 'end_date': datetime.datetime(2021, 1, 31, 23, 59, 59)}]
 
-datetime_extractor.parse_datetime('2020 decemberéig')
-# {'start_date': None, 'end_date': datetime.datetime(2020, 12, 31, 23, 59, 59)}
+text2datetime('2021 januárig', now=datetime(2020, 12, 27))
+# [{'start_date': None, 'end_date': datetime.datetime(2021, 1, 31, 23, 59, 59)}]
 ```
 
 The library is also capable of turning datetime objects into their Hungarian text representation.
 
 ```python
+from hun_date_parser import datetime2text
 from datetime import datetime
-from hun_date_parser import DatetimeTextualizer
 
-datetime_textualizer = DatetimeTextualizer()
-
-datetime_textualizer.generate_candidates()
-
-datetime_textualizer.generate_candidates(datetime(2020, 12, 20, 18, 34), time_precision=2)
-# {'date': ['ezen a héten vasárnap', '2020 december 20'],
+datetime2text(datetime(2020, 12, 20, 18, 34), now=datetime(2020, 12, 27), time_precision=2)
+# {'dates': ['múlt héten vasárnap', '2020 december 20'],
 #  'times': ['tizennyolc óra harmincnégy perc', '18:34', 'este hat óra harmincnégy perc', 'este fél 7 után 4 perccel']}
 ```
 
