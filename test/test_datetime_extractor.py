@@ -1,6 +1,7 @@
 from datetime import datetime
 
-from hun_date_parser.date_parser.datetime_extractor import DatetimeExtractor
+from hun_date_parser.utils import *
+from hun_date_parser.date_parser.datetime_extractor import DatetimeExtractor, extend_start_end
 
 
 def test_datetime_extractor():
@@ -21,3 +22,12 @@ def test_datetime_extractor():
 
         assert parsed_date['start_date'] == st
         assert parsed_date['end_date'] == end
+
+
+def test_extend_start_end():
+    inp_1 = {'start_date': [], 'end_date': [Hour(1, '')]}
+    assert extend_start_end(inp_1) == inp_1
+
+    inp_2 = {'start_date': [Month(1, ''), Hour(1, '')], 'end_date': []}
+    assert extend_start_end(inp_2) == {'start_date': [Month(1, ''), Hour(1, '')],
+                                       'end_date': [Month(1, ''), Hour(1, '')]}
