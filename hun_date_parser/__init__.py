@@ -1,4 +1,4 @@
-from hun_date_parser.date_textualizer.datetime_textualizer import DatetimeTextualizer
-from hun_date_parser.date_parser.datetime_extractor import DatetimeExtractor
+from hun_date_parser.date_textualizer.datetime_textualizer import DatetimeTextualizer, datetime2text
+from hun_date_parser.date_parser.datetime_extractor import DatetimeExtractor, text2datetime
 
-__all__ = ["DatetimeTextualizer", "DatetimeExtractor"]
+__all__ = ["DatetimeTextualizer", "DatetimeExtractor", "datetime2text", "text2datetime"]
