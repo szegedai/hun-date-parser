@@ -143,7 +143,7 @@ def extend_start_end(interval: Dict):
 
 class DatetimeExtractor:
 
-    def __init__(self, now: datetime):
+    def __init__(self, now: datetime = datetime.now()):
         self.now = now
 
     def _get_implicit_intervall(self, sentence_part: str):
