@@ -20,7 +20,7 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install pytest flake8 mypy
+        pip install -r test_requirements.txt
         pip install -r requirements.txt
     - name: Static analysis with mypy
       run: |
@@ -30,4 +30,8 @@ jobs:
         python -m flake8 --max-line-length=120 --per-file-ignores='patterns.py:E501' hun_date_parser
     - name: Test with pytest
       run: |
-        pytest
+        pytest --cov hun_date_parser
+    - name: Coverage report
+      run: python -m coveralls
+      env:
+        COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO }}
