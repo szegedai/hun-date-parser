@@ -97,6 +97,12 @@ def extend_start_end(interval: Dict) -> Dict:
     return interval_
 
 
+def type_isin_list(date_type: Union[Year, Month, Week, Day, Daypart, Hour, Minute], lst: List) -> bool:
+    matches = [pot_dp for pot_dp in lst if isinstance(pot_dp, date_type)]
+
+    return bool(matches)
+
+
 class DatetimeExtractor:
     """
     This class handles combined date and time parsing.
@@ -139,11 +145,14 @@ class DatetimeExtractor:
         for date_type in [Year, Month, Week, Day, Daypart, Hour, Minute]:
             dp_match = [pot_dp for pot_dp in dateparts if isinstance(pot_dp, date_type)]
 
+            if dp_match:
+                dp_match = dp_match[0]
+
             if date_type == Year:
                 if dp_match:
                     has_date = True
                     pre_first = False
-                    res_dt.append(dp_match[0][0])
+                    res_dt.append(dp_match[0])
                 else:
                     res_dt.append(now.year)
 
@@ -151,7 +160,7 @@ class DatetimeExtractor:
                 if dp_match:
                     has_date = True
                     pre_first = False
-                    res_dt.append(dp_match[0][0])
+                    res_dt.append(dp_match[0])
                 elif pre_first:
                     res_dt.append(now.month)
                 elif bottom:
@@ -159,18 +168,18 @@ class DatetimeExtractor:
                 else:
                     res_dt.append(12)
 
-            if date_type == Week:
+            if date_type == Week and not type_isin_list(Day, dateparts):
                 if dp_match:
                     has_date = True
                     pre_first = False
-                    week2dt = monday_of_calenderweek(res_dt[0], dp_match[0][0]) + timedelta(days=(0 if bottom else 6))
+                    week2dt = monday_of_calenderweek(res_dt[0], dp_match[0]) + timedelta(days=(0 if bottom else 6))
                     res_dt = [week2dt.year, week2dt.month, week2dt.day]
 
             if date_type == Day and len(res_dt) == 2:
                 if dp_match:
                     has_date = True
                     pre_first = False
-                    res_dt.append(dp_match[0][0])
+                    res_dt.append(dp_match[0])
                 elif pre_first:
                     res_dt.append(now.day)
                 elif bottom:
@@ -183,7 +192,7 @@ class DatetimeExtractor:
                 if dp_match:
                     has_time = True
                     pre_first = False
-                    dp = dp_match[0][0]
+                    dp = dp_match[0]
                     if bottom:
                         res_dt.append(daypart_mapping[dp][0])
                     elif dp == 5:
@@ -197,7 +206,7 @@ class DatetimeExtractor:
                 if dp_match:
                     has_time = True
                     pre_first = False
-                    res_dt.append(dp_match[0][0])
+                    res_dt.append(dp_match[0])
                 elif pre_first:
                     res_dt.append(now.hour)
                 elif bottom:
@@ -209,7 +218,7 @@ class DatetimeExtractor:
                 if dp_match:
                     has_time = True
                     pre_first = False
-                    res_dt.append(dp_match[0][0])
+                    res_dt.append(dp_match[0])
                 elif pre_first:
                     res_dt.append(now.minute)
                 elif bottom:

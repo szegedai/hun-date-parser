@@ -75,7 +75,8 @@ def test_match_weekday():
           ('ezen a heten hetfon', [[Year(2020, fn), Month(12, fn), Day(7, fn)]]),
           ('jövő kedden', [[Year(2020, fn), Month(12, fn), Day(15, fn)]]),
           ('előző szombaton ', [[Year(2020, fn), Month(12, fn), Day(5, fn)]]),
-          ('miért nem jöttél tegnap? na majd ma', [])]
+          ('miért nem jöttél tegnap? na majd ma', []),
+          ('jövő kedden', [[Year(2020, fn), Month(12, fn), Day(15, fn)]])]
 
     for inp, exp in tf:
         out = match_weekday(inp, now)
@@ -113,7 +114,8 @@ def test_match_named_year():
           ('kb két év múlva', [[Year(2022, fn)]]),
           ('tavalyelőtt történt', [[Year(2018, fn)]]),
           ('40 év múlva', [[Year(2060, fn)]]),
-          ('kb három évvel ezelőtt', [[Year(2017, fn)]])]
+          ('kb három évvel ezelőtt', [[Year(2017, fn)]]),
+          ('találkozzunk jövő héten szombaton', [])]
 
     for inp, exp in tf:
         out = match_named_year(inp, now)
