@@ -61,7 +61,7 @@ datetime2text(datetime(2020, 12, 20, 18, 34), now=datetime(2020, 12, 27), time_p
 
 ## :pencil: License
 
-This project is licensed under [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0) license. Feel free to use it in your own projects.
+This project is licensed under [MIT](https://choosealicense.com/licenses/mit/) license. Feel free to use it in your own projects.
 
 ## :wrench: Contribute
 
