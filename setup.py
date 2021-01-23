@@ -13,11 +13,11 @@ setuptools.setup(
     description="A tool for extracting datetime intervals from Hungarian sentences and turning datetime objects into Hungarian text.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/nsoma97/hun-date-parser",
+    url="https://github.com/szegedai/hun-date-parser",
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: Apache Software License",
+        "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
     python_requires='>=3.6',

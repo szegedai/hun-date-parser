@@ -31,10 +31,10 @@ text2datetime('találkozzunk jövő kedd délután!', now=datetime(2020, 12, 27)
 # [{'start_date': datetime.datetime(2020, 12, 29, 12, 0), 'end_date': datetime.datetime(2020, 12, 29, 17, 59, 59)}]
 
 text2datetime('találkozzunk jövő héten szombaton háromnegyed nyolc előtt két perccel', now=datetime(2020, 12, 27))
-# [{'start_date': datetime.datetime(2022, 1, 3, 7, 43), 'end_date': datetime.datetime(2022, 1, 9, 7, 43, 59)}]
+# [{'start_date': datetime.datetime(2021, 1, 2, 7, 43), 'end_date': datetime.datetime(2021, 1, 2, 7, 43, 59)}]
 
 text2datetime('találkozzunk jövő héten szombaton este háromnegyed nyolc előtt két perccel', now=datetime(2020, 12, 27))
-# [{'start_date': datetime.datetime(2022, 1, 3, 19, 43), 'end_date': datetime.datetime(2022, 1, 9, 19, 43, 59)}]
+# [{'start_date': datetime.datetime(2021, 1, 2, 19, 43), 'end_date': datetime.datetime(2021, 1, 2, 19, 43, 59)}]
 ```
 The date parser is also capable of parsing explicit intervals from the text even when only one side of the interval is specified.
 ```python
@@ -61,7 +61,7 @@ datetime2text(datetime(2020, 12, 20, 18, 34), now=datetime(2020, 12, 27), time_p
 
 ## :pencil: License
 
-This project is licensed under [Apache-2.0](https://www.apache.org/licenses/LICENSE-2.0) license. Feel free to use it in your own projects.
+This project is licensed under [MIT](https://choosealicense.com/licenses/mit/) license. Feel free to use it in your own projects.
 
 ## :wrench: Contribute
 
