@@ -21,7 +21,13 @@ def test_datetime_extractor():
         ('ráérek jövő hét hétfőn reggel 7-kor', datetime(2020, 12, 21, 7), datetime(2020, 12, 21, 7, 59, 59)),
         ('ráérek jövő hét hétfőn reggel hétkor', datetime(2020, 12, 21, 7), datetime(2020, 12, 21, 7, 59, 59)),
         ('ráérek jövő hétfőn reggel hétkor', datetime(2020, 12, 21, 7), datetime(2020, 12, 21, 7, 59, 59)),
-        ('ráérek reggel hétkor', datetime(2020, 12, 18, 7), datetime(2020, 12, 18, 7, 59, 59))
+        ('ráérek reggel hétkor', datetime(2020, 12, 18, 7), datetime(2020, 12, 18, 7, 59, 59)),
+        ('hétfőn hétkor', datetime(2020, 12, 14, 7), datetime(2020, 12, 14, 7, 59, 59)),
+        ('hétkor', datetime(2020, 12, 18, 7), datetime(2020, 12, 18, 7, 59, 59)),
+        ('2021 január 5', datetime(2021, 1, 5), datetime(2021, 1, 5, 23, 59, 59)),
+        ('2021 január 5 reggel 7', datetime(2021, 1, 5, 7), datetime(2021, 1, 5, 7, 59, 59)),
+        ('január 5 reggel 7', datetime(2020, 1, 5, 7), datetime(2020, 1, 5, 7, 59, 59)),
+        ('január 5-én', datetime(2020, 1, 5), datetime(2020, 1, 5, 23, 59, 59))
     ]
     now = datetime(2020, 12, 18)
     de = DatetimeExtractor(now)

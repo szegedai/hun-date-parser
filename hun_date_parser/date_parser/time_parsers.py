@@ -56,17 +56,20 @@ def match_time_words(s: str) -> List[Dict[str, Any]]:
     # Only numbers can match dates as well, this is an attempt to remove false matches
     hour_index = s.index(f'{hour}')
     before_hour = s[:hour_index].split()
-    months = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'szep', 'okt', 'nov', 'dec']
-    for month in months:
-        if month in remove_accent(before_hour[-1]):
-            return []
+    if before_hour:
+        months = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'szep', 'okt', 'nov', 'dec']
+        for month in months:
+            if month in remove_accent(before_hour[-1]):
+                return []
 
     # Fix false time match for input 'jövő hét'
     if remove_accent(hour) == 'het':
         hour_indeces = [m.start() for m in re.finditer('het(?!fo)', remove_accent(s))]
-        before_hour = s[:hour_indeces[-1]].split()
-        if 'jovo' in remove_accent(before_hour[-1]):
-            return []
+        if hour_indeces:
+            before_hour = s[:hour_indeces[-1]].split()
+            if before_hour:
+                if 'jovo' in remove_accent(before_hour[-1]):
+                    return []
 
     res = []
     am = True
