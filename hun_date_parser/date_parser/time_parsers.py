@@ -61,6 +61,11 @@ def match_time_words(s: str) -> List[Dict[str, Any]]:
         if month in remove_accent(before_hour[-1]):
             return []
 
+    # Fix false time match for input 'jövő hét'
+    if remove_accent(hour) == 'het':
+        if 'jovo' in remove_accent(before_hour[-1]):
+            return []
+
     res = []
     am = True
     date_parts = []
