@@ -12,7 +12,9 @@ def test_datetime_extractor():
         ('találkozzunk szombaton háromnegyed nyolckor', datetime(2020, 12, 19, 7, 45, 0),
          datetime(2020, 12, 19, 7, 45, 59)),
         ('találkozzunk szombaton háromnegyed nyolc előtt két perccel', datetime(2020, 12, 19, 7, 43, 0),
-         datetime(2020, 12, 19, 7, 43, 59))
+         datetime(2020, 12, 19, 7, 43, 59)),
+        ('találkozzunk december 27-én', datetime(2020, 12, 27), datetime(2020, 12, 27, 23, 59, 59)),
+        ('találkozzunk december 10-én', datetime(2020, 12, 10), datetime(2020, 12, 10, 23, 59, 59)),
     ]
     now = datetime(2020, 12, 18)
     de = DatetimeExtractor(now)

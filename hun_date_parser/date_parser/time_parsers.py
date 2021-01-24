@@ -53,6 +53,14 @@ def match_time_words(s: str) -> List[Dict[str, Any]]:
     else:
         daypart, hour_modifier, hour, minute = group[0]
 
+    # Only numbers can match dates as well, this is an attempt to remove false matches
+    hour_index = s.index(hour)
+    before_hour = s[:hour_index].split()
+    months = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'szep', 'okt', 'nov', 'dec']
+    for month in months:
+        if month in remove_accent(before_hour[-1]):
+            return []
+
     res = []
     am = True
     date_parts = []
