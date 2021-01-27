@@ -95,13 +95,13 @@ def match_time_words(s: str) -> List[Dict[str, Any]]:
 
         if hour_modifier:
             if 'haromnegyed' in remove_accent(hour_modifier):
-                hour_num = hour_num-1 if hour_num-1 >= 0 else 23
+                hour_num = hour_num - 1 if hour_num - 1 >= 0 else 23
                 minute_num = 45
             elif 'fel' in remove_accent(hour_modifier):
-                hour_num = hour_num-1 if hour_num-1 >= 0 else 23
+                hour_num = hour_num - 1 if hour_num - 1 >= 0 else 23
                 minute_num = 30
             elif 'negyed' in remove_accent(hour_modifier):
-                hour_num = hour_num-1 if hour_num-1 >= 0 else 23
+                hour_num = hour_num - 1 if hour_num - 1 >= 0 else 23
                 minute_num = 15
 
         if hour_num == NAN:
@@ -120,7 +120,7 @@ def match_time_words(s: str) -> List[Dict[str, Any]]:
             if 'elott' in remove_accent(minute) and not hour_modifier:
                 hour_num -= (minute_num // 60) + 1
                 hour_num = hour_num if hour_num >= 0 else 23
-                date_parts.extend([Hour(hour_num, 'time_words'), Minute(60-(minute_num % 60), 'time_words')])
+                date_parts.extend([Hour(hour_num, 'time_words'), Minute(60 - (minute_num % 60), 'time_words')])
             elif 'elott' in remove_accent(minute) and hour_modifier:
                 n_minutes_before = word_to_num(minute)
                 if n_minutes_before != NAN:
@@ -170,7 +170,8 @@ def match_now(s: str, now: datetime) -> List[Dict[str, Any]]:
 
     match = re.match(r'.*\bmost\b.*', s.lower())
     if match:
-        date_parts = [Year(now.year, 'now'), Month(now.month, 'now'), Day(now.day, 'now'), Hour(now.hour, 'now'), Minute(now.minute, 'now')]
+        date_parts = [Year(now.year, 'now'), Month(now.month, 'now'), Day(now.day, 'now'), Hour(now.hour, 'now'),
+                      Minute(now.minute, 'now')]
         return [{'match': 'most', 'date_parts': date_parts}]
 
     return []
