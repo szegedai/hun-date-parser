@@ -1,9 +1,11 @@
 import re
 
 from typing import Dict, List, Any
+from datetime import datetime
 
-from .patterns import R_DIGI, R_HOUR_MIN, R_HOUR_MIN_REV
-from hun_date_parser.utils import remove_accent, word_to_num, Hour, Minute, Daypart
+from hun_date_parser.date_parser.patterns import R_DIGI, R_HOUR_MIN, R_HOUR_MIN_REV
+from hun_date_parser.utils import remove_accent, word_to_num, Year, Month, Day, Hour, Minute, Daypart
+from hun_date_parser.date_parser.date_parsers import match_weekday
 
 NAN = -1
 
@@ -160,3 +162,15 @@ def match_time_words(s: str) -> List[Dict[str, Any]]:
             res.append({'match': group, 'date_parts': [Daypart(5, 'time_words')]})
 
     return res
+
+
+def match_now(s: str, now: datetime) -> List[Dict[str, Any]]:
+    if match_weekday(s, now):
+        return []
+
+    match = re.match(r'.*\bmost\b.*', s.lower())
+    if match:
+        date_parts = [Year(now.year, 'now'), Month(now.month, 'now'), Day(now.day, 'now'), Hour(now.hour, 'now'), Minute(now.minute, 'now')]
+        return [{'match': 'most', 'date_parts': date_parts}]
+
+    return []

@@ -27,7 +27,8 @@ def test_datetime_extractor():
         ('2021 január 5', datetime(2021, 1, 5), datetime(2021, 1, 5, 23, 59, 59)),
         ('2021 január 5 reggel 7', datetime(2021, 1, 5, 7), datetime(2021, 1, 5, 7, 59, 59)),
         ('január 5 reggel 7', datetime(2020, 1, 5, 7), datetime(2020, 1, 5, 7, 59, 59)),
-        ('január 5-én', datetime(2020, 1, 5), datetime(2020, 1, 5, 23, 59, 59))
+        ('január 5-én', datetime(2020, 1, 5), datetime(2020, 1, 5, 23, 59, 59)),
+        ('legyen most mondjuk', datetime(2020, 12, 18), datetime(2020, 12, 18, 0, 0, 59))  # TODO: Come up with better
     ]
     now = datetime(2020, 12, 18)
     de = DatetimeExtractor(now)
