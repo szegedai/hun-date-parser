@@ -1,5 +1,7 @@
-from hun_date_parser.utils import Daypart, Hour, Minute
-from hun_date_parser.date_parser.time_parsers import match_digi_clock, match_time_words
+from datetime import datetime
+
+from hun_date_parser.utils import Year, Month, Day, Daypart, Hour, Minute
+from hun_date_parser.date_parser.time_parsers import match_digi_clock, match_time_words, match_now
 
 
 def test_match_digi_clock():
@@ -52,6 +54,22 @@ def test_match_time_words():
 
     for inp, exp in tf:
         out = match_time_words(inp)
+        date_parts = []
+        for e in out:
+            date_parts.append(e['date_parts'])
+        assert date_parts == exp
+
+
+def test_match_now():
+    now = datetime(2020, 12, 30, 12, 1)
+    fn = 'now'
+    tf = [('kedden 8:45', []),
+          ('most kedden', []),
+          ('legyen most',
+           [[Year(now.year, fn), Month(now.month, fn), Day(now.day, fn), Hour(now.hour, fn), Minute(now.minute, fn)]])]
+
+    for inp, exp in tf:
+        out = match_now(inp, now)
         date_parts = []
         for e in out:
             date_parts.append(e['date_parts'])
