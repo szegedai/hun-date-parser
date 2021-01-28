@@ -264,6 +264,7 @@ class DatetimeExtractor:
         :param sentence: Input sentence string.
         :return: list of datetime interval dictionaries
         """
+        sentence = sentence.lower()
         sentence_parts = match_multi_match(sentence)
         parsed_dates = []
 
