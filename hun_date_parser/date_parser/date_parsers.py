@@ -117,8 +117,13 @@ def match_weekday(s: str, now: datetime) -> List[Dict[str, Any]]:
         elif 'mult' in remove_accent(week) or 'elozo' in remove_accent(week):
             n_weeks = -1
 
+        def offset_date(date):
+            if date.strftime("%Y-%m-%d") < datetime.now().strftime("%Y-%m-%d"):
+                return date + timedelta(days=7)
+            return date
+
         def get_day_of_week(w, d):
-            return ((now - timedelta(days=now.weekday())) + timedelta(days=w * 7)) + timedelta(days=d)
+            return offset_date(((now - timedelta(days=now.weekday())) + timedelta(days=w * 7)) + timedelta(days=d))
 
         if 'hetfo' in remove_accent(day):
             day = get_day_of_week(n_weeks, 0)
