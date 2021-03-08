@@ -103,7 +103,7 @@ def match_relative_day(s: str, now: datetime) -> List[Dict[str, Any]]:
     return res
 
 
-def match_weekday(s: str, now: datetime) -> List[Dict[str, Any]]:
+def match_weekday(s: str, now: datetime, expect_future_day: bool = False) -> List[Dict[str, Any]]:
     groups = re.findall(R_WEEKDAY, s)
 
     res = []
@@ -118,33 +118,40 @@ def match_weekday(s: str, now: datetime) -> List[Dict[str, Any]]:
             n_weeks = -1
 
         def offset_date(date):
-            if date.strftime("%Y-%m-%d") < datetime.now().strftime("%Y-%m-%d"):
+            if date.strftime("%Y-%m-%d") < now.strftime("%Y-%m-%d"):
                 return date + timedelta(days=7)
             return date
 
         def get_day_of_week(w, d):
-            return offset_date(((now - timedelta(days=now.weekday())) + timedelta(days=w * 7)) + timedelta(days=d))
+            return ((now - timedelta(days=now.weekday())) + timedelta(days=w * 7)) + timedelta(days=d)
 
         if 'hetfo' in remove_accent(day):
-            day = get_day_of_week(n_weeks, 0)
+            day = offset_date(get_day_of_week(n_weeks, 0)) if expect_future_day and n_weeks >= 0\
+                else get_day_of_week(n_weeks, 0)
             date_parts['date_parts'] = [Year(day.year, 'weekday'), Month(day.month, 'weekday'), Day(day.day, 'weekday')]
         elif 'kedd' in remove_accent(day):
-            day = get_day_of_week(n_weeks, 1)
+            day = offset_date(get_day_of_week(n_weeks, 1)) if expect_future_day and n_weeks >= 0 \
+                else get_day_of_week(n_weeks, 1)
             date_parts['date_parts'] = [Year(day.year, 'weekday'), Month(day.month, 'weekday'), Day(day.day, 'weekday')]
         elif 'szerda' in remove_accent(day):
-            day = get_day_of_week(n_weeks, 2)
+            day = offset_date(get_day_of_week(n_weeks, 2)) if expect_future_day and n_weeks >= 0 \
+                else get_day_of_week(n_weeks, 2)
             date_parts['date_parts'] = [Year(day.year, 'weekday'), Month(day.month, 'weekday'), Day(day.day, 'weekday')]
         elif 'csut' in remove_accent(day):
-            day = get_day_of_week(n_weeks, 3)
+            day = offset_date(get_day_of_week(n_weeks, 3)) if expect_future_day and n_weeks >= 0 \
+                else get_day_of_week(n_weeks, 3)
             date_parts['date_parts'] = [Year(day.year, 'weekday'), Month(day.month, 'weekday'), Day(day.day, 'weekday')]
         elif 'pent' in remove_accent(day):
-            day = get_day_of_week(n_weeks, 4)
+            day = offset_date(get_day_of_week(n_weeks, 4)) if expect_future_day and n_weeks >= 0 \
+                else get_day_of_week(n_weeks, 4)
             date_parts['date_parts'] = [Year(day.year, 'weekday'), Month(day.month, 'weekday'), Day(day.day, 'weekday')]
         elif 'szom' in remove_accent(day):
-            day = get_day_of_week(n_weeks, 5)
+            day = offset_date(get_day_of_week(n_weeks, 5)) if expect_future_day and n_weeks >= 0 \
+                else get_day_of_week(n_weeks, 5)
             date_parts['date_parts'] = [Year(day.year, 'weekday'), Month(day.month, 'weekday'), Day(day.day, 'weekday')]
         elif 'vas' in remove_accent(day):
-            day = get_day_of_week(n_weeks, 6)
+            day = offset_date(get_day_of_week(n_weeks, 6)) if expect_future_day and n_weeks >= 0 \
+                else get_day_of_week(n_weeks, 6)
             date_parts['date_parts'] = [Year(day.year, 'weekday'), Month(day.month, 'weekday'), Day(day.day, 'weekday')]
 
         res.append(date_parts)
