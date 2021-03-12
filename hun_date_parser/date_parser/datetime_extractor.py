@@ -26,7 +26,8 @@ daypart_mapping = [
 ]
 
 
-def text2datetime(input_sentence: str, now: datetime = datetime.now(), expect_future_day: bool = False) -> List[Dict[str, datelike]]:
+def text2datetime(input_sentence: str, now: datetime = datetime.now(),
+                  expect_future_day: bool = False) -> List[Dict[str, datelike]]:
     """
     Returns the list of datetime intervals found in the input sentence.
     :param input_sentence: Input sentence string.
@@ -38,7 +39,8 @@ def text2datetime(input_sentence: str, now: datetime = datetime.now(), expect_fu
     return datetime_extractor.parse_datetime(sentence=input_sentence)
 
 
-def text2date(input_sentence: str, now: datetime = datetime.now(), expect_future_day: bool = False) -> List[Dict[str, datelike]]:
+def text2date(input_sentence: str, now: datetime = datetime.now(),
+              expect_future_day: bool = False) -> List[Dict[str, datelike]]:
     """
     Returns the list of date intervals found in the input sentence.
     :param input_sentence: Input sentence string.
@@ -50,7 +52,8 @@ def text2date(input_sentence: str, now: datetime = datetime.now(), expect_future
     return datetime_extractor.parse_datetime(sentence=input_sentence)
 
 
-def text2time(input_sentence: str, now: datetime = datetime.now(), expect_future_day: bool = False) -> List[Dict[str, datelike]]:
+def text2time(input_sentence: str, now: datetime = datetime.now(),
+              expect_future_day: bool = False) -> List[Dict[str, datelike]]:
     """
     Returns the list of time intervals found in the input sentence.
     :param input_sentence: Input sentence string.
