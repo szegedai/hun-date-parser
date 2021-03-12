@@ -283,8 +283,8 @@ class DatetimeExtractor:
             if interval:
                 interval['start_date'] = 'OPEN' if interval['start_date'] == 'OPEN' else match_rules(self.now, interval[
                     'start_date'], self.expect_future_day)
-                interval['end_date'] = 'OPEN' if interval['end_date'] == 'OPEN' else match_rules(self.now,
-                    interval['end_date'], self.expect_future_day)
+                interval['end_date'] = 'OPEN' if interval['end_date'] == 'OPEN' else match_rules(self.now, interval[
+                    'end_date'], self.expect_future_day)
                 parsed_dates.append(interval)
             else:
                 parsed_dates += self._get_implicit_intervall(sentence_part)
