@@ -69,17 +69,24 @@ def test_match_relative_day():
 
 def test_match_weekday():
     fn = 'weekday'
-    now = datetime(2020, 12, 7)  # monday
+    now = datetime(2020, 12, 11)  # friday
 
-    tf = [('múlt vasárnap', [[Year(2020, fn), Month(12, fn), Day(6, fn)]]),
-          ('ezen a heten hetfon', [[Year(2020, fn), Month(12, fn), Day(7, fn)]]),
-          ('jövő kedden', [[Year(2020, fn), Month(12, fn), Day(15, fn)]]),
-          ('előző szombaton ', [[Year(2020, fn), Month(12, fn), Day(5, fn)]]),
-          ('miért nem jöttél tegnap? na majd ma', []),
-          ('jövő kedden', [[Year(2020, fn), Month(12, fn), Day(15, fn)]])]
+    tf = [('múlt vasárnap', [[Year(2020, fn), Month(12, fn), Day(6, fn)]], False),
+          ('ezen a heten hetfon', [[Year(2020, fn), Month(12, fn), Day(7, fn)]], False),
+          ('jövő kedden', [[Year(2020, fn), Month(12, fn), Day(15, fn)]], False),
+          ('előző szombaton ', [[Year(2020, fn), Month(12, fn), Day(5, fn)]], False),
+          ('miért nem jöttél tegnap? na majd ma', [], False),
+          ('jövő kedden', [[Year(2020, fn), Month(12, fn), Day(15, fn)]], False),
+          ('legyen most mondjuk', [[Year(2020, fn), Month(12, fn), Day(11, fn)]], True),
+          ('Szombaton ráérek', [[Year(2020, fn), Month(12, fn), Day(12, fn)]], True),
+          ('Mit szólnál hétfőhöz?', [[Year(2020, fn), Month(12, fn), Day(14, fn)]], True),
+          ('Pénteken ráérek', [[Year(2020, fn), Month(12, fn), Day(11, fn)]], True),
+          ('Múlt hét kedden beszéltünk', [[Year(2020, fn), Month(12, fn), Day(1, fn)]], True),
+          ('Szerdán ráérek', [[Year(2020, fn), Month(12, fn), Day(16, fn)]], True),
+          ('Jövő héten szerdán ráérek', [[Year(2020, fn), Month(12, fn), Day(16, fn)]], True)]
 
-    for inp, exp in tf:
-        out = match_weekday(inp, now)
+    for inp, exp, expect in tf:
+        out = match_weekday(inp, now, expect)
         date_parts = []
         for e in out:
             date_parts.append(e['date_parts'])
