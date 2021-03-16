@@ -26,50 +26,57 @@ daypart_mapping = [
 ]
 
 
-def text2datetime(input_sentence: str, now: datetime = datetime.now()) -> List[Dict[str, datelike]]:
+def text2datetime(input_sentence: str, now: datetime = datetime.now(),
+                  expect_future_day: bool = False) -> List[Dict[str, datelike]]:
     """
     Returns the list of datetime intervals found in the input sentence.
     :param input_sentence: Input sentence string.
     :param now: Current timestamp to calculate relative dates.
+    :param expect_future_day: Shows if the extracted date will be offset.
     :return: list of datetime interval dictionaries
     """
-    datetime_extractor = DatetimeExtractor(now=now, output_container='datetime')
+    datetime_extractor = DatetimeExtractor(now=now, output_container='datetime', expect_future_day=expect_future_day)
     return datetime_extractor.parse_datetime(sentence=input_sentence)
 
 
-def text2date(input_sentence: str, now: datetime = datetime.now()) -> List[Dict[str, datelike]]:
+def text2date(input_sentence: str, now: datetime = datetime.now(),
+              expect_future_day: bool = False) -> List[Dict[str, datelike]]:
     """
     Returns the list of date intervals found in the input sentence.
     :param input_sentence: Input sentence string.
     :param now: Current timestamp to calculate relative dates.
+    :param expect_future_day: Shows if the extracted date will be offset.
     :return: list of date interval dictionaries
     """
-    datetime_extractor = DatetimeExtractor(now=now, output_container='date')
+    datetime_extractor = DatetimeExtractor(now=now, output_container='date', expect_future_day=expect_future_day)
     return datetime_extractor.parse_datetime(sentence=input_sentence)
 
 
-def text2time(input_sentence: str, now: datetime = datetime.now()) -> List[Dict[str, datelike]]:
+def text2time(input_sentence: str, now: datetime = datetime.now(),
+              expect_future_day: bool = False) -> List[Dict[str, datelike]]:
     """
     Returns the list of time intervals found in the input sentence.
     :param input_sentence: Input sentence string.
     :param now: Current timestamp to calculate relative dates.
+    :param expect_future_day: Shows if the extracted date will be offset.
     :return: list of time interval dictionaries
     """
-    datetime_extractor = DatetimeExtractor(now=now, output_container='time')
+    datetime_extractor = DatetimeExtractor(now=now, output_container='time', expect_future_day=expect_future_day)
     return datetime_extractor.parse_datetime(sentence=input_sentence)
 
 
-def match_rules(now: datetime, sentence: str) -> List:
+def match_rules(now: datetime, sentence: str, expect_future_day: bool = False) -> List:
     """
     Matches all rules against input text.
     :param now: Current timestamp to calculate relative dates.
     :param sentence: Input sentence.
+    :param expect_future_day: Shows if the extracted date will be offset.
     :return: Parsed date and time classes.
     """
     matches = [*match_named_month(sentence, now),
                *match_iso_date(sentence),
                *match_relative_day(sentence, now),
-               *match_weekday(sentence, now),
+               *match_weekday(sentence, now, expect_future_day),
                *match_week(sentence, now),
                *match_named_year(sentence, now),
                *match_digi_clock(sentence),
@@ -112,17 +119,19 @@ class DatetimeExtractor:
     This class handles combined date and time parsing.
     """
 
-    def __init__(self, now: datetime = datetime.now(), output_container: str = 'datetime') -> None:
+    def __init__(self, now: datetime = datetime.now(), output_container: str = 'datetime',
+                 expect_future_day: bool = False) -> None:
         """
         :param now: Current timestamp to calculate relative dates.
         :param output_container: datetime object to populate with datetime parts
+        :param expect_future_day: Shows if the extracted date will be offset.
         """
         self.now = now
         self.output_container = output_container
+        self.expect_future_day = expect_future_day
 
     def _get_implicit_intervall(self, sentence_part: str):
-        matches = match_rules(self.now, sentence_part)
-
+        matches = match_rules(self.now, sentence_part, self.expect_future_day)
         return [{'start_date': matches, 'end_date': matches}]
 
     def assamble_datetime(self, now: datetime,
@@ -273,9 +282,9 @@ class DatetimeExtractor:
 
             if interval:
                 interval['start_date'] = 'OPEN' if interval['start_date'] == 'OPEN' else match_rules(self.now, interval[
-                    'start_date'])
-                interval['end_date'] = 'OPEN' if interval['end_date'] == 'OPEN' else match_rules(self.now,
-                                                                                                 interval['end_date'])
+                    'start_date'], self.expect_future_day)
+                interval['end_date'] = 'OPEN' if interval['end_date'] == 'OPEN' else match_rules(self.now, interval[
+                    'end_date'], self.expect_future_day)
                 parsed_dates.append(interval)
             else:
                 parsed_dates += self._get_implicit_intervall(sentence_part)
