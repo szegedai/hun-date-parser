@@ -7,7 +7,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="hun-date-parser",
-    version="0.0.6",
+    version="0.0.7",
     author="Soma Nagy",
     author_email="nagysomabalint@gmail.com",
     description="A tool for extracting datetime intervals from Hungarian sentences and turning datetime objects into Hungarian text.",
