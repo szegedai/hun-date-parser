@@ -111,7 +111,10 @@ def time2digi(t: time, resolution: int):
         return f'{str(t.hour).zfill(2)}:{str(t.minute).zfill(2)}:{str(t.second).zfill(2)}'
 
 
-def time2lifelike(t: time):
+def time2lifelike(t: time, resolution: int = 2):
+
+    if resolution == 1:
+        t = time(t.hour, 0)
 
     def get_h_rep(h):
         if h % 12 != 0:
