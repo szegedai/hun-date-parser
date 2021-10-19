@@ -43,7 +43,7 @@ class DatetimeTextualizer:
         times = [time2absolutetexttime(input_datetime.time(), time_precision),
                  time2digi(input_datetime.time(), time_precision),
                  time2relitivetexttime(input_datetime.time(), time_precision),
-                 time2lifelike(input_datetime.time())]
+                 time2lifelike(input_datetime.time(), time_precision)]
 
         return {
             "dates": dates,
