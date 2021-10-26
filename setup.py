@@ -1,5 +1,6 @@
 import setuptools
 import re
+import hun_date_parser
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
@@ -7,7 +8,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setuptools.setup(
     name="hun-date-parser",
-    version="0.0.8",
+    version=hun_date_parser.__version__,
     author="Soma Nagy",
     author_email="nagysomabalint@gmail.com",
     description="A tool for extracting datetime intervals from Hungarian sentences and turning datetime objects into Hungarian text.",
