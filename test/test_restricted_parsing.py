@@ -20,6 +20,18 @@ scenarios = [
          (ExtractWithinRangeSuccess.VALID_IN_RANGE,
           [{'start_date': datetime(2020, 2, 1), 'end_date': datetime(2020, 2, 29, 23, 59, 59)}])),
 
+        # Test AM/PM mismatch resolution
+        ({'start_date': datetime(2021, 1, 1, 12), 'end_date': datetime(2021, 1, 1, 16, 59, 59)},
+         'három órakor',
+         (ExtractWithinRangeSuccess.VALID_IN_RANGE,
+          [{'start_date': datetime(2021, 1, 1, 15), 'end_date': datetime(2021, 1, 1, 15, 59, 59)}])),
+
+        # Test AM/PM mismatch resolution
+        ({'start_date': datetime(2021, 1, 1, 18), 'end_date': datetime(2021, 1, 1, 21, 59, 59)},
+         'nyolc órakor',
+         (ExtractWithinRangeSuccess.VALID_IN_RANGE,
+          [{'start_date': datetime(2021, 1, 1, 20), 'end_date': datetime(2021, 1, 1, 20, 59, 59)}])),
+
         ({'start_date': datetime(2020, 1, 1), 'end_date': datetime(2020, 12, 31, 23, 59, 59)},
          'jövő februárban',
          (ExtractWithinRangeSuccess.OUT_OF_RANGE_FALLBACK,
