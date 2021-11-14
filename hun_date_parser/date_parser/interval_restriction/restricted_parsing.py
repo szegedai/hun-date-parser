@@ -3,14 +3,29 @@ This module (still WIP) implements extracting datetime intervals from pre-determ
 If extraction within the set interval is not successful, the extraction falls back to the text2datetime function
 """
 
-from datetime import datetime, date, time
+from datetime import datetime, date, time, timedelta
 from enum import Enum
 from typing import Dict, List, Union, Tuple
+from copy import deepcopy
 
 from hun_date_parser import text2datetime
 from hun_date_parser.utils import remove_accent
+from hun_date_parser.date_parser.time_parsers import _raw_match_time_words
 
 datelike = Union[datetime, date, time, None]
+
+
+def get_reversed_am_pm(dt: datetime):
+    dt_ = deepcopy(dt)
+    if dt.hour < 12:
+        dt_ = datetime(dt.year, dt.month, dt.day, dt.hour + 12, dt.minute, dt.second)
+    elif dt.hour > 12:
+        dt_ = datetime(dt.year, dt.month, dt.day, dt.hour - 12, dt.minute, dt.second)
+    elif dt.hour == 12:
+        dt_ = dt_ + timedelta(days=1)
+        dt_ = datetime(dt_.year, dt_.month, dt_.day, 0, dt_.minute, dt_.second)
+
+    return dt_
 
 
 class ExtractWithinRangeSuccess(Enum):
@@ -18,6 +33,7 @@ class ExtractWithinRangeSuccess(Enum):
     OUT_OF_RANGE_FALLBACK = 'out_of_range'
     RELATIVE_TIME_WORD_FALLBACK = 'relative_time_word'
     OPEN_RANGE_FALLBACK = 'open_range'
+    NO_MATCH_FALLBACK = 'no_match'
 
 
 def is_relative_datetime(query: str):
@@ -55,24 +71,51 @@ def extract_datetime_within_interval(interval_start: datetime,
                         expect_future_day=expect_future_day,
                         now=interval_start)
 
+    possible_am_pm_missmatch = False
+    parts = _raw_match_time_words(query_text)
+    if parts:
+        group, daypart, hour_modifier, hour, minute = parts
+        if not daypart and hour:
+            possible_am_pm_missmatch = True
+
+    extend_res = []
+    if possible_am_pm_missmatch:
+        for match in res:
+            extend_res.append({
+                    "start_date": get_reversed_am_pm(match["start_date"]),
+                    "end_date": get_reversed_am_pm(match["end_date"])
+                })
+
+    res += extend_res
+
+    response_type = ExtractWithinRangeSuccess.NO_MATCH_FALLBACK
+    restricted_date: List[Dict[str, datelike]] = []
     for r in res:
         if not (type(r['start_date']) == datetime and type(r['start_date']) == datetime):
-            return ExtractWithinRangeSuccess.OPEN_RANGE_FALLBACK, text2datetime(query_text,
-                                                                                expect_future_day=expect_future_day,
-                                                                                now=fallback_now)
+            response_type = ExtractWithinRangeSuccess.OPEN_RANGE_FALLBACK
+            restricted_date = text2datetime(query_text,
+                                            expect_future_day=expect_future_day,
+                                            now=fallback_now)
+            continue
 
         assert type(interval_start) == datetime and type(r['start_date']) == datetime
         assert type(interval_end) == datetime and type(r['end_date']) == datetime
         if not (interval_start <= r['start_date'] and r['end_date'] <= interval_end):
             # Extracted datetime is out of expected interval...
-            return ExtractWithinRangeSuccess.OUT_OF_RANGE_FALLBACK, text2datetime(query_text,
-                                                                                  expect_future_day=expect_future_day,
-                                                                                  now=fallback_now)
+            response_type = ExtractWithinRangeSuccess.OUT_OF_RANGE_FALLBACK
+            restricted_date = text2datetime(query_text,
+                                            expect_future_day=expect_future_day,
+                                            now=fallback_now)
+            continue
 
-    if is_relative_datetime(query_text):
-        # Datetime ranges relative to the current timestamp doesn't really make sense in this scenario...
-        return ExtractWithinRangeSuccess.RELATIVE_TIME_WORD_FALLBACK, text2datetime(query_text,
-                                                                                    expect_future_day=expect_future_day,
-                                                                                    now=fallback_now)
-    else:
-        return ExtractWithinRangeSuccess.VALID_IN_RANGE, res
+        if is_relative_datetime(query_text):
+            # Datetime ranges relative to the current timestamp doesn't really make sense in this scenario...
+            response_type = ExtractWithinRangeSuccess.RELATIVE_TIME_WORD_FALLBACK
+            restricted_date = text2datetime(query_text,
+                                            expect_future_day=expect_future_day,
+                                            now=fallback_now)
+        else:
+            response_type = ExtractWithinRangeSuccess.VALID_IN_RANGE
+            restricted_date = [r]
+
+    return response_type, restricted_date

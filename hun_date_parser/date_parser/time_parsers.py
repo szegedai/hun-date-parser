@@ -1,6 +1,6 @@
 import re
 
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Tuple, Optional
 from datetime import datetime
 
 from hun_date_parser.date_parser.patterns import R_DIGI, R_HOUR_MIN, R_HOUR_MIN_REV
@@ -31,10 +31,11 @@ def match_digi_clock(s: str) -> List[Dict[str, Any]]:
     return res
 
 
-def match_time_words(s: str) -> List[Dict[str, Any]]:
+def _raw_match_time_words(s: str) -> Optional[Tuple[Any, Any, Any, Any, Any]]:
     """
-    :param s: textual input
-    :return: tuple of date parts
+    Extracts date and time particles from text
+    :param s: input text
+    :return:
     """
     group = re.findall(R_HOUR_MIN, s)
     group = [m for m in group if ''.join(m)]
@@ -43,7 +44,7 @@ def match_time_words(s: str) -> List[Dict[str, Any]]:
     group_rev = [m for m in group_rev if ''.join(m)]
 
     if not (group or group_rev):
-        return []
+        return None
     elif group and not group_rev:
         daypart, hour_modifier, hour, minute = group[0]
     elif not group and group_rev:
@@ -54,6 +55,20 @@ def match_time_words(s: str) -> List[Dict[str, Any]]:
         minute += (' ' + is_before)
     else:
         daypart, hour_modifier, hour, minute = group[0]
+
+    return group, daypart, hour_modifier, hour, minute
+
+
+def match_time_words(s: str) -> List[Dict[str, Any]]:
+    """
+    :param s: textual input
+    :return: tuple of date parts
+    """
+    parts = _raw_match_time_words(s)
+    if not parts:
+        return []
+    else:
+        group, daypart, hour_modifier, hour, minute = parts
 
     # Only numbers can match dates as well, this is an attempt to remove false matches
     hour_index = s.index(f'{hour}')
