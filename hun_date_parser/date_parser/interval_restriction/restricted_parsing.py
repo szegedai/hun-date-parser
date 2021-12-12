@@ -81,10 +81,11 @@ def extract_datetime_within_interval(interval_start: datetime,
     extend_res = []
     if possible_am_pm_missmatch:
         for match in res:
-            extend_res.append({
-                    "start_date": get_reversed_am_pm(match["start_date"]),
-                    "end_date": get_reversed_am_pm(match["end_date"])
-                })
+            if isinstance(match["start_date"], datetime) and isinstance(match["end_date"], datetime):
+                extend_res.append({
+                        "start_date": get_reversed_am_pm(match["start_date"]),
+                        "end_date": get_reversed_am_pm(match["end_date"])
+                    })
 
     res += extend_res
 
