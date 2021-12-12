@@ -203,11 +203,13 @@ def match_n_periods_compared_to_now(s: str, now: datetime) -> List[Dict[str, Any
             if n:
                 n = word_to_num(n)
                 if freq == 'w':
-                    y, w = (now + timedelta(days=n*7)).isocalendar()[0:2]
-                    date_parts['date_parts'].extend([Year(y, fn), Week(w, fn)])
+                    res_dt = (now + timedelta(days=7*n))
+                    y, m, d = res_dt.year, res_dt.month, res_dt.day
+                    date_parts['date_parts'].extend([Year(y, fn), Month(m, fn), Day(d, fn)])
                 elif freq == 'd':
-                    y, w = (now + timedelta(days=n)).isocalendar()[0:2]
-                    date_parts['date_parts'].extend([Year(y, fn), Week(w, fn)])
+                    res_dt = (now + timedelta(days=n))
+                    y, m, d = res_dt.year, res_dt.month, res_dt.day
+                    date_parts['date_parts'].extend([Year(y, fn), Month(m, fn), Day(d, fn)])
                 elif freq == 'h':
                     res_dt = (now + timedelta(hours=n))
                     y, m, d, h = res_dt.year, res_dt.month, res_dt.day, res_dt.hour

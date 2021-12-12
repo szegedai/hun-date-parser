@@ -1,11 +1,11 @@
+import pytest
 from datetime import datetime
 
 from hun_date_parser.utils import *
 from hun_date_parser.date_parser.datetime_extractor import DatetimeExtractor, extend_start_end
 
 
-def test_datetime_extractor():
-    tf = [
+scenarios = [
         ('ezen a héten', datetime(2020, 12, 14, 0, 0, 0), datetime(2020, 12, 20, 23, 59, 59)),
         ('legyen ma reggel nyolckor', datetime(2020, 12, 18, 8, 0, 0), datetime(2020, 12, 18, 8, 59, 59)),
         ('legyen ma', datetime(2020, 12, 18, 0, 0, 0), datetime(2020, 12, 18, 23, 59, 59)),
@@ -28,16 +28,18 @@ def test_datetime_extractor():
         ('2021 január 5 reggel 7', datetime(2021, 1, 5, 7), datetime(2021, 1, 5, 7, 59, 59)),
         ('január 5 reggel 7', datetime(2020, 1, 5, 7), datetime(2020, 1, 5, 7, 59, 59)),
         ('január 5-én', datetime(2020, 1, 5), datetime(2020, 1, 5, 23, 59, 59)),
-        ('legyen most mondjuk', datetime(2020, 12, 18), datetime(2020, 12, 18, 0, 0, 59))  # TODO: Come up with better
+        ('legyen most mondjuk', datetime(2020, 12, 18), datetime(2020, 12, 18, 0, 0, 59)),  # TODO: Come up with better
     ]
+
+
+@pytest.mark.parametrize("inp_txt, st, end", scenarios)
+def test_datetime_extractor(inp_txt, st, end):
     now = datetime(2020, 12, 18)
     de = DatetimeExtractor(now)
+    parsed_date = de.parse_datetime(inp_txt)[0]
 
-    for inp_txt, st, end in tf:
-        parsed_date = de.parse_datetime(inp_txt)[0]
-
-        assert parsed_date['start_date'] == st
-        assert parsed_date['end_date'] == end
+    assert parsed_date['start_date'] == st
+    assert parsed_date['end_date'] == end
 
 
 def test_extend_start_end():
