@@ -88,14 +88,16 @@ def extract_datetime_within_interval(interval_start: datetime,
 
     res += extend_res
 
-    response_type = ExtractWithinRangeSuccess.NO_MATCH_FALLBACK
     restricted_date: List[Dict[str, datelike]] = []
+    response_candidates = [(5, ExtractWithinRangeSuccess.NO_MATCH_FALLBACK, restricted_date)]
     for r in res:
         if not (type(r['start_date']) == datetime and type(r['start_date']) == datetime):
             response_type = ExtractWithinRangeSuccess.OPEN_RANGE_FALLBACK
             restricted_date = text2datetime(query_text,
                                             expect_future_day=expect_future_day,
                                             now=fallback_now)
+
+            response_candidates.append((4, response_type, restricted_date))
             continue
 
         assert type(interval_start) == datetime and type(r['start_date']) == datetime
@@ -106,6 +108,8 @@ def extract_datetime_within_interval(interval_start: datetime,
             restricted_date = text2datetime(query_text,
                                             expect_future_day=expect_future_day,
                                             now=fallback_now)
+
+            response_candidates.append((2, response_type, restricted_date))
             continue
 
         if is_relative_datetime(query_text):
@@ -114,8 +118,15 @@ def extract_datetime_within_interval(interval_start: datetime,
             restricted_date = text2datetime(query_text,
                                             expect_future_day=expect_future_day,
                                             now=fallback_now)
+
+            response_candidates.append((3, response_type, restricted_date))
         else:
             response_type = ExtractWithinRangeSuccess.VALID_IN_RANGE
             restricted_date = [r]
+
+            response_candidates.append((1, response_type, restricted_date))
+
+    response_candidates_ranked = sorted(response_candidates)
+    _, response_type, restricted_date = response_candidates_ranked[0]
 
     return response_type, restricted_date
