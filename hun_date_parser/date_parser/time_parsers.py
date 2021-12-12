@@ -112,7 +112,6 @@ def match_time_words(s: str) -> List[Dict[str, Any]]:
         if 'mulva' in remove_accent(s):
             return []
 
-
         hour_num = word_to_num(hour)
         minute_num = word_to_num(minute)
 
