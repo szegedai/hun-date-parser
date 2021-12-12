@@ -92,7 +92,7 @@ def extract_datetime_within_interval(interval_start: datetime,
     restricted_date: List[Dict[str, datelike]] = []
     response_candidates = [(5, ExtractWithinRangeSuccess.NO_MATCH_FALLBACK, restricted_date)]
     for r in res:
-        if not (type(r['start_date']) == datetime and type(r['start_date']) == datetime):
+        if not (isinstance(r['start_date'], datetime) and isinstance(r['end_date'], datetime)):
             response_type = ExtractWithinRangeSuccess.OPEN_RANGE_FALLBACK
             restricted_date = text2datetime(query_text,
                                             expect_future_day=expect_future_day,
