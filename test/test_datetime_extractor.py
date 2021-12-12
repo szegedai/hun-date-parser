@@ -33,7 +33,10 @@ scenarios = [
         ('egy óra múlva', datetime(2020, 12, 18, 1), datetime(2020, 12, 18, 1, 59, 59)),
         ('két óra múlva', datetime(2020, 12, 18, 2), datetime(2020, 12, 18, 2, 59, 59)),
         ('egy hét múlva', datetime(2020, 12, 25), datetime(2020, 12, 25, 23, 59, 59)),
-        ('5 perc múlva', datetime(2020, 12, 18, 0, 5), datetime(2020, 12, 18, 0, 5, 59))
+        ('5 perc múlva', datetime(2020, 12, 18, 0, 5), datetime(2020, 12, 18, 0, 5, 59)),
+        ('három nap múlva', datetime(2020, 12, 21), datetime(2020, 12, 21, 23, 59, 59)),
+        ('csütörtök', datetime(2020, 12, 17), datetime(2020, 12, 17, 23, 59, 59)),
+        ('jövő csütörtökön', datetime(2020, 12, 24), datetime(2020, 12, 24, 23, 59, 59)),
     ]
 
 
