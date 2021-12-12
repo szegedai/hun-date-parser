@@ -216,8 +216,9 @@ def match_n_periods_compared_to_now(s: str, now: datetime) -> List[Dict[str, Any
                     date_parts['date_parts'].extend([Year(y, fn), Month(m, fn), Day(d, fn), Hour(h, fn)])
                 elif freq == 'm':
                     res_dt = (now + timedelta(minutes=n))
-                    y, m, d, h, m = res_dt.year, res_dt.month, res_dt.day, res_dt.hour, res_dt.minute
-                    date_parts['date_parts'].extend([Year(y, fn), Month(m, fn), Day(d, fn), Hour(h, fn), Minute(m, fn)])
+                    y, mo, d, h, mi = res_dt.year, res_dt.month, res_dt.day, res_dt.hour, res_dt.minute
+                    date_parts['date_parts'].extend([Year(y, fn), Month(mo, fn),
+                                                     Day(d, fn), Hour(h, fn), Minute(mi, fn)])
 
             res.append(date_parts)
 

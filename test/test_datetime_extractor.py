@@ -30,6 +30,10 @@ scenarios = [
         ('január 5 reggel 7', datetime(2020, 1, 5, 7), datetime(2020, 1, 5, 7, 59, 59)),
         ('január 5-én', datetime(2020, 1, 5), datetime(2020, 1, 5, 23, 59, 59)),
         ('legyen most mondjuk', datetime(2020, 12, 18), datetime(2020, 12, 18, 0, 0, 59)),  # TODO: Come up with better
+        ('egy óra múlva', datetime(2020, 12, 18, 1), datetime(2020, 12, 18, 1, 59, 59)),
+        ('két óra múlva', datetime(2020, 12, 18, 2), datetime(2020, 12, 18, 2, 59, 59)),
+        ('egy hét múlva', datetime(2020, 12, 25), datetime(2020, 12, 25, 23, 59, 59)),
+        ('5 perc múlva', datetime(2020, 12, 18, 0, 5), datetime(2020, 12, 18, 0, 5, 59))
     ]
 
 

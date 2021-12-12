@@ -99,6 +99,20 @@ def match_time_words(s: str) -> List[Dict[str, Any]]:
             am = False
 
     if hour:
+
+        # SKIP the whole matching rule when any of these apply
+        # TODO: come up with a more elegant solution for this
+        # TODO: i.e: by implementing the possibility of one rule exclude another
+        # this is made redundant by the change in the patterns
+        non_hours = ['ev', 'perc']
+        for nh in non_hours:
+            if f' {nh}' in remove_accent(hour) or remove_accent(hour).startswith(nh):
+                return []
+
+        if 'mulva' in remove_accent(s):
+            return []
+
+
         hour_num = word_to_num(hour)
         minute_num = word_to_num(minute)
 
@@ -106,12 +120,6 @@ def match_time_words(s: str) -> List[Dict[str, Any]]:
             # default to business hour if daypart is not specified
             if hour_num < 8:
                 hour_num += 12
-
-        # this is made redundant by the change in the patterns
-        non_hours = ['ev', 'perc']
-        for nh in non_hours:
-            if f' {nh}' in remove_accent(hour) or remove_accent(hour).startswith(nh):
-                return []
 
         if hour_modifier:
             if 'haromnegyed' in remove_accent(hour_modifier):
