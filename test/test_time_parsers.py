@@ -2,7 +2,7 @@ import pytest
 from datetime import datetime
 
 from hun_date_parser.utils import Year, Month, Day, Daypart, Hour, Minute
-from hun_date_parser.date_parser.time_parsers import match_digi_clock, match_time_words, match_now
+from hun_date_parser.date_parser.time_parsers import match_digi_clock, match_time_words, match_now, match_hwords
 
 
 def test_match_digi_clock():
@@ -78,3 +78,23 @@ def test_match_now():
         for e in out:
             date_parts.append(e['date_parts'])
         assert date_parts == exp
+
+
+hword_fn = 'hwords'
+hword_scenarios = [
+    ('16h', [[Hour(16, hword_fn)]]),
+    ('16 h', []),
+    ('16h-kor', [[Hour(16, hword_fn)]]),
+    ('h', []),
+    ('1 hely', []),
+    ('jövő csütörtökön 16h', [[Hour(16, hword_fn)]])
+]
+
+
+@pytest.mark.parametrize("inp, exp", hword_scenarios)
+def test_match_hwords(inp, exp):
+    out = match_hwords(inp)
+    date_parts = []
+    for e in out:
+        date_parts.append(e['date_parts'])
+    assert date_parts == exp
