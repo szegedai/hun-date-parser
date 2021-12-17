@@ -1,5 +1,5 @@
 pytest
 flake8
-mypy
+mypy==0.910
 pytest-cov
 coveralls
