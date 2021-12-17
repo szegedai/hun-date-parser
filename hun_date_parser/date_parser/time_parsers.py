@@ -3,7 +3,7 @@ import re
 from typing import Dict, List, Any, Tuple, Optional
 from datetime import datetime
 
-from hun_date_parser.date_parser.patterns import R_DIGI, R_HOUR_MIN, R_HOUR_MIN_REV
+from hun_date_parser.date_parser.patterns import R_DIGI, R_HOUR_MIN, R_HOUR_MIN_REV, R_HWORDS_
 from hun_date_parser.utils import remove_accent, word_to_num, Year, Month, Day, Hour, Minute, Daypart
 from hun_date_parser.date_parser.date_parsers import match_weekday
 
@@ -27,6 +27,18 @@ def match_digi_clock(s: str) -> List[Dict[str, Any]]:
             res.append({'match': group, 'date_parts': [Hour(h, 'digi_clock'), Minute(m, 'digi_clock')]})
         elif len(group) == 1:
             res.append({'match': group, 'date_parts': [Hour(group[0], 'digi_clock')]})
+
+    return res
+
+
+def match_hwords(s: str) -> List[Dict[str, Any]]:
+    group = re.findall(R_HWORDS_, s)
+    group = [m for m in group if ''.join(m)]
+
+    res = []
+    for match in group:
+        match = int(match)
+        res.append({'match': match, 'date_parts': [Hour(match, 'hwords')]})
 
     return res
 

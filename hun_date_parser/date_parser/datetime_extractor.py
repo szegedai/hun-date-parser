@@ -11,7 +11,7 @@ from hun_date_parser.date_parser.structure_parsers import match_multi_match, mat
 from hun_date_parser.date_parser.date_parsers import (match_named_month, match_iso_date, match_weekday,
                                                       match_relative_day,
                                                       match_week, match_named_year, match_n_periods_compared_to_now)
-from hun_date_parser.date_parser.time_parsers import match_digi_clock, match_time_words, match_now
+from hun_date_parser.date_parser.time_parsers import match_digi_clock, match_time_words, match_now, match_hwords
 from hun_date_parser.utils import Year, Month, Week, Day, Daypart, Hour, Minute, monday_of_calenderweek
 
 datelike = Union[datetime, date, time, None]
@@ -80,6 +80,7 @@ def match_rules(now: datetime, sentence: str, expect_future_day: bool = False) -
                *match_week(sentence, now),
                *match_named_year(sentence, now),
                *match_digi_clock(sentence),
+               *match_hwords(sentence),
                *match_time_words(sentence),
                *match_now(sentence, now),
                *match_n_periods_compared_to_now(sentence, now)]
