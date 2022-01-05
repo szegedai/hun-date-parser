@@ -172,6 +172,7 @@ class DatetimeExtractor:
                     pre_first = False
                     res_dt.append(_dp_match[0])
                 else:
+                    # TODO: this should take into account the expect_future_day parameter...
                     res_dt.append(now.year)
 
             if date_type == Month:

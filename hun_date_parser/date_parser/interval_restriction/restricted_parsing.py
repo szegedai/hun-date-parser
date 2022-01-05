@@ -17,9 +17,9 @@ datelike = Union[datetime, date, time, None]
 
 def get_reversed_am_pm(dt: datetime):
     dt_ = deepcopy(dt)
-    if dt.hour < 12:
+    if 0 < dt.hour < 12:
         dt_ = datetime(dt.year, dt.month, dt.day, dt.hour + 12, dt.minute, dt.second)
-    elif dt.hour > 12:
+    elif not (dt.hour == 23 and dt.minute == 59) and dt.hour > 12:
         dt_ = datetime(dt.year, dt.month, dt.day, dt.hour - 12, dt.minute, dt.second)
     elif dt.hour == 12:
         dt_ = dt_ + timedelta(days=1)
