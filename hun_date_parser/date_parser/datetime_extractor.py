@@ -17,12 +17,12 @@ from hun_date_parser.utils import Year, Month, Week, Day, Daypart, Hour, Minute,
 datelike = Union[datetime, date, time, None]
 
 daypart_mapping = [
-    (3, 5),
-    (6, 9),
-    (10, 11),
-    (12, 17),
-    (18, 21),
-    (22, 2)
+    (3, 5),     # hajnal
+    (6, 10),    # reggel
+    (8, 11),    # délelőtt
+    (12, 18),   # délután
+    (18, 21),   # este
+    (22, 2)     # éjjel
 ]
 
 
