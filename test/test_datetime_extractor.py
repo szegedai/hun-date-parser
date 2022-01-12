@@ -38,6 +38,7 @@ scenarios = [
         ('csütörtök', datetime(2020, 12, 17), datetime(2020, 12, 17, 23, 59, 59)),
         ('jövő csütörtökön', datetime(2020, 12, 24), datetime(2020, 12, 24, 23, 59, 59)),
         ('jövő csütörtökön 16h', datetime(2020, 12, 24, 16), datetime(2020, 12, 24, 16, 59, 59)),
+        ('igen 10-kor', datetime(2020, 12, 18, 10), datetime(2020, 12, 18, 10, 59, 59)),
     ]
 
 

@@ -48,6 +48,8 @@ time_word_scenarios = [
     ('mondjuk tíz perccel 8 óra előtt', [[Hour(7, time_word_fn), Minute(50, time_word_fn)]]),
     ('délután fél négy után hat perccel', [[Hour(15, time_word_fn), Minute(36, time_word_fn)]]),
     ('6 óra után 3 perccel', [[Hour(18, time_word_fn), Minute(3, time_word_fn)]]),
+    ('igen, 10-kor', [[Hour(10, time_word_fn)]]),
+    ('igen 10-kor', [[Hour(10, time_word_fn)]]),
     ('ezen a héten', []),
     ('2020 december', []),
     ('kb húsz év múlva', []),
