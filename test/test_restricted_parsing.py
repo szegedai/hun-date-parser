@@ -10,6 +10,11 @@ scenarios = [
          (ExtractWithinRangeSuccess.VALID_IN_RANGE,
           [{'start_date': datetime(2021, 10, 12), 'end_date': datetime(2021, 10, 12, 23, 59, 59)}])),
 
+        ({'start_date': datetime(2021, 10, 11), 'end_date': datetime(2021, 10, 18, 23, 59, 59)},
+         'kedden vagy szerdán',
+         (ExtractWithinRangeSuccess.VALID_IN_RANGE,
+          [{'start_date': datetime(2021, 10, 12), 'end_date': datetime(2021, 10, 12, 23, 59, 59)}])),
+
         ({'start_date': datetime(2022, 1, 1), 'end_date': datetime(2022, 12, 31, 23, 59, 59)},
          'februárban',
          (ExtractWithinRangeSuccess.VALID_IN_RANGE,
