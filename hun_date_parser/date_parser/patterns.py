@@ -2,9 +2,9 @@
 R_MULTI = r'(.*)\bvagy\b(.*)|(.*)\bés\b(.*)'
 
 # schemas
-R_TOLIG = r'(.*-?t[oóöő]l)(.*-?ig)'
-R_TOL = r'([:\w ]*-?t[oóöő]l).*'
-R_IG = r'([:\w ]*-?ig)'
+R_TOLIG = r'(.*-?t[oóöő]l\b)(.*-?ig\b)'
+R_TOL = r'([:\w ]*-?t[oóöő]l\b).*'
+R_IG = r'([:\w ]*-?ig\b)'
 
 # hyper day level patterns
 R_ISO_DATE = r'(\b\d{4,4})(?:[-\\/\.](1[0-2]|0?[1-9]))?(?:[-\\/\.](1[0-9]|2[0-9]|3[01]|0?[1-9]))?'

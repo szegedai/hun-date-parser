@@ -17,6 +17,10 @@ def test_match_interval():
 
 def test_match_multi_match():
     w = [('kedden és szerdán', ['kedden', 'szerdán']),
+         # ('kedden, szerdán és pénteken', ['kedden', 'szerdán', 'pénteken']),
+         # ('kedden, szerdán', ['kedden', 'szerdán']),
+         # These could cause significant unintended consequences,
+         # deeper rethinking is required than simply splitting among commas as well
          ('2020 január vagy februárjában', ['2020 január', 'februárjában'])]
 
     for inp, out in w:

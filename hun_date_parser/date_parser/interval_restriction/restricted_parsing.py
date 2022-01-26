@@ -127,7 +127,7 @@ def extract_datetime_within_interval(interval_start: datetime,
 
             response_candidates.append((1, response_type, restricted_date))
 
-    response_candidates_ranked = sorted(response_candidates)
+    response_candidates_ranked = sorted(response_candidates, key=lambda x: x[0])
     _, response_type, restricted_date = response_candidates_ranked[0]
 
     return response_type, restricted_date
