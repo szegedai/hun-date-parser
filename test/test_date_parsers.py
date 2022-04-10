@@ -1,8 +1,29 @@
+import pytest
 from datetime import datetime
 
 from hun_date_parser.date_parser.date_parsers import Year, Month, Week, Day
-from hun_date_parser.date_parser.date_parsers import (match_iso_date, match_named_month, match_relative_day, match_weekday,
+from hun_date_parser.date_parser.date_parsers import (match_iso_date, match_named_month, match_relative_day,
+                                                      match_weekday,
                                                       match_week, match_named_year)
+
+tf_named_month = [
+    ('jan 20-án', [[Month(1, 'named_month'), Day(20, 'named_month')]]),
+    ('2020 febr. 4', [[Month(2, 'named_month'), Day(4, 'named_month')]]),
+    ('január', [[Month(1, 'named_month')]]),
+    (' február ', [[Month(2, 'named_month')]]),
+    ('janos', []),
+    ('', []),
+    ('2020 július', [[Month(7, 'named_month')]]),
+    ('2020 június - augusztus 30', [[Month(6, 'named_month')], [Month(8, 'named_month'), Day(30, 'named_month')]]),
+    ('június 20 - július 30',
+     [[Month(6, 'named_month'), Day(20, 'named_month')], [Month(7, 'named_month'), Day(30, 'named_month')]]),
+    ('tavaly február ', [[Year(2019, 'named_month'), Month(2, 'named_month')]]),
+    ('legyen jövő február 12-én', [[Year(2021, 'named_month'), Month(2, 'named_month'), Day(12, 'named_month')]]),
+    ('legyen jövő év február 12-én', [[Year(2021, 'named_month'), Month(2, 'named_month'), Day(12, 'named_month')]]),
+    ('ápr 15', [[Month(4, 'named_month'), Day(15, 'named_month')]]),
+    ('május 15', [[Month(5, 'named_month'), Day(15, 'named_month')]]),
+    ('április 1', [[Month(4, 'named_month'), Day(1, 'named_month')]]),
+    ('legyen jövőre február 12-én', [[Year(2021, 'named_month'), Month(2, 'named_month'), Day(12, 'named_month')]])]
 
 
 def test_match_iso_date():
@@ -22,30 +43,15 @@ def test_match_iso_date():
         assert date_parts == exp
 
 
-def test_named_month():
-    fn = 'named_month'
+@pytest.mark.parametrize("inp,exp", tf_named_month)
+def test_named_month(inp, exp):
     now = datetime(2020, 10, 1)
 
-    tf = [('jan 20-án', [[Month(1, fn), Day(20, fn)]]),
-          ('2020 febr. 4', [[Month(2, fn), Day(4, fn)]]),
-          ('január', [[Month(1, fn)]]),
-          (' február ', [[Month(2, fn)]]),
-          ('janos', []),
-          ('', []),
-          ('2020 július', [[Month(7, fn)]]),
-          ('2020 június - augusztus 30', [[Month(6, fn)], [Month(8, fn), Day(30, fn)]]),
-          ('június 20 - július 30', [[Month(6, fn), Day(20, fn)], [Month(7, fn), Day(30, fn)]]),
-          ('tavaly február ', [[Year(2019, fn), Month(2, fn)]]),
-          ('legyen jövő február 12-én', [[Year(2021, fn), Month(2, fn), Day(12, fn)]]),
-          ('legyen jövő év február 12-én', [[Year(2021, fn), Month(2, fn), Day(12, fn)]]),
-          ('legyen jövőre február 12-én', [[Year(2021, fn), Month(2, fn), Day(12, fn)]])]
-
-    for inp, exp in tf:
-        out = match_named_month(inp, now)
-        date_parts = []
-        for e in out:
-            date_parts.append(e['date_parts'])
-        assert date_parts == exp
+    out = match_named_month(inp, now)
+    date_parts = []
+    for e in out:
+        date_parts.append(e['date_parts'])
+    assert date_parts == exp
 
 
 def test_match_relative_day():
