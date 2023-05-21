@@ -127,7 +127,7 @@ def match_weekday(s: str, now: datetime, expect_future_day: bool = False) -> Lis
             return ((now - timedelta(days=now.weekday())) + timedelta(days=w * 7)) + timedelta(days=d)
 
         if 'hetfo' in remove_accent(day):
-            day = offset_date(get_day_of_week(n_weeks, 0)) if expect_future_day and n_weeks >= 0\
+            day = offset_date(get_day_of_week(n_weeks, 0)) if expect_future_day and n_weeks >= 0 \
                 else get_day_of_week(n_weeks, 0)
             date_parts['date_parts'] = [Year(day.year, 'weekday'), Month(day.month, 'weekday'), Day(day.day, 'weekday')]
         elif 'kedd' in remove_accent(day):
@@ -203,7 +203,7 @@ def match_n_periods_compared_to_now(s: str, now: datetime) -> List[Dict[str, Any
             if n:
                 n = word_to_num(n)
                 if freq == 'w':
-                    res_dt = (now + timedelta(days=7*n))
+                    res_dt = (now + timedelta(days=7 * n))
                     y, m, d = res_dt.year, res_dt.month, res_dt.day
                     date_parts['date_parts'].extend([Year(y, fn), Month(m, fn), Day(d, fn)])
                 elif freq == 'd':
