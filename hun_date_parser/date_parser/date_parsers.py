@@ -5,7 +5,8 @@ from dateutil.relativedelta import relativedelta
 
 from .patterns import (R_ISO_DATE, R_NAMED_MONTH, R_TODAY, R_TOMORROW, R_NTOMORROW, R_YESTERDAY, R_NYESTERDAY,
                        R_WEEKDAY, R_WEEK, R_YEAR, R_NDAYS_FROM_NOW, R_NWEEKS_FROM_NOW, R_NHOURS_FROM_NOW,
-                       R_NMINS_FROM_NOW, R_RELATIVE_MONTH)
+                       R_NMINS_FROM_NOW, R_RELATIVE_MONTH, R_NMINS_PRIOR_NOW, R_NDAYS_PRIOR_NOW, R_NHOURS_PRIOR_NOW,
+                       R_NWEEKS_PRIOR_NOW)
 from hun_date_parser.utils import remove_accent, word_to_num, Year, Month, Week, Day, Hour, Minute
 
 
@@ -184,18 +185,22 @@ def match_week(s: str, now: datetime) -> List[Dict[str, Any]]:
 
 
 def match_n_periods_compared_to_now(s: str, now: datetime) -> List[Dict[str, Any]]:
-    # TODO: implement n-periods-before-now functionality
     fn = 'n_date_periods_compared_to_now'
 
     regexes = [
-        (R_NWEEKS_FROM_NOW, 'w'),
-        (R_NDAYS_FROM_NOW, 'd'),
-        (R_NHOURS_FROM_NOW, 'h'),
-        (R_NMINS_FROM_NOW, 'm')
+        (R_NWEEKS_FROM_NOW, 'w', 'future'),
+        (R_NDAYS_FROM_NOW, 'd', 'future'),
+        (R_NHOURS_FROM_NOW, 'h', 'future'),
+        (R_NMINS_FROM_NOW, 'm', 'future'),
+        (R_NWEEKS_PRIOR_NOW, 'w', 'past'),
+        (R_NDAYS_PRIOR_NOW, 'd', 'past'),
+        (R_NHOURS_PRIOR_NOW, 'h', 'past'),
+        (R_NMINS_FROM_NOW, 'm', 'past'),
     ]
     res = []
 
-    for regex, freq in regexes:
+    for regex, freq, before_or_after in regexes:
+        multiplier = -1 if before_or_after == "past" else 1
         groups = re.findall(regex, s)
         for group in groups:
             date_parts = {'match': group, 'date_parts': []}
@@ -204,19 +209,19 @@ def match_n_periods_compared_to_now(s: str, now: datetime) -> List[Dict[str, Any
             if n:
                 n = word_to_num(n)
                 if freq == 'w':
-                    res_dt = (now + timedelta(days=7 * n))
+                    res_dt = (now + timedelta(days=multiplier * 7 * n))
                     y, m, d = res_dt.year, res_dt.month, res_dt.day
                     date_parts['date_parts'].extend([Year(y, fn), Month(m, fn), Day(d, fn)])
                 elif freq == 'd':
-                    res_dt = (now + timedelta(days=n))
+                    res_dt = (now + timedelta(days=multiplier * n))
                     y, m, d = res_dt.year, res_dt.month, res_dt.day
                     date_parts['date_parts'].extend([Year(y, fn), Month(m, fn), Day(d, fn)])
                 elif freq == 'h':
-                    res_dt = (now + timedelta(hours=n))
+                    res_dt = (now + timedelta(hours=multiplier * n))
                     y, m, d, h = res_dt.year, res_dt.month, res_dt.day, res_dt.hour
                     date_parts['date_parts'].extend([Year(y, fn), Month(m, fn), Day(d, fn), Hour(h, fn)])
                 elif freq == 'm':
-                    res_dt = (now + timedelta(minutes=n))
+                    res_dt = (now + timedelta(minutes=multiplier * n))
                     y, mo, d, h, mi = res_dt.year, res_dt.month, res_dt.day, res_dt.hour, res_dt.minute
                     date_parts['date_parts'].extend([Year(y, fn), Month(mo, fn),
                                                      Day(d, fn), Hour(h, fn), Minute(mi, fn)])

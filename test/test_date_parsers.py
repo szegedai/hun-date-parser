@@ -4,7 +4,8 @@ from datetime import datetime
 from hun_date_parser.date_parser.date_parsers import Year, Month, Week, Day
 from hun_date_parser.date_parser.date_parsers import (match_iso_date, match_named_month, match_relative_day,
                                                       match_weekday,
-                                                      match_week, match_named_year, match_relative_month)
+                                                      match_week, match_named_year, match_relative_month,
+                                                      match_n_periods_compared_to_now)
 
 tf_named_month = [
     ('jan 20-án', [[Month(1, 'named_month'), Day(20, 'named_month')]]),
@@ -91,6 +92,16 @@ tf_relative_month = [
     ('következendő hónap', [[Year(2023, 'relative_month'), Month(6, 'relative_month')]]),
 ]
 
+tf_n_periods_from_now = [
+    ('egy hét múlva', [[Year(2023, 'n_date_periods_compared_to_now'), Month(5, 'n_date_periods_compared_to_now'), Day(27, 'n_date_periods_compared_to_now')]]),
+    ('egy héttel korábban', [[Year(2023, 'n_date_periods_compared_to_now'), Month(5, 'n_date_periods_compared_to_now'), Day(13, 'n_date_periods_compared_to_now')]]),
+    ('két héttel korábbi időpont', [[Year(2023, 'n_date_periods_compared_to_now'), Month(5, 'n_date_periods_compared_to_now'), Day(6, 'n_date_periods_compared_to_now')]]),
+    ('1 hét múlva', [[Year(2023, 'n_date_periods_compared_to_now'), Month(5, 'n_date_periods_compared_to_now'), Day(27, 'n_date_periods_compared_to_now')]]),
+    ('1 héttel ezelőtt', [[Year(2023, 'n_date_periods_compared_to_now'), Month(5, 'n_date_periods_compared_to_now'), Day(13, 'n_date_periods_compared_to_now')]]),
+    ('6 nappal ezelőtt', [[Year(2023, 'n_date_periods_compared_to_now'), Month(5, 'n_date_periods_compared_to_now'), Day(14, 'n_date_periods_compared_to_now')]]),
+    ('5 nap múlva', [[Year(2023, 'n_date_periods_compared_to_now'), Month(5, 'n_date_periods_compared_to_now'), Day(25, 'n_date_periods_compared_to_now')]]),
+]
+
 
 @pytest.mark.parametrize("inp,exp", tf_iso_date)
 def test_match_iso_date(inp, exp):
@@ -152,10 +163,20 @@ def test_match_named_year(inp, exp):
         date_parts.append(e['date_parts'])
     assert date_parts == exp
 
+
 @pytest.mark.parametrize("inp,exp", tf_relative_month)
 def test_match_relative_month(inp, exp):
     now = datetime(2023, 5, 20)
     out = match_relative_month(inp, now)
+    date_parts = []
+    for e in out:
+        date_parts.append(e['date_parts'])
+    assert date_parts == exp
+
+@pytest.mark.parametrize("inp,exp", tf_n_periods_from_now)
+def test_match_n_periods_compared_to_now(inp, exp):
+    now = datetime(2023, 5, 20)
+    out = match_n_periods_compared_to_now(inp, now)
     date_parts = []
     for e in out:
         date_parts.append(e['date_parts'])
