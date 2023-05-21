@@ -1,10 +1,11 @@
 import re
 from typing import Dict, List, Any
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 
 from .patterns import (R_ISO_DATE, R_NAMED_MONTH, R_TODAY, R_TOMORROW, R_NTOMORROW, R_YESTERDAY, R_NYESTERDAY,
                        R_WEEKDAY, R_WEEK, R_YEAR, R_NDAYS_FROM_NOW, R_NWEEKS_FROM_NOW, R_NHOURS_FROM_NOW,
-                       R_NMINS_FROM_NOW)
+                       R_NMINS_FROM_NOW, R_RELATIVE_MONTH)
 from hun_date_parser.utils import remove_accent, word_to_num, Year, Month, Week, Day, Hour, Minute
 
 
@@ -248,6 +249,35 @@ def match_named_year(s: str, now: datetime) -> List[Dict[str, Any]]:
             num_before = word_to_num(group)
             if num_before != -1:
                 date_parts['date_parts'] = [Year(now.year - num_before, 'named_year')]
+
+        res.append(date_parts)
+
+    return res
+
+
+def match_relative_month(s: str, now: datetime) -> List[Dict[str, Any]]:
+    groups = re.findall(R_RELATIVE_MONTH, s)
+
+    res = []
+    for group in groups:
+        date_parts = {'match': group, 'date_parts': []}
+
+        if ('mult' in remove_accent(group)
+                or 'elozo' in remove_accent(group)
+                or 'utolso' in remove_accent(group)
+                or 'utobbi' in remove_accent(group)):
+            prev_month = now.date() + relativedelta(months=-1)
+            date_parts['date_parts'] = [Year(prev_month.year, 'relative_month'),
+                                        Month(prev_month.month, 'relative_month')]
+        elif (remove_accent(group).startswith("ezen")
+                or 'ebben' in remove_accent(group)
+                or 'aktualis' in remove_accent(group)):
+            date_parts['date_parts'] = [Year(now.year, 'relative_month'), Month(now.month, 'relative_month')]
+        elif ('jovo' in remove_accent(group)
+                or 'kovetkez' in remove_accent(group)):
+            next_month = now.date() + relativedelta(months=1)
+            date_parts['date_parts'] = [Year(next_month.year, 'relative_month'),
+                                        Month(next_month.month, 'relative_month')]
 
         res.append(date_parts)
 

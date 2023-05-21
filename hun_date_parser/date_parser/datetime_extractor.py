@@ -10,7 +10,8 @@ from copy import copy
 from hun_date_parser.date_parser.structure_parsers import match_multi_match, match_interval
 from hun_date_parser.date_parser.date_parsers import (match_named_month, match_iso_date, match_weekday,
                                                       match_relative_day,
-                                                      match_week, match_named_year, match_n_periods_compared_to_now)
+                                                      match_week, match_named_year, match_n_periods_compared_to_now,
+                                                      match_relative_month)
 from hun_date_parser.date_parser.time_parsers import match_digi_clock, match_time_words, match_now, match_hwords
 from hun_date_parser.utils import Year, Month, Week, Day, Daypart, Hour, Minute, monday_of_calenderweek
 
@@ -83,7 +84,8 @@ def match_rules(now: datetime, sentence: str, expect_future_day: bool = False) -
                *match_hwords(sentence),
                *match_time_words(sentence),
                *match_now(sentence, now),
-               *match_n_periods_compared_to_now(sentence, now)]
+               *match_n_periods_compared_to_now(sentence, now),
+               *match_relative_month(sentence, now)]
 
     matches = list(chain(*[m['date_parts'] for m in matches]))
 

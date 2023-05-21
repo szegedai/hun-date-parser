@@ -4,7 +4,7 @@ from datetime import datetime
 from hun_date_parser.date_parser.date_parsers import Year, Month, Week, Day
 from hun_date_parser.date_parser.date_parsers import (match_iso_date, match_named_month, match_relative_day,
                                                       match_weekday,
-                                                      match_week, match_named_year)
+                                                      match_week, match_named_year, match_relative_month)
 
 tf_named_month = [
     ('jan 20-án', [[Month(1, 'named_month'), Day(20, 'named_month')]]),
@@ -74,6 +74,23 @@ tf_named_year = [('tavaly', [[Year(2019, 'named_year')]]),
                  ('kb három évvel ezelőtt', [[Year(2017, 'named_year')]]),
                  ('találkozzunk jövő héten szombaton', [])]
 
+tf_relative_month = [
+    ('az utolsó hónapom.', [[Year(2023, 'relative_month'), Month(4, 'relative_month')]]),
+    ('a legutóbbi hónapom.', [[Year(2023, 'relative_month'), Month(4, 'relative_month')]]),
+    ('a legutobbi honapom', [[Year(2023, 'relative_month'), Month(4, 'relative_month')]]),
+    ('mi történt a múlt hónapban?', [[Year(2023, 'relative_month'), Month(4, 'relative_month')]]),
+    ('Mik az elmúlt hónapban történtek', [[Year(2023, 'relative_month'), Month(4, 'relative_month')]]),
+    ('a múlt hónapban időrendi sorrendben.', [[Year(2023, 'relative_month'), Month(4, 'relative_month')]]),
+    (' az elmúlt hónapban a?', [[Year(2023, 'relative_month'), Month(4, 'relative_month')]]),
+    (' az elmult honapban a?', [[Year(2023, 'relative_month'), Month(4, 'relative_month')]]),
+    ('ebben a hónapban', [[Year(2023, 'relative_month'), Month(5, 'relative_month')]]),
+    ('ezen hónapban', [[Year(2023, 'relative_month'), Month(5, 'relative_month')]]),
+    ('az aktuális hónap', [[Year(2023, 'relative_month'), Month(5, 'relative_month')]]),
+    ('jövő hónap', [[Year(2023, 'relative_month'), Month(6, 'relative_month')]]),
+    ('következő hónap', [[Year(2023, 'relative_month'), Month(6, 'relative_month')]]),
+    ('következendő hónap', [[Year(2023, 'relative_month'), Month(6, 'relative_month')]]),
+]
+
 
 @pytest.mark.parametrize("inp,exp", tf_iso_date)
 def test_match_iso_date(inp, exp):
@@ -130,6 +147,16 @@ def test_match_match_week(inp, exp):
 def test_match_named_year(inp, exp):
     now = datetime(2020, 12, 7)
     out = match_named_year(inp, now)
+    date_parts = []
+    for e in out:
+        date_parts.append(e['date_parts'])
+    assert date_parts == exp
+
+@pytest.mark.parametrize("inp,exp", tf_relative_month)
+def test_match_relative_month(inp, exp):
+    now = datetime(2023, 5, 20)
+    out = match_relative_month(inp, now)
+    print(out)
     date_parts = []
     for e in out:
         date_parts.append(e['date_parts'])
