@@ -156,7 +156,6 @@ def test_match_named_year(inp, exp):
 def test_match_relative_month(inp, exp):
     now = datetime(2023, 5, 20)
     out = match_relative_month(inp, now)
-    print(out)
     date_parts = []
     for e in out:
         date_parts.append(e['date_parts'])
