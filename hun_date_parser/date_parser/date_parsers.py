@@ -6,8 +6,10 @@ from dateutil.relativedelta import relativedelta
 from .patterns import (R_ISO_DATE, R_NAMED_MONTH, R_TODAY, R_TOMORROW, R_NTOMORROW, R_YESTERDAY, R_NYESTERDAY,
                        R_WEEKDAY, R_WEEK, R_YEAR, R_NDAYS_FROM_NOW, R_NWEEKS_FROM_NOW, R_NHOURS_FROM_NOW,
                        R_NMINS_FROM_NOW, R_RELATIVE_MONTH, R_NMINS_PRIOR_NOW, R_NDAYS_PRIOR_NOW, R_NHOURS_PRIOR_NOW,
-                       R_NWEEKS_PRIOR_NOW)
-from hun_date_parser.utils import remove_accent, word_to_num, Year, Month, Week, Day, Hour, Minute
+                       R_NWEEKS_PRIOR_NOW, R_IN_PAST_PERIOD_MINS, R_IN_PAST_PERIOD_HOURS, R_IN_PAST_PERIOD_DAYS,
+                       R_IN_PAST_PERIOD_WEEKS, R_IN_PAST_PERIOD_MONTHS, R_IN_PAST_PERIOD_YEARS)
+from hun_date_parser.utils import remove_accent, word_to_num, Year, Month, Week, Day, Hour, Minute,\
+    OverrideBottomWithNow, OverrideTopWithNow
 
 
 def match_iso_date(s: str) -> List[Dict[str, Any]]:
@@ -195,7 +197,7 @@ def match_n_periods_compared_to_now(s: str, now: datetime) -> List[Dict[str, Any
         (R_NWEEKS_PRIOR_NOW, 'w', 'past'),
         (R_NDAYS_PRIOR_NOW, 'd', 'past'),
         (R_NHOURS_PRIOR_NOW, 'h', 'past'),
-        (R_NMINS_FROM_NOW, 'm', 'past'),
+        (R_NMINS_PRIOR_NOW, 'm', 'past'),
     ]
     res = []
 
@@ -285,5 +287,54 @@ def match_relative_month(s: str, now: datetime) -> List[Dict[str, Any]]:
                                         Month(next_month.month, 'relative_month')]
 
         res.append(date_parts)
+
+    return res
+
+
+def match_in_past_n_periods(s: str, now: datetime) -> List[Dict[str, Any]]:
+    fn = 'in_past_n_periods'
+
+    regexes = [
+        (R_IN_PAST_PERIOD_YEARS, 'year', 'past'),
+        (R_IN_PAST_PERIOD_MONTHS, 'month', 'past'),
+        (R_IN_PAST_PERIOD_WEEKS, 'week', 'past'),
+        (R_IN_PAST_PERIOD_DAYS, 'day', 'past'),
+        (R_IN_PAST_PERIOD_HOURS, 'hour', 'past'),
+        (R_IN_PAST_PERIOD_MINS, 'minute', 'past'),
+    ]
+    res = []
+
+    for regex, freq, before_or_after in regexes:
+        multiplier = -1 if before_or_after == "past" else 1
+        groups = re.findall(regex, s)
+        for group in groups:
+            date_parts = {'match': group, 'date_parts': []}
+
+            n = group[1]
+            if n:
+                n = word_to_num(n)
+                if freq == 'year':
+                    res_dt = (now + relativedelta(years=multiplier * n))
+                    y, m, d = res_dt.year, res_dt.month, res_dt.day
+                    date_parts['date_parts'].extend([Year(y, fn), Month(m, fn), Day(d, fn), OverrideTopWithNow()])
+                elif freq == 'week':
+                    res_dt = (now + timedelta(days=multiplier * 7 * n))
+                    y, m, d = res_dt.year, res_dt.month, res_dt.day
+                    date_parts['date_parts'].extend([Year(y, fn), Month(m, fn), Day(d, fn), OverrideTopWithNow()])
+                elif freq == 'day':
+                    res_dt = (now + timedelta(days=multiplier * n))
+                    y, m, d = res_dt.year, res_dt.month, res_dt.day
+                    date_parts['date_parts'].extend([Year(y, fn), Month(m, fn), Day(d, fn), OverrideTopWithNow()])
+                elif freq == 'hour':
+                    res_dt = (now + timedelta(hours=multiplier * n))
+                    y, m, d, h = res_dt.year, res_dt.month, res_dt.day, res_dt.hour
+                    date_parts['date_parts'].extend([Year(y, fn), Month(m, fn), Day(d, fn), Hour(h, fn), OverrideTopWithNow()])
+                elif freq == 'minute':
+                    res_dt = (now + timedelta(minutes=multiplier * n))
+                    y, mo, d, h, mi = res_dt.year, res_dt.month, res_dt.day, res_dt.hour, res_dt.minute
+                    date_parts['date_parts'].extend([Year(y, fn), Month(mo, fn),
+                                                     Day(d, fn), Hour(h, fn), Minute(mi, fn), OverrideTopWithNow()])
+
+            res.append(date_parts)
 
     return res

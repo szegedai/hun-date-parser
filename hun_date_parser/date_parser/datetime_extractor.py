@@ -13,7 +13,7 @@ from hun_date_parser.date_parser.date_parsers import (match_named_month, match_i
                                                       match_week, match_named_year, match_n_periods_compared_to_now,
                                                       match_relative_month)
 from hun_date_parser.date_parser.time_parsers import match_digi_clock, match_time_words, match_now, match_hwords
-from hun_date_parser.utils import Year, Month, Week, Day, Daypart, Hour, Minute, monday_of_calenderweek
+from hun_date_parser.utils import Year, Month, Week, Day, Daypart, Hour, Minute, OverrideTopWithNow, OverrideBottomWithNow, monday_of_calenderweek, DateTimePartConatiner
 
 datelike = Union[datetime, date, time, None]
 
@@ -138,7 +138,7 @@ class DatetimeExtractor:
         matches = match_rules(self.now, sentence_part, self.expect_future_day)
         return [{'start_date': matches, 'end_date': matches}]
 
-    def assamble_datetime(self, now: datetime,
+    def assemble_datetime(self, now: datetime,
                           dateparts: Union[List[Union[Year, Month, Week, Day, Daypart, Hour, Minute]], str],
                           bottom: bool = True) -> datelike:
         """
@@ -157,31 +157,32 @@ class DatetimeExtractor:
             return None
 
         has_date, has_time = False, False
+        override_bottom, override_top = type_isin_list(OverrideBottomWithNow, dateparts), type_isin_list(OverrideTopWithNow, dateparts)
 
         pre_first = True
         for date_type in [Year, Month, Week, Day, Daypart, Hour, Minute]:
             dp_match = [pot_dp for pot_dp in dateparts if isinstance(pot_dp, date_type)]
 
-            _dp_match: Union[Tuple[int, str], None]
+            _dp_match: Union[DateTimePartConatiner, None]
             if dp_match:
                 _dp_match = dp_match[0]
             else:
                 _dp_match = None
 
             if date_type == Year:
-                if _dp_match:
+                if _dp_match and _dp_match.value:
                     has_date = True
                     pre_first = False
-                    res_dt.append(_dp_match[0])
+                    res_dt.append(_dp_match.value)
                 else:
                     # TODO: this should take into account the expect_future_day parameter...
                     res_dt.append(now.year)
 
             if date_type == Month:
-                if _dp_match:
+                if _dp_match and _dp_match.value:
                     has_date = True
                     pre_first = False
-                    res_dt.append(_dp_match[0])
+                    res_dt.append(_dp_match.value)
                 elif pre_first:
                     res_dt.append(now.month)
                 elif bottom:
@@ -190,17 +191,17 @@ class DatetimeExtractor:
                     res_dt.append(12)
 
             if date_type == Week and not type_isin_list(Day, dateparts):
-                if _dp_match:
+                if _dp_match and _dp_match.value:
                     has_date = True
                     pre_first = False
-                    week2dt = monday_of_calenderweek(res_dt[0], _dp_match[0]) + timedelta(days=(0 if bottom else 6))
+                    week2dt = monday_of_calenderweek(res_dt[0], _dp_match.value) + timedelta(days=(0 if bottom else 6))
                     res_dt = [week2dt.year, week2dt.month, week2dt.day]
 
             if date_type == Day and len(res_dt) == 2:
-                if _dp_match:
+                if _dp_match and _dp_match.value:
                     has_date = True
                     pre_first = False
-                    res_dt.append(_dp_match[0])
+                    res_dt.append(_dp_match.value)
                 elif pre_first:
                     res_dt.append(now.day)
                 elif bottom:
@@ -210,10 +211,10 @@ class DatetimeExtractor:
                     res_dt.append(mr[1])
 
             if date_type == Daypart:
-                if _dp_match:
+                if _dp_match and _dp_match.value:
                     has_time = True
                     pre_first = False
-                    dp = _dp_match[0]
+                    dp = _dp_match.value
                     if bottom:
                         res_dt.append(daypart_mapping[dp][0])
                     elif dp == 5:
@@ -224,10 +225,10 @@ class DatetimeExtractor:
                         res_dt.append(daypart_mapping[dp][1])
 
             if date_type == Hour and len(res_dt) == 3:
-                if _dp_match:
+                if _dp_match and _dp_match.value:
                     has_time = True
                     pre_first = False
-                    res_dt.append(_dp_match[0])
+                    res_dt.append(_dp_match.value)
                 elif pre_first:
                     res_dt.append(now.hour)
                 elif bottom:
@@ -236,10 +237,10 @@ class DatetimeExtractor:
                     res_dt.append(23)
 
             if date_type == Minute:
-                if _dp_match:
+                if _dp_match and _dp_match.value:
                     has_time = True
                     pre_first = False
-                    res_dt.append(_dp_match[0])
+                    res_dt.append(_dp_match.value)
                 elif pre_first:
                     res_dt.append(now.minute)
                 elif bottom:
@@ -255,17 +256,29 @@ class DatetimeExtractor:
         y, m, d, h, mi, s = res_dt
 
         if self.output_container == 'datetime':
-            if has_date or has_time:
+            if bottom and override_bottom:
+                return now
+            elif not bottom and override_top:
+                return now
+            elif has_date or has_time:
                 return datetime(y, m, d, h, mi, s)
             else:
                 return None
         elif self.output_container == 'date':
-            if has_date:
+            if bottom and override_bottom:
+                return now.date()
+            elif not bottom and override_top:
+                return now.date()
+            elif has_date:
                 return date(y, m, d)
             else:
                 return None
         elif self.output_container == 'time':
-            if has_time:
+            if bottom and override_bottom:
+                return now.time()
+            elif not bottom and override_top:
+                return now.time()
+            elif has_time:
                 return time(h, mi, s)
             else:
                 return None
@@ -296,8 +309,8 @@ class DatetimeExtractor:
 
         parsed_dates = [extend_start_end(intv) for intv in parsed_dates]
 
-        parsed_dates = [{'start_date': self.assamble_datetime(self.now, parsed_date['start_date'], bottom=True),
-                         'end_date': self.assamble_datetime(self.now, parsed_date['end_date'], bottom=False)}
+        parsed_dates = [{'start_date': self.assemble_datetime(self.now, parsed_date['start_date'], bottom=True),
+                         'end_date': self.assemble_datetime(self.now, parsed_date['end_date'], bottom=False)}
                         for parsed_date in parsed_dates]
 
         parsed_dates = [intv for intv in parsed_dates if intv['start_date'] or intv['end_date']]

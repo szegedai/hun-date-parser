@@ -1,11 +1,11 @@
 import pytest
 from datetime import datetime
 
-from hun_date_parser.date_parser.date_parsers import Year, Month, Week, Day
+from hun_date_parser.date_parser.date_parsers import Year, Month, Week, Day, OverrideTopWithNow
 from hun_date_parser.date_parser.date_parsers import (match_iso_date, match_named_month, match_relative_day,
                                                       match_weekday,
                                                       match_week, match_named_year, match_relative_month,
-                                                      match_n_periods_compared_to_now)
+                                                      match_n_periods_compared_to_now, match_in_past_n_periods)
 
 tf_named_month = [
     ('jan 20-án', [[Month(1, 'named_month'), Day(20, 'named_month')]]),
@@ -102,6 +102,14 @@ tf_n_periods_from_now = [
     ('5 nap múlva', [[Year(2023, 'n_date_periods_compared_to_now'), Month(5, 'n_date_periods_compared_to_now'), Day(25, 'n_date_periods_compared_to_now')]]),
 ]
 
+tf_in_past_n_periods = [
+    ("elmúlt egy hét", [[Year(2023, 'in_past_n_periods'), Month(5, 'in_past_n_periods'), Day(13, 'in_past_n_periods'), OverrideTopWithNow()]]),
+    ("az előző egy hétben", [[Year(2023, 'in_past_n_periods'), Month(5, 'in_past_n_periods'), Day(13, 'in_past_n_periods'), OverrideTopWithNow()]]),
+    ("az előző két hétben", [[Year(2023, 'in_past_n_periods'), Month(5, 'in_past_n_periods'), Day(6, 'in_past_n_periods'), OverrideTopWithNow()]]),
+    ("az előző két évi adatok", [[Year(2021, 'in_past_n_periods'), Month(5, 'in_past_n_periods'), Day(20, 'in_past_n_periods'), OverrideTopWithNow()]]),
+    ("az előző 10 nap tranzakciói", [[Year(2023, 'in_past_n_periods'), Month(5, 'in_past_n_periods'), Day(10, 'in_past_n_periods'), OverrideTopWithNow()]])
+]
+
 
 @pytest.mark.parametrize("inp,exp", tf_iso_date)
 def test_match_iso_date(inp, exp):
@@ -173,10 +181,21 @@ def test_match_relative_month(inp, exp):
         date_parts.append(e['date_parts'])
     assert date_parts == exp
 
+
 @pytest.mark.parametrize("inp,exp", tf_n_periods_from_now)
 def test_match_n_periods_compared_to_now(inp, exp):
     now = datetime(2023, 5, 20)
     out = match_n_periods_compared_to_now(inp, now)
+    date_parts = []
+    for e in out:
+        date_parts.append(e['date_parts'])
+    assert date_parts == exp
+
+
+@pytest.mark.parametrize("inp,exp", tf_in_past_n_periods)
+def test_match_n_periods_compared_to_now(inp, exp):
+    now = datetime(2023, 5, 20)
+    out = match_in_past_n_periods(inp, now)
     date_parts = []
     for e in out:
         date_parts.append(e['date_parts'])

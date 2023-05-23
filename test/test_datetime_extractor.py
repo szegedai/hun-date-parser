@@ -73,3 +73,36 @@ def test_extend_start_end():
     inp_2 = {'start_date': [Month(1, ''), Hour(1, '')], 'end_date': []}
     assert extend_start_end(inp_2) == {'start_date': [Month(1, ''), Hour(1, '')],
                                        'end_date': [Month(1, ''), Hour(1, '')]}
+
+
+assemble_scenarios = [
+    ([Year(2024, "rule_name"), Month(2, "rule_name")], datetime(2024, 2, 1, 0, 0, 0), True),
+    ([Year(2024, "rule_name"), Month(2, "rule_name")], datetime(2024, 2, 29, 23, 59, 59), False),
+
+    ([Year(2024, "rule_name"), Month(2, "rule_name"), Day(2, "rule_name")], datetime(2024, 2, 2, 0, 0, 0), True),
+    ([Year(2024, "rule_name"), Month(2, "rule_name"), Day(2, "rule_name")], datetime(2024, 2, 2, 23, 59, 59), False),
+
+    ([Month(7, "rule_name"), Day(2, "rule_name")], datetime(2023, 7, 2, 0, 0, 0), True),
+    ([Month(7, "rule_name"), Day(2, "rule_name")], datetime(2023, 7, 2, 23, 59, 59), False),
+
+    ([Day(29, "rule_name"), Hour(10, "rule_name")], datetime(2023, 5, 29, 10, 0, 0), True),
+    ([Day(29, "rule_name"), Hour(10, "rule_name")], datetime(2023, 5, 29, 10, 59, 59), False),
+
+    ([Hour(10, "rule_name")], datetime(2023, 5, 23, 10, 0, 0), True),
+
+    ([Hour(12, "rule_name"), OverrideBottomWithNow()], datetime(2023, 5, 23, 12, 59, 59), False),
+    ([Hour(12, "rule_name"), OverrideBottomWithNow()], datetime(2023, 5, 23, 0, 0, 0), True),
+    ([Year(2023, "rule_name"), Month(5, "rule_name"), Day(22, "rule_name"), Hour(12, "rule_name"), OverrideTopWithNow()], datetime(2023, 5, 22, 12, 0, 0), True),
+    ([Year(2023, "rule_name"), Month(5, "rule_name"), Day(22, "rule_name"), Hour(12, "rule_name"), OverrideTopWithNow()], datetime(2023, 5, 23, 0, 0, 0), False),
+]
+
+
+@pytest.mark.parametrize("inp_lst, resp, is_bottom", assemble_scenarios)
+def test_assemble_datetime(inp_lst, resp, is_bottom):
+    now = datetime(2023, 5, 23)
+    dt_extractor = DatetimeExtractor()
+    result = dt_extractor.assemble_datetime(now=now,
+                                            dateparts=inp_lst,
+                                            bottom=is_bottom)
+
+    assert result == resp
