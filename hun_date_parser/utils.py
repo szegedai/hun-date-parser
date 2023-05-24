@@ -1,69 +1,53 @@
-from typing import Union
+from typing import Optional
 from copy import copy
 from datetime import date, timedelta
 from dataclasses import dataclass
 
-# Year = NamedTuple('Year', [('x', int), ('rule', str)])
-# Month = NamedTuple('Month', [('x', int), ('rule', str)])
-# Week = NamedTuple('Week', [('x', int), ('rule', str)])
-# Day = NamedTuple('Day', [('x', int), ('rule', str)])
-# Daypart = NamedTuple('Daypart', [('x', int), ('rule', str)])
-# Hour = NamedTuple('Hour', [('x', int), ('rule', str)])
-# Minute = NamedTuple('Minute', [('x', int), ('rule', str)])
-# Second = NamedTuple('Second', [('x', int), ('rule', str)])
-
 
 @dataclass
 class DateTimePartConatiner:
-    pass
+    value: Optional[int]
+    rule: str
 
 
 @dataclass
 class Year(DateTimePartConatiner):
-    value: int
-    rule: str
+    pass
 
 
 @dataclass
 class Month(DateTimePartConatiner):
-    value: int
-    rule: str
+    pass
 
 
 @dataclass
 class Week(DateTimePartConatiner):
-    value: int
-    rule: str
+    pass
 
 
 @dataclass
 class Day(DateTimePartConatiner):
-    value: int
-    rule: str
+    pass
 
 
 @dataclass
 class Daypart(DateTimePartConatiner):
-    value: int
-    rule: str
+    pass
 
 
 @dataclass
 class Hour(DateTimePartConatiner):
-    value: int
-    rule: str
+    pass
 
 
 @dataclass
 class Minute(DateTimePartConatiner):
-    value: int
-    rule: str
+    pass
 
 
 @dataclass
 class Second(DateTimePartConatiner):
-    value: int
-    rule: str
+    pass
 
 
 @dataclass

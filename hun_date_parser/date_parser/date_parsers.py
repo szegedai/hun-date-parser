@@ -8,8 +8,7 @@ from .patterns import (R_ISO_DATE, R_NAMED_MONTH, R_TODAY, R_TOMORROW, R_NTOMORR
                        R_NMINS_FROM_NOW, R_RELATIVE_MONTH, R_NMINS_PRIOR_NOW, R_NDAYS_PRIOR_NOW, R_NHOURS_PRIOR_NOW,
                        R_NWEEKS_PRIOR_NOW, R_IN_PAST_PERIOD_MINS, R_IN_PAST_PERIOD_HOURS, R_IN_PAST_PERIOD_DAYS,
                        R_IN_PAST_PERIOD_WEEKS, R_IN_PAST_PERIOD_MONTHS, R_IN_PAST_PERIOD_YEARS)
-from hun_date_parser.utils import remove_accent, word_to_num, Year, Month, Week, Day, Hour, Minute,\
-    OverrideBottomWithNow, OverrideTopWithNow
+from hun_date_parser.utils import remove_accent, word_to_num, Year, Month, Week, Day, Hour, Minute, OverrideTopWithNow
 
 
 def match_iso_date(s: str) -> List[Dict[str, Any]]:
@@ -210,6 +209,10 @@ def match_n_periods_compared_to_now(s: str, now: datetime) -> List[Dict[str, Any
             n = group[1]
             if n:
                 n = word_to_num(n)
+
+                if n == -1:
+                    continue
+
                 if freq == 'w':
                     res_dt = (now + timedelta(days=multiplier * 7 * n))
                     y, m, d = res_dt.year, res_dt.month, res_dt.day
@@ -250,10 +253,18 @@ def match_named_year(s: str, now: datetime) -> List[Dict[str, Any]]:
             date_parts['date_parts'] = [Year(now.year + 1, 'named_year')]
         elif 'mulva' in remove_accent(group):
             num_after = word_to_num(group)
+
+            if num_after == -1:
+                continue
+
             if num_after != -1:
                 date_parts['date_parts'] = [Year(now.year + num_after, 'named_year')]
         elif 'ezelott' in remove_accent(group) or 'korabban' in remove_accent(group):
             num_before = word_to_num(group)
+
+            if num_before == -1:
+                continue
+
             if num_before != -1:
                 date_parts['date_parts'] = [Year(now.year - num_before, 'named_year')]
 
@@ -313,27 +324,43 @@ def match_in_past_n_periods(s: str, now: datetime) -> List[Dict[str, Any]]:
             n = group[1]
             if n:
                 n = word_to_num(n)
+
+                if n == -1:
+                    continue
+
                 if freq == 'year':
                     res_dt = (now + relativedelta(years=multiplier * n))
                     y, m, d = res_dt.year, res_dt.month, res_dt.day
-                    date_parts['date_parts'].extend([Year(y, fn), Month(m, fn), Day(d, fn), OverrideTopWithNow()])
+                    date_parts['date_parts'].extend([Year(y, fn), Month(m, fn), Day(d, fn),
+                                                     OverrideTopWithNow(None, fn)])
+
+                elif freq == 'month':
+                    res_dt = now + relativedelta(months=multiplier * n)
+                    y, m, d = res_dt.year, res_dt.month, res_dt.day
+                    date_parts['date_parts'].extend([Year(y, fn), Month(m, fn), Day(d, fn),
+                                                     OverrideTopWithNow(None, fn)])
+
                 elif freq == 'week':
                     res_dt = (now + timedelta(days=multiplier * 7 * n))
                     y, m, d = res_dt.year, res_dt.month, res_dt.day
-                    date_parts['date_parts'].extend([Year(y, fn), Month(m, fn), Day(d, fn), OverrideTopWithNow()])
+                    date_parts['date_parts'].extend([Year(y, fn), Month(m, fn), Day(d, fn),
+                                                     OverrideTopWithNow(None, fn)])
                 elif freq == 'day':
                     res_dt = (now + timedelta(days=multiplier * n))
                     y, m, d = res_dt.year, res_dt.month, res_dt.day
-                    date_parts['date_parts'].extend([Year(y, fn), Month(m, fn), Day(d, fn), OverrideTopWithNow()])
+                    date_parts['date_parts'].extend([Year(y, fn), Month(m, fn), Day(d, fn),
+                                                     OverrideTopWithNow(None, fn)])
                 elif freq == 'hour':
                     res_dt = (now + timedelta(hours=multiplier * n))
                     y, m, d, h = res_dt.year, res_dt.month, res_dt.day, res_dt.hour
-                    date_parts['date_parts'].extend([Year(y, fn), Month(m, fn), Day(d, fn), Hour(h, fn), OverrideTopWithNow()])
+                    date_parts['date_parts'].extend([Year(y, fn), Month(m, fn), Day(d, fn), Hour(h, fn),
+                                                     OverrideTopWithNow(None, fn)])
                 elif freq == 'minute':
                     res_dt = (now + timedelta(minutes=multiplier * n))
                     y, mo, d, h, mi = res_dt.year, res_dt.month, res_dt.day, res_dt.hour, res_dt.minute
                     date_parts['date_parts'].extend([Year(y, fn), Month(mo, fn),
-                                                     Day(d, fn), Hour(h, fn), Minute(mi, fn), OverrideTopWithNow()])
+                                                     Day(d, fn), Hour(h, fn), Minute(mi, fn),
+                                                     OverrideTopWithNow(None, fn)])
 
             res.append(date_parts)
 

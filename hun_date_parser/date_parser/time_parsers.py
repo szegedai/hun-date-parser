@@ -43,6 +43,33 @@ def match_hwords(s: str) -> List[Dict[str, Any]]:
     return res
 
 
+def is_indeed_hour(s: str):
+    s_uac = remove_accent(s)
+
+    words_indicating_hour = [
+        "ora",
+        "-kor",
+        "egykor",
+        "kettokor",
+        "haromkor",
+        "negykor",
+        "otkor",
+        "hatkor",
+        "hetkor",
+        "nyolckor",
+        "kilenckor",
+        "tizkor",
+        "tizenegykor",
+        "tizenkettokor"
+    ]
+
+    for w in words_indicating_hour:
+        if w in s_uac:
+            return True
+
+    return False
+
+
 def _raw_match_time_words(s: str) -> Optional[Tuple[Any, Any, Any, Any, Any]]:
     """
     Extracts date and time particles from text
@@ -67,6 +94,12 @@ def _raw_match_time_words(s: str) -> Optional[Tuple[Any, Any, Any, Any, Any]]:
         minute += (' ' + is_before)
     else:
         daypart, hour_modifier, hour, minute = group[0]
+
+    # when a single number is matched, the pattern currently interprets it as an hour value
+    # i.e.: "1" --> 1 hour or "egy" --> 1 hour
+    # this check is designed to address this issue (R_HOUR_MIN pattern needs to be rewritten for a proper solution)
+    if not (daypart or minute or hour_modifier) and hour and not is_indeed_hour(s):
+        return [('', '', '', '')], '', '', '', ''
 
     return group, daypart, hour_modifier, hour, minute
 

@@ -103,11 +103,17 @@ tf_n_periods_from_now = [
 ]
 
 tf_in_past_n_periods = [
-    ("elmúlt egy hét", [[Year(2023, 'in_past_n_periods'), Month(5, 'in_past_n_periods'), Day(13, 'in_past_n_periods'), OverrideTopWithNow()]]),
-    ("az előző egy hétben", [[Year(2023, 'in_past_n_periods'), Month(5, 'in_past_n_periods'), Day(13, 'in_past_n_periods'), OverrideTopWithNow()]]),
-    ("az előző két hétben", [[Year(2023, 'in_past_n_periods'), Month(5, 'in_past_n_periods'), Day(6, 'in_past_n_periods'), OverrideTopWithNow()]]),
-    ("az előző két évi adatok", [[Year(2021, 'in_past_n_periods'), Month(5, 'in_past_n_periods'), Day(20, 'in_past_n_periods'), OverrideTopWithNow()]]),
-    ("az előző 10 nap tranzakciói", [[Year(2023, 'in_past_n_periods'), Month(5, 'in_past_n_periods'), Day(10, 'in_past_n_periods'), OverrideTopWithNow()]])
+    ("elmúlt egy hét", [[Year(2023, 'in_past_n_periods'), Month(5, 'in_past_n_periods'),
+                         Day(13, 'in_past_n_periods'), OverrideTopWithNow(None, 'in_past_n_periods')]]),
+    ("az előző egy hétben", [[Year(2023, 'in_past_n_periods'), Month(5, 'in_past_n_periods'),
+                              Day(13, 'in_past_n_periods'), OverrideTopWithNow(None, 'in_past_n_periods')]]),
+    ("az előző két hétben", [[Year(2023, 'in_past_n_periods'), Month(5, 'in_past_n_periods'),
+                              Day(6, 'in_past_n_periods'), OverrideTopWithNow(None, 'in_past_n_periods')]]),
+    ("az előző két évi adatok", [[Year(2021, 'in_past_n_periods'), Month(5, 'in_past_n_periods'),
+                                  Day(20, 'in_past_n_periods'), OverrideTopWithNow(None, 'in_past_n_periods')]]),
+    ("az előző 10 nap tranzakciói", [[Year(2023, 'in_past_n_periods'), Month(5, 'in_past_n_periods'),
+                                      Day(10, 'in_past_n_periods'), OverrideTopWithNow(None, 'in_past_n_periods')]]),
+    ("az előző sport nap teljesítménye", []),
 ]
 
 

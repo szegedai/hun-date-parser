@@ -40,6 +40,9 @@ scenarios = [
     ('igen 10-kor', [datetime(2020, 12, 18, 10), datetime(2020, 12, 18, 10, 59, 59)]),
     ('csütörtök vagy péntek', [datetime(2020, 12, 17), datetime(2020, 12, 17, 23, 59, 59),
                                datetime(2020, 12, 18), datetime(2020, 12, 18, 23, 59, 59)]),
+    ('előző két napban', [datetime(2020, 12, 16), datetime(2020, 12, 18)]),
+    ('előző 14 napban', [datetime(2020, 12, 4), datetime(2020, 12, 18)]),
+    ('előző 1 havi', [datetime(2020, 11, 18), datetime(2020, 12, 18)]),
 ]
 
 
@@ -90,10 +93,12 @@ assemble_scenarios = [
 
     ([Hour(10, "rule_name")], datetime(2023, 5, 23, 10, 0, 0), True),
 
-    ([Hour(12, "rule_name"), OverrideBottomWithNow()], datetime(2023, 5, 23, 12, 59, 59), False),
-    ([Hour(12, "rule_name"), OverrideBottomWithNow()], datetime(2023, 5, 23, 0, 0, 0), True),
-    ([Year(2023, "rule_name"), Month(5, "rule_name"), Day(22, "rule_name"), Hour(12, "rule_name"), OverrideTopWithNow()], datetime(2023, 5, 22, 12, 0, 0), True),
-    ([Year(2023, "rule_name"), Month(5, "rule_name"), Day(22, "rule_name"), Hour(12, "rule_name"), OverrideTopWithNow()], datetime(2023, 5, 23, 0, 0, 0), False),
+    ([Hour(12, "rule_name"), OverrideBottomWithNow(None, "rule_name")], datetime(2023, 5, 23, 12, 59, 59), False),
+    ([Hour(12, "rule_name"), OverrideBottomWithNow(None, "rule_name")], datetime(2023, 5, 23, 0, 0, 0), True),
+    ([Year(2023, "rule_name"), Month(5, "rule_name"), Day(22, "rule_name"), Hour(12, "rule_name"),
+      OverrideTopWithNow(None, "rule_name")], datetime(2023, 5, 22, 12, 0, 0), True),
+    ([Year(2023, "rule_name"), Month(5, "rule_name"), Day(22, "rule_name"), Hour(12, "rule_name"),
+      OverrideTopWithNow(None, "rule_name")], datetime(2023, 5, 23, 0, 0, 0), False),
 ]
 
 

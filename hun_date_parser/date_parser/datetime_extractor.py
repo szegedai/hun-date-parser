@@ -11,9 +11,10 @@ from hun_date_parser.date_parser.structure_parsers import match_multi_match, mat
 from hun_date_parser.date_parser.date_parsers import (match_named_month, match_iso_date, match_weekday,
                                                       match_relative_day,
                                                       match_week, match_named_year, match_n_periods_compared_to_now,
-                                                      match_relative_month)
+                                                      match_relative_month, match_in_past_n_periods)
 from hun_date_parser.date_parser.time_parsers import match_digi_clock, match_time_words, match_now, match_hwords
-from hun_date_parser.utils import Year, Month, Week, Day, Daypart, Hour, Minute, OverrideTopWithNow, OverrideBottomWithNow, monday_of_calenderweek, DateTimePartConatiner
+from hun_date_parser.utils import (Year, Month, Week, Day, Daypart, Hour, Minute, OverrideTopWithNow,
+                                   OverrideBottomWithNow, monday_of_calenderweek, DateTimePartConatiner)
 
 datelike = Union[datetime, date, time, None]
 
@@ -85,7 +86,8 @@ def match_rules(now: datetime, sentence: str, expect_future_day: bool = False) -
                *match_time_words(sentence),
                *match_now(sentence, now),
                *match_n_periods_compared_to_now(sentence, now),
-               *match_relative_month(sentence, now)]
+               *match_relative_month(sentence, now),
+               *match_in_past_n_periods(sentence, now)]
 
     matches = list(chain(*[m['date_parts'] for m in matches]))
 
@@ -159,6 +161,8 @@ class DatetimeExtractor:
         has_date, has_time = False, False
         override_bottom, override_top = type_isin_list(OverrideBottomWithNow, dateparts), type_isin_list(OverrideTopWithNow, dateparts)
 
+        print(dateparts, "OR", override_top, override_bottom)
+
         pre_first = True
         for date_type in [Year, Month, Week, Day, Daypart, Hour, Minute]:
             dp_match = [pot_dp for pot_dp in dateparts if isinstance(pot_dp, date_type)]
@@ -170,7 +174,7 @@ class DatetimeExtractor:
                 _dp_match = None
 
             if date_type == Year:
-                if _dp_match and _dp_match.value:
+                if _dp_match:
                     has_date = True
                     pre_first = False
                     res_dt.append(_dp_match.value)
@@ -179,7 +183,7 @@ class DatetimeExtractor:
                     res_dt.append(now.year)
 
             if date_type == Month:
-                if _dp_match and _dp_match.value:
+                if _dp_match:
                     has_date = True
                     pre_first = False
                     res_dt.append(_dp_match.value)
@@ -191,14 +195,14 @@ class DatetimeExtractor:
                     res_dt.append(12)
 
             if date_type == Week and not type_isin_list(Day, dateparts):
-                if _dp_match and _dp_match.value:
+                if _dp_match:
                     has_date = True
                     pre_first = False
                     week2dt = monday_of_calenderweek(res_dt[0], _dp_match.value) + timedelta(days=(0 if bottom else 6))
                     res_dt = [week2dt.year, week2dt.month, week2dt.day]
 
             if date_type == Day and len(res_dt) == 2:
-                if _dp_match and _dp_match.value:
+                if _dp_match:
                     has_date = True
                     pre_first = False
                     res_dt.append(_dp_match.value)
@@ -211,7 +215,7 @@ class DatetimeExtractor:
                     res_dt.append(mr[1])
 
             if date_type == Daypart:
-                if _dp_match and _dp_match.value:
+                if _dp_match:
                     has_time = True
                     pre_first = False
                     dp = _dp_match.value
@@ -225,7 +229,7 @@ class DatetimeExtractor:
                         res_dt.append(daypart_mapping[dp][1])
 
             if date_type == Hour and len(res_dt) == 3:
-                if _dp_match and _dp_match.value:
+                if _dp_match:
                     has_time = True
                     pre_first = False
                     res_dt.append(_dp_match.value)
@@ -237,7 +241,7 @@ class DatetimeExtractor:
                     res_dt.append(23)
 
             if date_type == Minute:
-                if _dp_match and _dp_match.value:
+                if _dp_match:
                     has_time = True
                     pre_first = False
                     res_dt.append(_dp_match.value)
