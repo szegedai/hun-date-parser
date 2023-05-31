@@ -176,7 +176,7 @@ class DatetimeExtractor:
                 _dp_match = None
 
             if date_type == Year:
-                if _dp_match:
+                if _dp_match and _dp_match.value is not None:
                     has_date = True
                     pre_first = False
                     res_dt.append(_dp_match.value)
@@ -185,7 +185,7 @@ class DatetimeExtractor:
                     res_dt.append(now.year)
 
             if date_type == Month:
-                if _dp_match:
+                if _dp_match and _dp_match.value is not None:
                     has_date = True
                     pre_first = False
                     res_dt.append(_dp_match.value)
@@ -197,14 +197,14 @@ class DatetimeExtractor:
                     res_dt.append(12)
 
             if date_type == Week and not type_isin_list(Day, dateparts):
-                if _dp_match:
+                if _dp_match and _dp_match.value is not None:
                     has_date = True
                     pre_first = False
                     week2dt = monday_of_calenderweek(res_dt[0], _dp_match.value) + timedelta(days=(0 if bottom else 6))
                     res_dt = [week2dt.year, week2dt.month, week2dt.day]
 
             if date_type == Day and len(res_dt) == 2:
-                if _dp_match:
+                if _dp_match and _dp_match.value is not None:
                     has_date = True
                     pre_first = False
                     res_dt.append(_dp_match.value)
@@ -217,7 +217,7 @@ class DatetimeExtractor:
                     res_dt.append(mr[1])
 
             if date_type == Daypart:
-                if _dp_match:
+                if _dp_match and _dp_match.value is not None:
                     has_time = True
                     pre_first = False
                     dp = _dp_match.value
@@ -231,7 +231,7 @@ class DatetimeExtractor:
                         res_dt.append(daypart_mapping[dp][1])
 
             if date_type == Hour and len(res_dt) == 3:
-                if _dp_match:
+                if _dp_match and _dp_match.value is not None:
                     has_time = True
                     pre_first = False
                     res_dt.append(_dp_match.value)
@@ -243,7 +243,7 @@ class DatetimeExtractor:
                     res_dt.append(23)
 
             if date_type == Minute:
-                if _dp_match:
+                if _dp_match and _dp_match.value is not None:
                     has_time = True
                     pre_first = False
                     res_dt.append(_dp_match.value)
