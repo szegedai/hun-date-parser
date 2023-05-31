@@ -42,7 +42,21 @@ scenarios = [
                                datetime(2020, 12, 18), datetime(2020, 12, 18, 23, 59, 59)]),
     ('előző két napban', [datetime(2020, 12, 16), datetime(2020, 12, 18)]),
     ('előző 14 napban', [datetime(2020, 12, 4), datetime(2020, 12, 18)]),
+    ('előző tizennégy napban', [datetime(2020, 12, 4), datetime(2020, 12, 18)]),
     ('előző 1 havi', [datetime(2020, 11, 18), datetime(2020, 12, 18)]),
+    ('előző 2 havi', [datetime(2020, 10, 18), datetime(2020, 12, 18)]),
+    ('előző két havi', [datetime(2020, 10, 18), datetime(2020, 12, 18)]),
+    ('előző két hónapban', [datetime(2020, 10, 18), datetime(2020, 12, 18)]),
+    ('megelőző két hónap', [datetime(2020, 10, 18), datetime(2020, 12, 18)]),
+    ('elmúlt két hónap', [datetime(2020, 10, 18), datetime(2020, 12, 18)]),
+    ('az elmúlt két hónap', [datetime(2020, 10, 18), datetime(2020, 12, 18)]),
+    ('az elmúlt két hónap', [datetime(2020, 10, 18), datetime(2020, 12, 18)]),
+    ('az elmúlt hónap', [datetime(2020, 11, 18), datetime(2020, 12, 18)]),
+    ('az elmúlt nap', [datetime(2020, 12, 17), datetime(2020, 12, 18)]),
+    ('az elmúlt 1 nap', [datetime(2020, 12, 17), datetime(2020, 12, 18)]),
+    ('az elmúlt egy nap', [datetime(2020, 12, 17), datetime(2020, 12, 18)]),
+    ('az elmúlt hét', [datetime(2020, 12, 11), datetime(2020, 12, 18)]),
+    ('az elmúlt 1 hét', [datetime(2020, 12, 11), datetime(2020, 12, 18)]),
 ]
 
 

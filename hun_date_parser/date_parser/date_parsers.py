@@ -323,7 +323,7 @@ def match_in_past_n_periods(s: str, now: datetime) -> List[Dict[str, Any]]:
 
             n = group[1]
             if n:
-                n = word_to_num(n)
+                n = word_to_num(n) if n != " " else 1
 
                 if n == -1:
                     continue

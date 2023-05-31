@@ -80,10 +80,10 @@ tf_relative_month = [
     ('a legutóbbi hónapom.', [[Year(2023, 'relative_month'), Month(4, 'relative_month')]]),
     ('a legutobbi honapom', [[Year(2023, 'relative_month'), Month(4, 'relative_month')]]),
     ('mi történt a múlt hónapban?', [[Year(2023, 'relative_month'), Month(4, 'relative_month')]]),
-    ('Mik az elmúlt hónapban történtek', [[Year(2023, 'relative_month'), Month(4, 'relative_month')]]),
+    ('Mik az elmúlt hónapban történtek', [[]]),
     ('a múlt hónapban időrendi sorrendben.', [[Year(2023, 'relative_month'), Month(4, 'relative_month')]]),
-    (' az elmúlt hónapban a?', [[Year(2023, 'relative_month'), Month(4, 'relative_month')]]),
-    (' az elmult honapban a?', [[Year(2023, 'relative_month'), Month(4, 'relative_month')]]),
+    (' az elmúlt hónapban a?', [[]]),
+    (' az elmult honapban a?', [[]]),
     ('ebben a hónapban', [[Year(2023, 'relative_month'), Month(5, 'relative_month')]]),
     ('ezen hónapban', [[Year(2023, 'relative_month'), Month(5, 'relative_month')]]),
     ('az aktuális hónap', [[Year(2023, 'relative_month'), Month(5, 'relative_month')]]),
@@ -199,7 +199,7 @@ def test_match_n_periods_compared_to_now(inp, exp):
 
 
 @pytest.mark.parametrize("inp,exp", tf_in_past_n_periods)
-def test_match_n_periods_compared_to_now(inp, exp):
+def test_match_in_past_n_periods(inp, exp):
     now = datetime(2023, 5, 20)
     out = match_in_past_n_periods(inp, now)
     date_parts = []

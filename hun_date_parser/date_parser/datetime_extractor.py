@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, date, time
 from calendar import monthrange
 from itertools import chain
 
-from typing import Dict, List, Union, Tuple
+from typing import Dict, List, Union
 from copy import copy
 
 from hun_date_parser.date_parser.structure_parsers import match_multi_match, match_interval
