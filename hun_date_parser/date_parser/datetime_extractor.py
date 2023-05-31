@@ -161,8 +161,6 @@ class DatetimeExtractor:
         has_date, has_time = False, False
         override_bottom, override_top = type_isin_list(OverrideBottomWithNow, dateparts), type_isin_list(OverrideTopWithNow, dateparts)
 
-        print(dateparts, "OR", override_top, override_bottom)
-
         pre_first = True
         for date_type in [Year, Month, Week, Day, Daypart, Hour, Minute]:
             dp_match = [pot_dp for pot_dp in dateparts if isinstance(pot_dp, date_type)]
