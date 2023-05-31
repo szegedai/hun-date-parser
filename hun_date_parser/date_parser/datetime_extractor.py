@@ -159,7 +159,11 @@ class DatetimeExtractor:
             return None
 
         has_date, has_time = False, False
-        override_bottom, override_top = type_isin_list(OverrideBottomWithNow, dateparts), type_isin_list(OverrideTopWithNow, dateparts)
+
+        # this functionality is used to override the bottom or the top of the interval with the current date
+        # rules indicate the necessity for this with returning either OverrideBottomWithNow or OverrideTopWithNow
+        override_bottom, override_top = type_isin_list(OverrideBottomWithNow, dateparts),\
+            type_isin_list(OverrideTopWithNow, dateparts)
 
         pre_first = True
         for date_type in [Year, Month, Week, Day, Daypart, Hour, Minute]:
