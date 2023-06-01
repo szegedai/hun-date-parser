@@ -1,15 +1,63 @@
-from typing import NamedTuple
+from typing import Optional
 from copy import copy
 from datetime import date, timedelta
+from dataclasses import dataclass
 
-Year = NamedTuple('Year', [('x', int), ('rule', str)])
-Month = NamedTuple('Month', [('x', int), ('rule', str)])
-Week = NamedTuple('Week', [('x', int), ('rule', str)])
-Day = NamedTuple('Day', [('x', int), ('rule', str)])
-Daypart = NamedTuple('Daypart', [('x', int), ('rule', str)])
-Hour = NamedTuple('Hour', [('x', int), ('rule', str)])
-Minute = NamedTuple('Minute', [('x', int), ('rule', str)])
-Second = NamedTuple('Second', [('x', int), ('rule', str)])
+
+@dataclass
+class DateTimePartConatiner:
+    value: Optional[int]
+    rule: str
+
+
+@dataclass
+class Year(DateTimePartConatiner):
+    pass
+
+
+@dataclass
+class Month(DateTimePartConatiner):
+    pass
+
+
+@dataclass
+class Week(DateTimePartConatiner):
+    pass
+
+
+@dataclass
+class Day(DateTimePartConatiner):
+    pass
+
+
+@dataclass
+class Daypart(DateTimePartConatiner):
+    pass
+
+
+@dataclass
+class Hour(DateTimePartConatiner):
+    pass
+
+
+@dataclass
+class Minute(DateTimePartConatiner):
+    pass
+
+
+@dataclass
+class Second(DateTimePartConatiner):
+    pass
+
+
+@dataclass
+class OverrideTopWithNow(DateTimePartConatiner):
+    pass
+
+
+@dataclass
+class OverrideBottomWithNow(DateTimePartConatiner):
+    pass
 
 
 def remove_accent(s: str):
