@@ -13,7 +13,7 @@ from hun_date_parser.date_parser.date_parsers import (match_named_month, match_i
                                                       match_week, match_named_year, match_n_periods_compared_to_now,
                                                       match_relative_month, match_in_past_n_periods)
 from hun_date_parser.date_parser.time_parsers import match_digi_clock, match_time_words, match_now, match_hwords
-from hun_date_parser.utils import (Year, Month, Week, Day, Daypart, Hour, Minute, OverrideTopWithNow,
+from hun_date_parser.utils import (Year, Month, Week, Day, Daypart, Hour, Minute, OverrideTopWithNow, SearchScopes,
                                    OverrideBottomWithNow, monday_of_calenderweek, DateTimePartConatiner)
 
 datelike = Union[datetime, date, time, None]
@@ -29,56 +29,57 @@ daypart_mapping = [
 
 
 def text2datetime(input_sentence: str, now: datetime = datetime.now(),
-                  expect_future_day: bool = False) -> List[Dict[str, datelike]]:
+                  search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED) -> List[Dict[str, datelike]]:
     """
     Returns the list of datetime intervals found in the input sentence.
     :param input_sentence: Input sentence string.
     :param now: Current timestamp to calculate relative dates.
-    :param expect_future_day: Shows if the extracted date will be offset.
+    :param search_scope: Defines whether the timeframe should be restricted to past or future.
     :return: list of datetime interval dictionaries
     """
-    datetime_extractor = DatetimeExtractor(now=now, output_container='datetime', expect_future_day=expect_future_day)
+    datetime_extractor = DatetimeExtractor(now=now, output_container='datetime', search_scope=search_scope)
     return datetime_extractor.parse_datetime(sentence=input_sentence)
 
 
 def text2date(input_sentence: str, now: datetime = datetime.now(),
-              expect_future_day: bool = False) -> List[Dict[str, datelike]]:
+              search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED) -> List[Dict[str, datelike]]:
     """
     Returns the list of date intervals found in the input sentence.
     :param input_sentence: Input sentence string.
     :param now: Current timestamp to calculate relative dates.
-    :param expect_future_day: Shows if the extracted date will be offset.
+    :param search_scope: Defines whether the timeframe should be restricted to past or future.
     :return: list of date interval dictionaries
     """
-    datetime_extractor = DatetimeExtractor(now=now, output_container='date', expect_future_day=expect_future_day)
+    datetime_extractor = DatetimeExtractor(now=now, output_container='date', search_scope=search_scope)
     return datetime_extractor.parse_datetime(sentence=input_sentence)
 
 
 def text2time(input_sentence: str, now: datetime = datetime.now(),
-              expect_future_day: bool = False) -> List[Dict[str, datelike]]:
+              search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED) -> List[Dict[str, datelike]]:
     """
     Returns the list of time intervals found in the input sentence.
     :param input_sentence: Input sentence string.
     :param now: Current timestamp to calculate relative dates.
-    :param expect_future_day: Shows if the extracted date will be offset.
+    :param search_scope: Defines whether the timeframe should be restricted to past or future.
     :return: list of time interval dictionaries
     """
-    datetime_extractor = DatetimeExtractor(now=now, output_container='time', expect_future_day=expect_future_day)
+    datetime_extractor = DatetimeExtractor(now=now, output_container='time', search_scope=search_scope)
     return datetime_extractor.parse_datetime(sentence=input_sentence)
 
 
-def match_rules(now: datetime, sentence: str, expect_future_day: bool = False) -> List:
+def match_rules(now: datetime, sentence: str,
+                search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED) -> List:
     """
     Matches all rules against input text.
     :param now: Current timestamp to calculate relative dates.
     :param sentence: Input sentence.
-    :param expect_future_day: Shows if the extracted date will be offset.
+    :param search_scope: Defines whether the timeframe should be restricted to past or future.
     :return: Parsed date and time classes.
     """
     matches = [*match_named_month(sentence, now),
                *match_iso_date(sentence),
                *match_relative_day(sentence, now),
-               *match_weekday(sentence, now, expect_future_day),
+               *match_weekday(sentence, now, search_scope),
                *match_week(sentence, now),
                *match_named_year(sentence, now),
                *match_digi_clock(sentence),
@@ -126,18 +127,18 @@ class DatetimeExtractor:
     """
 
     def __init__(self, now: datetime = datetime.now(), output_container: str = 'datetime',
-                 expect_future_day: bool = False) -> None:
+                 search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED) -> None:
         """
         :param now: Current timestamp to calculate relative dates.
         :param output_container: datetime object to populate with datetime parts
-        :param expect_future_day: Shows if the extracted date will be offset.
+        :param search_scope: Defines whether the timeframe should be restricted to past or future.
         """
         self.now = now
         self.output_container = output_container
-        self.expect_future_day = expect_future_day
+        self.search_scope = search_scope
 
     def _get_implicit_intervall(self, sentence_part: str):
-        matches = match_rules(self.now, sentence_part, self.expect_future_day)
+        matches = match_rules(self.now, sentence_part, self.search_scope)
         return [{'start_date': matches, 'end_date': matches}]
 
     def assemble_datetime(self, now: datetime,
@@ -181,7 +182,7 @@ class DatetimeExtractor:
                     pre_first = False
                     res_dt.append(_dp_match.value)
                 else:
-                    # TODO: this should take into account the expect_future_day parameter...
+                    # TODO: this should take into account the search_scope parameter...
                     res_dt.append(now.year)
 
             if date_type == Month:
@@ -306,9 +307,9 @@ class DatetimeExtractor:
 
             if interval:
                 interval['start_date'] = 'OPEN' if interval['start_date'] == 'OPEN' else match_rules(self.now, interval[
-                    'start_date'], self.expect_future_day)
+                    'start_date'], self.search_scope)
                 interval['end_date'] = 'OPEN' if interval['end_date'] == 'OPEN' else match_rules(self.now, interval[
-                    'end_date'], self.expect_future_day)
+                    'end_date'], self.search_scope)
                 parsed_dates.append(interval)
             else:
                 parsed_dates += self._get_implicit_intervall(sentence_part)

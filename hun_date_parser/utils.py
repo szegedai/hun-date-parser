@@ -2,6 +2,7 @@ from typing import Optional
 from copy import copy
 from datetime import date, timedelta
 from dataclasses import dataclass
+from enum import Enum
 
 
 @dataclass
@@ -58,6 +59,12 @@ class OverrideTopWithNow(DateTimePartConatiner):
 @dataclass
 class OverrideBottomWithNow(DateTimePartConatiner):
     pass
+
+
+class SearchScopes(Enum):
+    NOT_RESTRICTED = "not_restricted"
+    PAST_SEARCH = "past_search"
+    FUTURE_DAY = "future_day"
 
 
 def remove_accent(s: str):

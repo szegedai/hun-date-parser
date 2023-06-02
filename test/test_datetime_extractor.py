@@ -125,3 +125,24 @@ def test_assemble_datetime(inp_lst, resp, is_bottom):
                                             bottom=is_bottom)
 
     assert result == resp
+
+
+tf_past_search_scenarios = [
+    ('ezen a héten', [datetime(2023, 5, 29, 0, 0, 0), datetime(2023, 6, 4, 23, 59, 59)]),
+    ('legyen ma reggel nyolckor', [datetime(2023, 6, 1, 8, 0, 0), datetime(2023, 6, 1, 8, 59, 59)]),
+    ('legyen ma', [datetime(2023, 6, 1, 0, 0, 0), datetime(2023, 6, 1, 23, 59, 59)]),
+    ("szombat", [datetime(2023, 5, 27, 0, 0, 0), datetime(2023, 5, 27, 23, 59, 59)]),
+    ("múlt szombat", [datetime(2023, 5, 27, 0, 0, 0), datetime(2023, 5, 27, 23, 59, 59)]),
+]
+
+
+@pytest.mark.parametrize("inp_txt, resp", tf_past_search_scenarios)
+def test_past_search(inp_txt, resp):
+    now = datetime(2023, 6, 1)
+    de = DatetimeExtractor(now, search_scope=SearchScopes.PAST_SEARCH)
+    parsed_date = de.parse_datetime(inp_txt)
+    st, end = resp
+
+    assert len(parsed_date) == 1
+    assert parsed_date[0]['start_date'] == st
+    assert parsed_date[0]['end_date'] == end

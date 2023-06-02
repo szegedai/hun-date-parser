@@ -9,7 +9,7 @@ from typing import Dict, List, Union, Tuple
 from copy import deepcopy
 
 from hun_date_parser import text2datetime
-from hun_date_parser.utils import remove_accent
+from hun_date_parser.utils import remove_accent, SearchScopes
 from hun_date_parser.date_parser.time_parsers import _raw_match_time_words
 
 datelike = Union[datetime, date, time, None]
@@ -53,7 +53,7 @@ def is_relative_datetime(query: str):
 def extract_datetime_within_interval(interval_start: datetime,
                                      interval_end: datetime,
                                      query_text: str,
-                                     expect_future_day: bool = False,
+                                     search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED,
                                      fallback_now=datetime.now()) -> Tuple[ExtractWithinRangeSuccess,
                                                                            List[Dict[str, datelike]]]:
     """
@@ -68,7 +68,7 @@ def extract_datetime_within_interval(interval_start: datetime,
     """
 
     res = text2datetime(query_text,
-                        expect_future_day=expect_future_day,
+                        search_scope=search_scope,
                         now=interval_start)
 
     possible_am_pm_missmatch = False
@@ -95,7 +95,7 @@ def extract_datetime_within_interval(interval_start: datetime,
         if not (isinstance(r['start_date'], datetime) and isinstance(r['end_date'], datetime)):
             response_type = ExtractWithinRangeSuccess.OPEN_RANGE_FALLBACK
             restricted_date = text2datetime(query_text,
-                                            expect_future_day=expect_future_day,
+                                            search_scope=search_scope,
                                             now=fallback_now)
 
             response_candidates.append((4, response_type, restricted_date))
@@ -107,7 +107,7 @@ def extract_datetime_within_interval(interval_start: datetime,
             # Extracted datetime is out of expected interval...
             response_type = ExtractWithinRangeSuccess.OUT_OF_RANGE_FALLBACK
             restricted_date = text2datetime(query_text,
-                                            expect_future_day=expect_future_day,
+                                            search_scope=search_scope,
                                             now=fallback_now)
 
             response_candidates.append((2, response_type, restricted_date))
@@ -117,7 +117,7 @@ def extract_datetime_within_interval(interval_start: datetime,
             # Datetime ranges relative to the current timestamp doesn't really make sense in this scenario...
             response_type = ExtractWithinRangeSuccess.RELATIVE_TIME_WORD_FALLBACK
             restricted_date = text2datetime(query_text,
-                                            expect_future_day=expect_future_day,
+                                            search_scope=search_scope,
                                             now=fallback_now)
 
             response_candidates.append((3, response_type, restricted_date))
