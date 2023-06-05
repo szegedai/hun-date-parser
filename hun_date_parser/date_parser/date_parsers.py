@@ -1,6 +1,6 @@
 import re
 from typing import Dict, List, Any
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from dateutil.relativedelta import relativedelta
 
 from .patterns import (R_ISO_DATE, R_NAMED_MONTH, R_TODAY, R_TOMORROW, R_NTOMORROW, R_YESTERDAY, R_NYESTERDAY,
@@ -38,32 +38,65 @@ def match_iso_date(s: str) -> List[Dict[str, Any]]:
     return res
 
 
-def match_named_month(s: str, now: datetime) -> List[Dict[str, Any]]:
-    """
-    Match named month and day
-    :param s: textual input
-    :return: tuple of date parts
-    """
+def match_named_month(s: str, now: datetime,
+                      search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED) -> List[Dict[str, Any]]:
+
+    def has_already_passed(now, dt):
+        return dt < now.date()
+
+    def has_month_already_pass(now, month):
+        return month < now.month
+
     groups = re.findall(R_NAMED_MONTH, s)
     months = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'szep', 'okt', 'nov', 'dec']
 
     res = []
-    groups = [(mod, m, d.lstrip('0')) if d else (mod, m, '') for mod, m, d in groups]
+    groups = [(mod, m, d.lstrip('0')) if
+              d else (mod, m, '') for mod, m, d in groups]
+
     for group in groups:
         group_res = {'match': group, 'date_parts': []}
-        if group[0]:
+
+        month_detected = None
+        for i, month in enumerate(months):
+            if month in remove_accent(group[1]):
+                group_res['date_parts'].append(Month(i + 1, 'named_month'))
+                month_detected = i + 1
+                break
+
+        day_detected = None
+        if bool(group[2].strip(" ")) and month_detected is not None:
+            day_num = word_to_num(group[2])
+            if day_num != -1:
+                day_detected = day_num
+                group_res['date_parts'].append(Day(day_detected, 'named_month'))
+
+        detected_date_assumed_horizont = None
+        if month_detected is not None and day_detected is not None:
+            detected_month_day = date(now.year, month_detected, day_detected)
+            if detected_month_day < now.date():
+                detected_date_assumed_horizont = "past"
+            else:
+                detected_date_assumed_horizont = "future"
+        elif month_detected is not None:
+            if has_month_already_pass(now, month_detected):
+                detected_date_assumed_horizont = "past"
+            else:
+                detected_date_assumed_horizont = "future"
+
+        if month_detected is None:
+            continue
+
+        if bool(group[0].strip(" ")):
             if 'jovo' in remove_accent(group[0]):
                 group_res['date_parts'].append(Year(now.year + 1, 'named_month'))
             elif 'tavaly' in remove_accent(group[0]):
                 group_res['date_parts'].append(Year(now.year - 1, 'named_month'))
-
-        for i, month in enumerate(months):
-            if month in remove_accent(group[1]):
-                group_res['date_parts'].append(Month(i + 1, 'named_month'))
-                break
-
-        if group[2]:
-            group_res['date_parts'].append(Day(int(group[2]), 'named_month'))
+        else:
+            if search_scope == SearchScopes.FUTURE_DAY and detected_date_assumed_horizont == "past":
+                group_res['date_parts'].append(Year(now.year + 1, 'named_month'))
+            elif search_scope == SearchScopes.PAST_SEARCH and detected_date_assumed_horizont == "future":
+                group_res['date_parts'].append(Year(now.year - 1, 'named_month'))
 
         res.append(group_res)
 

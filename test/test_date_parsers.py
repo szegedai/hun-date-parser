@@ -10,23 +10,43 @@ from hun_date_parser.utils import SearchScopes
 
 
 tf_named_month = [
-    ('jan 20-án', [[Month(1, 'named_month'), Day(20, 'named_month')]]),
-    ('2020 febr. 4', [[Month(2, 'named_month'), Day(4, 'named_month')]]),
-    ('január', [[Month(1, 'named_month')]]),
-    (' február ', [[Month(2, 'named_month')]]),
-    ('janos', []),
-    ('', []),
-    ('2020 július', [[Month(7, 'named_month')]]),
-    ('2020 június - augusztus 30', [[Month(6, 'named_month')], [Month(8, 'named_month'), Day(30, 'named_month')]]),
+    ('jan 20-án', [[Month(1, 'named_month'), Day(20, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('2020 febr. 4', [[Month(2, 'named_month'), Day(4, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('január', [[Month(1, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    (' február ', [[Month(2, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('janos', [], SearchScopes.NOT_RESTRICTED),
+    ('', [], SearchScopes.NOT_RESTRICTED),
+    ('2020 július', [[Month(7, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('2020 június - augusztus 30', [[Month(6, 'named_month')], [Month(8, 'named_month'), Day(30, 'named_month')]],
+     SearchScopes.NOT_RESTRICTED),
     ('június 20 - július 30',
-     [[Month(6, 'named_month'), Day(20, 'named_month')], [Month(7, 'named_month'), Day(30, 'named_month')]]),
-    ('tavaly február ', [[Year(2019, 'named_month'), Month(2, 'named_month')]]),
-    ('legyen jövő február 12-én', [[Year(2021, 'named_month'), Month(2, 'named_month'), Day(12, 'named_month')]]),
-    ('legyen jövő év február 12-én', [[Year(2021, 'named_month'), Month(2, 'named_month'), Day(12, 'named_month')]]),
-    ('ápr 15', [[Month(4, 'named_month'), Day(15, 'named_month')]]),
-    ('május 15', [[Month(5, 'named_month'), Day(15, 'named_month')]]),
-    ('április 1', [[Month(4, 'named_month'), Day(1, 'named_month')]]),
-    ('legyen jövőre február 12-én', [[Year(2021, 'named_month'), Month(2, 'named_month'), Day(12, 'named_month')]])]
+     [[Month(6, 'named_month'), Day(20, 'named_month')], [Month(7, 'named_month'), Day(30, 'named_month')]],
+     SearchScopes.NOT_RESTRICTED),
+    ('tavaly február ', [[Month(2, 'named_month'), Year(2019, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('legyen jövő február 12-én', [[Month(2, 'named_month'), Day(12, 'named_month'), Year(2021, 'named_month')]],
+     SearchScopes.NOT_RESTRICTED),
+    ('legyen jövő év február 12-én', [[Month(2, 'named_month'), Day(12, 'named_month'), Year(2021, 'named_month')]],
+     SearchScopes.NOT_RESTRICTED),
+    ('ápr 15', [[Month(4, 'named_month'), Day(15, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('május 15', [[Month(5, 'named_month'), Day(15, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('április 1', [[Month(4, 'named_month'), Day(1, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('legyen jövőre február 12-én', [[Month(2, 'named_month'), Day(12, 'named_month'), Year(2021, 'named_month')]],
+     SearchScopes.NOT_RESTRICTED),
+    ('május 15', [[Month(5, 'named_month'), Day(15, 'named_month'), Year(2021, 'named_month')]],
+     SearchScopes.FUTURE_DAY),
+    ('május 15', [[Month(5, 'named_month'), Day(15, 'named_month')]],
+     SearchScopes.PAST_SEARCH),
+    ('november 15', [[Month(11, 'named_month'), Day(15, 'named_month'), Year(2019, 'named_month')]],
+     SearchScopes.PAST_SEARCH),
+    ('október 15', [[Month(10, 'named_month'), Day(15, 'named_month')]],
+     SearchScopes.FUTURE_DAY),
+    ('október 15', [[Month(10, 'named_month'), Day(15, 'named_month'), Year(2019, 'named_month')]],
+     SearchScopes.PAST_SEARCH),
+    ('október 3', [[Month(10, 'named_month'), Day(3, 'named_month')]],
+     SearchScopes.PAST_SEARCH),
+    ('október 15', [[Month(10, 'named_month'), Day(15, 'named_month')]],
+     SearchScopes.NOT_RESTRICTED),
+]
 
 tf_match_relative_day = [
     ('ma', [[Year(2020, 'relative_day'), Month(10, 'relative_day'), Day(1, 'relative_day')]]),
@@ -128,11 +148,11 @@ def test_match_iso_date(inp, exp):
     assert date_parts == exp
 
 
-@pytest.mark.parametrize("inp,exp", tf_named_month)
-def test_named_month(inp, exp):
-    now = datetime(2020, 10, 1)
+@pytest.mark.parametrize("inp,exp,search_scope", tf_named_month)
+def test_named_month(inp, exp, search_scope):
+    now = datetime(2020, 10, 10)
 
-    out = match_named_month(inp, now)
+    out = match_named_month(inp, now, search_scope)
     date_parts = []
     for e in out:
         date_parts.append(e['date_parts'])
