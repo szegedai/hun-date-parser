@@ -165,3 +165,18 @@ def test_past_search(inp_txt, resp, search_scope):
     assert len(parsed_date) == 1
     assert parsed_date[0]['start_date'] == st
     assert parsed_date[0]['end_date'] == end
+
+
+tf_bad_dates = [
+    "január 32",
+    "június 31"
+]
+
+
+@pytest.mark.parametrize("inp_txt", tf_bad_dates)
+def test_bad_dates(inp_txt):
+    now = datetime(2023, 6, 1)
+    de = DatetimeExtractor(now)
+    parsed_date = de.parse_datetime(inp_txt)
+    assert parsed_date == []
+

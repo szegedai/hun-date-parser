@@ -9,7 +9,7 @@ from .patterns import (R_ISO_DATE, R_NAMED_MONTH, R_TODAY, R_TOMORROW, R_NTOMORR
                        R_NWEEKS_PRIOR_NOW, R_IN_PAST_PERIOD_MINS, R_IN_PAST_PERIOD_HOURS, R_IN_PAST_PERIOD_DAYS,
                        R_IN_PAST_PERIOD_WEEKS, R_IN_PAST_PERIOD_MONTHS, R_IN_PAST_PERIOD_YEARS)
 from hun_date_parser.utils import (remove_accent, word_to_num, Year, Month, Week, Day, Hour, Minute,
-                                   OverrideTopWithNow, SearchScopes)
+                                   OverrideTopWithNow, SearchScopes, return_on_value_error)
 
 
 def match_iso_date(s: str) -> List[Dict[str, Any]]:
@@ -38,11 +38,9 @@ def match_iso_date(s: str) -> List[Dict[str, Any]]:
     return res
 
 
+@return_on_value_error([])
 def match_named_month(s: str, now: datetime,
                       search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED) -> List[Dict[str, Any]]:
-
-    def has_already_passed(now, dt):
-        return dt < now.date()
 
     def has_month_already_pass(now, month):
         return month < now.month

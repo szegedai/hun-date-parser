@@ -14,7 +14,8 @@ from hun_date_parser.date_parser.date_parsers import (match_named_month, match_i
                                                       match_relative_month, match_in_past_n_periods)
 from hun_date_parser.date_parser.time_parsers import match_digi_clock, match_time_words, match_now, match_hwords
 from hun_date_parser.utils import (Year, Month, Week, Day, Daypart, Hour, Minute, OverrideTopWithNow, SearchScopes,
-                                   OverrideBottomWithNow, monday_of_calenderweek, DateTimePartConatiner)
+                                   OverrideBottomWithNow, monday_of_calenderweek, DateTimePartConatiner,
+                                   return_on_value_error)
 
 datelike = Union[datetime, date, time, None]
 
@@ -141,6 +142,7 @@ class DatetimeExtractor:
         matches = match_rules(self.now, sentence_part, self.search_scope)
         return [{'start_date': matches, 'end_date': matches}]
 
+    @return_on_value_error(None)
     def assemble_datetime(self, now: datetime,
                           dateparts: Union[List[Union[Year, Month, Week, Day, Daypart, Hour, Minute]], str],
                           bottom: bool = True) -> datelike:
