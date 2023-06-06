@@ -154,15 +154,15 @@ def match_weekday(s: str, now: datetime,
         elif 'mult' in remove_accent(week) or 'elozo' in remove_accent(week):
             n_weeks = -1
 
-        def to_next_week(date):
-            if date.date() < now.date():
-                return date + timedelta(days=7)
-            return date
+        def to_next_week(dt):
+            if dt.date() < now.date():
+                return dt + timedelta(days=7)
+            return dt
 
-        def to_last_week(date):
-            if date.date() > now.date():
-                return date - timedelta(days=7)
-            return date
+        def to_last_week(dt):
+            if dt.date() > now.date():
+                return dt - timedelta(days=7)
+            return dt
 
         def get_day_of_week(w, d):
             return ((now - timedelta(days=now.weekday())) + timedelta(days=w * 7)) + timedelta(days=d)
