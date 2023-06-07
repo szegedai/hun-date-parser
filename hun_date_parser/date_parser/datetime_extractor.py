@@ -77,7 +77,7 @@ def match_rules(now: datetime, sentence: str,
     :param search_scope: Defines whether the timeframe should be restricted to past or future.
     :return: Parsed date and time classes.
     """
-    matches = [*match_named_month(sentence, now),
+    matches = [*match_named_month(sentence, now, search_scope),
                *match_iso_date(sentence),
                *match_relative_day(sentence, now),
                *match_weekday(sentence, now, search_scope),

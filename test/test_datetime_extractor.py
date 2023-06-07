@@ -152,6 +152,9 @@ tf_past_search_scenarios = [
     ("hétfő", [datetime(2023, 6, 5, 0, 0, 0), datetime(2023, 6, 5, 23, 59, 59)], SearchScopes.FUTURE_DAY),
     ("jövő hétfő", [datetime(2023, 6, 5, 0, 0, 0), datetime(2023, 6, 5, 23, 59, 59)], SearchScopes.FUTURE_DAY),
     ("jövő hétfő", [datetime(2023, 6, 5, 0, 0, 0), datetime(2023, 6, 5, 23, 59, 59)], SearchScopes.PAST_SEARCH),
+    ("augusztus", [datetime(2022, 8, 1, 0, 0, 0), datetime(2022, 8, 31, 23, 59, 59)], SearchScopes.PAST_SEARCH),
+    ("augusztus", [datetime(2023, 8, 1, 0, 0, 0), datetime(2023, 8, 31, 23, 59, 59)], SearchScopes.NOT_RESTRICTED),
+    ("augusztus", [datetime(2023, 8, 1, 0, 0, 0), datetime(2023, 8, 31, 23, 59, 59)], SearchScopes.FUTURE_DAY),
 ]
 
 
