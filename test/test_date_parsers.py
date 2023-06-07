@@ -46,6 +46,20 @@ tf_named_month = [
      SearchScopes.PAST_SEARCH),
     ('október 15', [[Month(10, 'named_month'), Day(15, 'named_month')]],
      SearchScopes.NOT_RESTRICTED),
+    ('október 10', [[Month(10, 'named_month'), Day(10, 'named_month')]],
+     SearchScopes.NOT_RESTRICTED),
+    ('október 10', [[Month(10, 'named_month'), Day(10, 'named_month')]],
+     SearchScopes.FUTURE_DAY),
+    ('október 9', [[Month(10, 'named_month'), Day(9, 'named_month'), Year(2021, 'named_month')]],
+     SearchScopes.FUTURE_DAY),
+    ('október 11', [[Month(10, 'named_month'), Day(11, 'named_month'), Year(2019, 'named_month')]],
+     SearchScopes.PAST_SEARCH),
+    ('október', [[Month(10, 'named_month')]],
+     SearchScopes.NOT_RESTRICTED),
+    ('október', [[Month(10, 'named_month')]],
+     SearchScopes.FUTURE_DAY),
+    ('október', [[Month(10, 'named_month')]],
+     SearchScopes.PAST_SEARCH),
 ]
 
 tf_match_relative_day = [

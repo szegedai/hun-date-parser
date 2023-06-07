@@ -72,12 +72,16 @@ def match_named_month(s: str, now: datetime,
         detected_date_assumed_horizont = None
         if month_detected is not None and day_detected is not None:
             detected_month_day = date(now.year, month_detected, day_detected)
-            if detected_month_day < now.date():
+            if detected_month_day == now.date():
+                detected_date_assumed_horizont = "current"
+            elif detected_month_day < now.date():
                 detected_date_assumed_horizont = "past"
             else:
                 detected_date_assumed_horizont = "future"
         elif month_detected is not None:
-            if has_month_already_pass(now, month_detected):
+            if now.month == month_detected:
+                detected_date_assumed_horizont = "current"
+            elif has_month_already_pass(now, month_detected):
                 detected_date_assumed_horizont = "past"
             else:
                 detected_date_assumed_horizont = "future"
