@@ -48,6 +48,35 @@ text2datetime('2021 januárig', now=datetime(2020, 12, 27))
 # [{'start_date': None, 'end_date': datetime.datetime(2021, 1, 31, 23, 59, 59)}]
 ```
 
+For the function `text2datetime` the parameter `search_scope` is used to inform what is the desired time interval to parse the inputs.
+
+- The default value `SearchScopes.NOT_RESTRICTED` doesn't restrict the scope of the search.
+  - i.e.: when Tuesday is parsed the date for the Tuesday on the given week is going to be returned, not considering whether that given date is in the past or the future
+- To prefer future dates in case of ambiguity, use the value `SearchScopes.FUTURE_DAY`
+  - In this case, when Tuesday is parsed, the function will return the closest Tuesday in the future, not necessarily the current week's Tuesday.
+- Similarly to search in the future, nudging the library to prefer past dates is possible with the value `SearchScopes.PAST_SEARCH`
+  - For instance, given a scenario when May is parsed by the function, with this setting, if this year's May is still in the future, last year's May will be returned.
+  - Please note, when there's no ambiguity, the function can still return future/past dates, even when a different preference is specified.
+
+An example:
+```python
+from hun_date_parser import text2datetime
+from datetime import datetime
+from hun_date_parser.utils import SearchScopes
+
+text2datetime('augusztus', now=datetime(2023, 6, 7), search_scope=SearchScopes.PAST_SEARCH)
+# [{'start_date': datetime.datetime(2023, 8, 1, 0, 0),
+#   'end_date': datetime.datetime(2023, 8, 31, 23, 59, 59)}]
+
+text2datetime('péntek', now=datetime(2023, 6, 7), search_scope=SearchScopes.PAST_SEARCH)
+# [{'start_date': datetime.datetime(2023, 6, 2, 0, 0),
+#   'end_date': datetime.datetime(2023, 6, 2, 23, 59, 59)}]
+
+text2datetime('péntek', now=datetime(2023, 6, 7), search_scope=SearchScopes.NOT_RESTRICTED)
+# [{'start_date': datetime.datetime(2023, 6, 9, 0, 0),
+#   'end_date': datetime.datetime(2023, 6, 9, 23, 59, 59)}]
+```
+
 The library is also capable of turning datetime objects into their Hungarian text representation.
 
 ```python

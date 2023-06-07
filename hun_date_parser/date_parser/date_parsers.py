@@ -1,6 +1,6 @@
 import re
 from typing import Dict, List, Any
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, date
 from dateutil.relativedelta import relativedelta
 
 from .patterns import (R_ISO_DATE, R_NAMED_MONTH, R_TODAY, R_TOMORROW, R_NTOMORROW, R_YESTERDAY, R_NYESTERDAY,
@@ -8,7 +8,8 @@ from .patterns import (R_ISO_DATE, R_NAMED_MONTH, R_TODAY, R_TOMORROW, R_NTOMORR
                        R_NMINS_FROM_NOW, R_RELATIVE_MONTH, R_NMINS_PRIOR_NOW, R_NDAYS_PRIOR_NOW, R_NHOURS_PRIOR_NOW,
                        R_NWEEKS_PRIOR_NOW, R_IN_PAST_PERIOD_MINS, R_IN_PAST_PERIOD_HOURS, R_IN_PAST_PERIOD_DAYS,
                        R_IN_PAST_PERIOD_WEEKS, R_IN_PAST_PERIOD_MONTHS, R_IN_PAST_PERIOD_YEARS)
-from hun_date_parser.utils import remove_accent, word_to_num, Year, Month, Week, Day, Hour, Minute, OverrideTopWithNow
+from hun_date_parser.utils import (remove_accent, word_to_num, Year, Month, Week, Day, Hour, Minute,
+                                   OverrideTopWithNow, SearchScopes, return_on_value_error)
 
 
 def match_iso_date(s: str) -> List[Dict[str, Any]]:
@@ -37,32 +38,67 @@ def match_iso_date(s: str) -> List[Dict[str, Any]]:
     return res
 
 
-def match_named_month(s: str, now: datetime) -> List[Dict[str, Any]]:
-    """
-    Match named month and day
-    :param s: textual input
-    :return: tuple of date parts
-    """
+@return_on_value_error([])
+def match_named_month(s: str, now: datetime,
+                      search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED) -> List[Dict[str, Any]]:
+
+    def has_month_already_pass(now, month):
+        return month < now.month
+
     groups = re.findall(R_NAMED_MONTH, s)
     months = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'szep', 'okt', 'nov', 'dec']
 
     res = []
-    groups = [(mod, m, d.lstrip('0')) if d else (mod, m, '') for mod, m, d in groups]
+    groups = [(mod, m, d.lstrip('0')) if
+              d else (mod, m, '') for mod, m, d in groups]
+
     for group in groups:
         group_res = {'match': group, 'date_parts': []}
-        if group[0]:
+
+        month_detected = None
+        for i, month in enumerate(months):
+            if month in remove_accent(group[1]):
+                group_res['date_parts'].append(Month(i + 1, 'named_month'))
+                month_detected = i + 1
+                break
+
+        day_detected = None
+        if bool(group[2].strip(" ")) and month_detected is not None:
+            day_num = word_to_num(group[2])
+            if day_num != -1:
+                day_detected = day_num
+                group_res['date_parts'].append(Day(day_detected, 'named_month'))
+
+        detected_date_assumed_horizont = None
+        if month_detected is not None and day_detected is not None:
+            detected_month_day = date(now.year, month_detected, day_detected)
+            if detected_month_day == now.date():
+                detected_date_assumed_horizont = "current"
+            elif detected_month_day < now.date():
+                detected_date_assumed_horizont = "past"
+            else:
+                detected_date_assumed_horizont = "future"
+        elif month_detected is not None:
+            if now.month == month_detected:
+                detected_date_assumed_horizont = "current"
+            elif has_month_already_pass(now, month_detected):
+                detected_date_assumed_horizont = "past"
+            else:
+                detected_date_assumed_horizont = "future"
+
+        if month_detected is None:
+            continue
+
+        if bool(group[0].strip(" ")):
             if 'jovo' in remove_accent(group[0]):
                 group_res['date_parts'].append(Year(now.year + 1, 'named_month'))
             elif 'tavaly' in remove_accent(group[0]):
                 group_res['date_parts'].append(Year(now.year - 1, 'named_month'))
-
-        for i, month in enumerate(months):
-            if month in remove_accent(group[1]):
-                group_res['date_parts'].append(Month(i + 1, 'named_month'))
-                break
-
-        if group[2]:
-            group_res['date_parts'].append(Day(int(group[2]), 'named_month'))
+        else:
+            if search_scope == SearchScopes.FUTURE_DAY and detected_date_assumed_horizont == "past":
+                group_res['date_parts'].append(Year(now.year + 1, 'named_month'))
+            elif search_scope == SearchScopes.PAST_SEARCH and detected_date_assumed_horizont == "future":
+                group_res['date_parts'].append(Year(now.year - 1, 'named_month'))
 
         res.append(group_res)
 
@@ -107,7 +143,8 @@ def match_relative_day(s: str, now: datetime) -> List[Dict[str, Any]]:
     return res
 
 
-def match_weekday(s: str, now: datetime, expect_future_day: bool = False) -> List[Dict[str, Any]]:
+def match_weekday(s: str, now: datetime,
+                  search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED) -> List[Dict[str, Any]]:
     groups = re.findall(R_WEEKDAY, s)
 
     res = []
@@ -121,41 +158,49 @@ def match_weekday(s: str, now: datetime, expect_future_day: bool = False) -> Lis
         elif 'mult' in remove_accent(week) or 'elozo' in remove_accent(week):
             n_weeks = -1
 
-        def offset_date(date):
-            if date.strftime("%Y-%m-%d") < now.strftime("%Y-%m-%d"):
-                return date + timedelta(days=7)
-            return date
+        def to_next_week(dt):
+            if dt.date() < now.date():
+                return dt + timedelta(days=7)
+            return dt
+
+        def to_last_week(dt):
+            if dt.date() > now.date():
+                return dt - timedelta(days=7)
+            return dt
 
         def get_day_of_week(w, d):
             return ((now - timedelta(days=now.weekday())) + timedelta(days=w * 7)) + timedelta(days=d)
 
+        day_num = -1
         if 'hetfo' in remove_accent(day):
-            day = offset_date(get_day_of_week(n_weeks, 0)) if expect_future_day and n_weeks >= 0 \
-                else get_day_of_week(n_weeks, 0)
-            date_parts['date_parts'] = [Year(day.year, 'weekday'), Month(day.month, 'weekday'), Day(day.day, 'weekday')]
+            day_num = 0
         elif 'kedd' in remove_accent(day):
-            day = offset_date(get_day_of_week(n_weeks, 1)) if expect_future_day and n_weeks >= 0 \
-                else get_day_of_week(n_weeks, 1)
-            date_parts['date_parts'] = [Year(day.year, 'weekday'), Month(day.month, 'weekday'), Day(day.day, 'weekday')]
+            day_num = 1
         elif 'szerda' in remove_accent(day):
-            day = offset_date(get_day_of_week(n_weeks, 2)) if expect_future_day and n_weeks >= 0 \
-                else get_day_of_week(n_weeks, 2)
-            date_parts['date_parts'] = [Year(day.year, 'weekday'), Month(day.month, 'weekday'), Day(day.day, 'weekday')]
+            day_num = 2
         elif 'csut' in remove_accent(day):
-            day = offset_date(get_day_of_week(n_weeks, 3)) if expect_future_day and n_weeks >= 0 \
-                else get_day_of_week(n_weeks, 3)
-            date_parts['date_parts'] = [Year(day.year, 'weekday'), Month(day.month, 'weekday'), Day(day.day, 'weekday')]
+            day_num = 3
         elif 'pent' in remove_accent(day):
-            day = offset_date(get_day_of_week(n_weeks, 4)) if expect_future_day and n_weeks >= 0 \
-                else get_day_of_week(n_weeks, 4)
-            date_parts['date_parts'] = [Year(day.year, 'weekday'), Month(day.month, 'weekday'), Day(day.day, 'weekday')]
+            day_num = 4
         elif 'szom' in remove_accent(day):
-            day = offset_date(get_day_of_week(n_weeks, 5)) if expect_future_day and n_weeks >= 0 \
-                else get_day_of_week(n_weeks, 5)
-            date_parts['date_parts'] = [Year(day.year, 'weekday'), Month(day.month, 'weekday'), Day(day.day, 'weekday')]
+            day_num = 5
         elif 'vas' in remove_accent(day):
-            day = offset_date(get_day_of_week(n_weeks, 6)) if expect_future_day and n_weeks >= 0 \
-                else get_day_of_week(n_weeks, 6)
+            day_num = 6
+
+        if day_num != -1:
+            if search_scope == SearchScopes.PAST_SEARCH:
+                if n_weeks == 0:
+                    day = to_last_week(get_day_of_week(n_weeks, day_num))
+                else:
+                    day = get_day_of_week(n_weeks, day_num)
+            elif search_scope == SearchScopes.FUTURE_DAY:
+                if n_weeks == 0:
+                    day = to_next_week(get_day_of_week(n_weeks, day_num))
+                else:
+                    day = get_day_of_week(n_weeks, day_num)
+            else:
+                day = get_day_of_week(n_weeks, day_num)
+
             date_parts['date_parts'] = [Year(day.year, 'weekday'), Month(day.month, 'weekday'), Day(day.day, 'weekday')]
 
         res.append(date_parts)

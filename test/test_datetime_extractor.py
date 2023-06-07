@@ -125,3 +125,61 @@ def test_assemble_datetime(inp_lst, resp, is_bottom):
                                             bottom=is_bottom)
 
     assert result == resp
+
+
+tf_past_search_scenarios = [
+    ('ezen a héten', [datetime(2023, 5, 29, 0, 0, 0), datetime(2023, 6, 4, 23, 59, 59)], SearchScopes.PAST_SEARCH),
+    ('ezen a héten', [datetime(2023, 5, 29, 0, 0, 0), datetime(2023, 6, 4, 23, 59, 59)], SearchScopes.FUTURE_DAY),
+    ('legyen ma reggel nyolckor', [datetime(2023, 6, 1, 8, 0, 0), datetime(2023, 6, 1, 8, 59, 59)],
+     SearchScopes.PAST_SEARCH),
+    ('legyen ma', [datetime(2023, 6, 1, 0, 0, 0), datetime(2023, 6, 1, 23, 59, 59)], SearchScopes.PAST_SEARCH),
+    ('legyen ma', [datetime(2023, 6, 1, 0, 0, 0), datetime(2023, 6, 1, 23, 59, 59)], SearchScopes.NOT_RESTRICTED),
+    ('legyen ma', [datetime(2023, 6, 1, 0, 0, 0), datetime(2023, 6, 1, 23, 59, 59)], SearchScopes.FUTURE_DAY),
+    ("szombat", [datetime(2023, 5, 27, 0, 0, 0), datetime(2023, 5, 27, 23, 59, 59)], SearchScopes.PAST_SEARCH),
+    ("szombat", [datetime(2023, 6, 3, 0, 0, 0), datetime(2023, 6, 3, 23, 59, 59)], SearchScopes.NOT_RESTRICTED),
+    ("szombat", [datetime(2023, 6, 3, 0, 0, 0), datetime(2023, 6, 3, 23, 59, 59)], SearchScopes.FUTURE_DAY),
+    ("múlt szombat", [datetime(2023, 5, 27, 0, 0, 0), datetime(2023, 5, 27, 23, 59, 59)], SearchScopes.PAST_SEARCH),
+    ("csütörtök", [datetime(2023, 6, 1, 0, 0, 0), datetime(2023, 6, 1, 23, 59, 59)], SearchScopes.PAST_SEARCH),
+    ("csütörtök", [datetime(2023, 6, 1, 0, 0, 0), datetime(2023, 6, 1, 23, 59, 59)], SearchScopes.FUTURE_DAY),
+    ("csütörtök", [datetime(2023, 6, 1, 0, 0, 0), datetime(2023, 6, 1, 23, 59, 59)], SearchScopes.NOT_RESTRICTED),
+    ("szerda", [datetime(2023, 5, 31, 0, 0, 0), datetime(2023, 5, 31, 23, 59, 59)], SearchScopes.PAST_SEARCH),
+    ("múlt szerda", [datetime(2023, 5, 24, 0, 0, 0), datetime(2023, 5, 24, 23, 59, 59)], SearchScopes.PAST_SEARCH),
+    ("múlt szerda", [datetime(2023, 5, 24, 0, 0, 0), datetime(2023, 5, 24, 23, 59, 59)], SearchScopes.NOT_RESTRICTED),
+    ("múlt szerda", [datetime(2023, 5, 24, 0, 0, 0), datetime(2023, 5, 24, 23, 59, 59)], SearchScopes.FUTURE_DAY),
+    ("kedd", [datetime(2023, 5, 30, 0, 0, 0), datetime(2023, 5, 30, 23, 59, 59)], SearchScopes.PAST_SEARCH),
+    ("kedd", [datetime(2023, 5, 30, 0, 0, 0), datetime(2023, 5, 30, 23, 59, 59)], SearchScopes.NOT_RESTRICTED),
+    ("kedd", [datetime(2023, 6, 6, 0, 0, 0), datetime(2023, 6, 6, 23, 59, 59)], SearchScopes.FUTURE_DAY),
+    ("hétfő", [datetime(2023, 6, 5, 0, 0, 0), datetime(2023, 6, 5, 23, 59, 59)], SearchScopes.FUTURE_DAY),
+    ("jövő hétfő", [datetime(2023, 6, 5, 0, 0, 0), datetime(2023, 6, 5, 23, 59, 59)], SearchScopes.FUTURE_DAY),
+    ("jövő hétfő", [datetime(2023, 6, 5, 0, 0, 0), datetime(2023, 6, 5, 23, 59, 59)], SearchScopes.PAST_SEARCH),
+    ("augusztus", [datetime(2022, 8, 1, 0, 0, 0), datetime(2022, 8, 31, 23, 59, 59)], SearchScopes.PAST_SEARCH),
+    ("augusztus", [datetime(2023, 8, 1, 0, 0, 0), datetime(2023, 8, 31, 23, 59, 59)], SearchScopes.NOT_RESTRICTED),
+    ("augusztus", [datetime(2023, 8, 1, 0, 0, 0), datetime(2023, 8, 31, 23, 59, 59)], SearchScopes.FUTURE_DAY),
+]
+
+
+@pytest.mark.parametrize("inp_txt, resp, search_scope", tf_past_search_scenarios)
+def test_past_search(inp_txt, resp, search_scope):
+    now = datetime(2023, 6, 1)
+    de = DatetimeExtractor(now, search_scope=search_scope)
+    parsed_date = de.parse_datetime(inp_txt)
+    st, end = resp
+
+    assert len(parsed_date) == 1
+    assert parsed_date[0]['start_date'] == st
+    assert parsed_date[0]['end_date'] == end
+
+
+tf_bad_dates = [
+    "január 32",
+    "június 31"
+]
+
+
+@pytest.mark.parametrize("inp_txt", tf_bad_dates)
+def test_bad_dates(inp_txt):
+    now = datetime(2023, 6, 1)
+    de = DatetimeExtractor(now)
+    parsed_date = de.parse_datetime(inp_txt)
+    assert parsed_date == []
+

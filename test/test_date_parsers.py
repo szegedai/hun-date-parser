@@ -6,25 +6,61 @@ from hun_date_parser.date_parser.date_parsers import (match_iso_date, match_name
                                                       match_weekday,
                                                       match_week, match_named_year, match_relative_month,
                                                       match_n_periods_compared_to_now, match_in_past_n_periods)
+from hun_date_parser.utils import SearchScopes
+
 
 tf_named_month = [
-    ('jan 20-án', [[Month(1, 'named_month'), Day(20, 'named_month')]]),
-    ('2020 febr. 4', [[Month(2, 'named_month'), Day(4, 'named_month')]]),
-    ('január', [[Month(1, 'named_month')]]),
-    (' február ', [[Month(2, 'named_month')]]),
-    ('janos', []),
-    ('', []),
-    ('2020 július', [[Month(7, 'named_month')]]),
-    ('2020 június - augusztus 30', [[Month(6, 'named_month')], [Month(8, 'named_month'), Day(30, 'named_month')]]),
+    ('jan 20-án', [[Month(1, 'named_month'), Day(20, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('2020 febr. 4', [[Month(2, 'named_month'), Day(4, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('január', [[Month(1, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    (' február ', [[Month(2, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('janos', [], SearchScopes.NOT_RESTRICTED),
+    ('', [], SearchScopes.NOT_RESTRICTED),
+    ('2020 július', [[Month(7, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('2020 június - augusztus 30', [[Month(6, 'named_month')], [Month(8, 'named_month'), Day(30, 'named_month')]],
+     SearchScopes.NOT_RESTRICTED),
     ('június 20 - július 30',
-     [[Month(6, 'named_month'), Day(20, 'named_month')], [Month(7, 'named_month'), Day(30, 'named_month')]]),
-    ('tavaly február ', [[Year(2019, 'named_month'), Month(2, 'named_month')]]),
-    ('legyen jövő február 12-én', [[Year(2021, 'named_month'), Month(2, 'named_month'), Day(12, 'named_month')]]),
-    ('legyen jövő év február 12-én', [[Year(2021, 'named_month'), Month(2, 'named_month'), Day(12, 'named_month')]]),
-    ('ápr 15', [[Month(4, 'named_month'), Day(15, 'named_month')]]),
-    ('május 15', [[Month(5, 'named_month'), Day(15, 'named_month')]]),
-    ('április 1', [[Month(4, 'named_month'), Day(1, 'named_month')]]),
-    ('legyen jövőre február 12-én', [[Year(2021, 'named_month'), Month(2, 'named_month'), Day(12, 'named_month')]])]
+     [[Month(6, 'named_month'), Day(20, 'named_month')], [Month(7, 'named_month'), Day(30, 'named_month')]],
+     SearchScopes.NOT_RESTRICTED),
+    ('tavaly február ', [[Month(2, 'named_month'), Year(2019, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('legyen jövő február 12-én', [[Month(2, 'named_month'), Day(12, 'named_month'), Year(2021, 'named_month')]],
+     SearchScopes.NOT_RESTRICTED),
+    ('legyen jövő év február 12-én', [[Month(2, 'named_month'), Day(12, 'named_month'), Year(2021, 'named_month')]],
+     SearchScopes.NOT_RESTRICTED),
+    ('ápr 15', [[Month(4, 'named_month'), Day(15, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('május 15', [[Month(5, 'named_month'), Day(15, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('április 1', [[Month(4, 'named_month'), Day(1, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('legyen jövőre február 12-én', [[Month(2, 'named_month'), Day(12, 'named_month'), Year(2021, 'named_month')]],
+     SearchScopes.NOT_RESTRICTED),
+    ('május 15', [[Month(5, 'named_month'), Day(15, 'named_month'), Year(2021, 'named_month')]],
+     SearchScopes.FUTURE_DAY),
+    ('május 15', [[Month(5, 'named_month'), Day(15, 'named_month')]],
+     SearchScopes.PAST_SEARCH),
+    ('november 15', [[Month(11, 'named_month'), Day(15, 'named_month'), Year(2019, 'named_month')]],
+     SearchScopes.PAST_SEARCH),
+    ('október 15', [[Month(10, 'named_month'), Day(15, 'named_month')]],
+     SearchScopes.FUTURE_DAY),
+    ('október 15', [[Month(10, 'named_month'), Day(15, 'named_month'), Year(2019, 'named_month')]],
+     SearchScopes.PAST_SEARCH),
+    ('október 3', [[Month(10, 'named_month'), Day(3, 'named_month')]],
+     SearchScopes.PAST_SEARCH),
+    ('október 15', [[Month(10, 'named_month'), Day(15, 'named_month')]],
+     SearchScopes.NOT_RESTRICTED),
+    ('október 10', [[Month(10, 'named_month'), Day(10, 'named_month')]],
+     SearchScopes.NOT_RESTRICTED),
+    ('október 10', [[Month(10, 'named_month'), Day(10, 'named_month')]],
+     SearchScopes.FUTURE_DAY),
+    ('október 9', [[Month(10, 'named_month'), Day(9, 'named_month'), Year(2021, 'named_month')]],
+     SearchScopes.FUTURE_DAY),
+    ('október 11', [[Month(10, 'named_month'), Day(11, 'named_month'), Year(2019, 'named_month')]],
+     SearchScopes.PAST_SEARCH),
+    ('október', [[Month(10, 'named_month')]],
+     SearchScopes.NOT_RESTRICTED),
+    ('október', [[Month(10, 'named_month')]],
+     SearchScopes.FUTURE_DAY),
+    ('október', [[Month(10, 'named_month')]],
+     SearchScopes.PAST_SEARCH),
+]
 
 tf_match_relative_day = [
     ('ma', [[Year(2020, 'relative_day'), Month(10, 'relative_day'), Day(1, 'relative_day')]]),
@@ -47,18 +83,18 @@ tf_iso_date = [
       [Year(2020, 'match_iso_date'), Month(12, 'match_iso_date'), Day(29, 'match_iso_date')]])]
 
 tf_weekday = [
-    ('múlt vasárnap', [[Year(2020, 'weekday'), Month(12, 'weekday'), Day(6, 'weekday')]], False),
-    ('ezen a heten hetfon', [[Year(2020, 'weekday'), Month(12, 'weekday'), Day(7, 'weekday')]], False),
-    ('jövő kedden', [[Year(2020, 'weekday'), Month(12, 'weekday'), Day(15, 'weekday')]], False),
-    ('előző szombaton ', [[Year(2020, 'weekday'), Month(12, 'weekday'), Day(5, 'weekday')]], False),
-    ('miért nem jöttél tegnap? na majd ma', [], False),
-    ('jövő kedden', [[Year(2020, 'weekday'), Month(12, 'weekday'), Day(15, 'weekday')]], False),
-    ('szombaton ráérek', [[Year(2020, 'weekday'), Month(12, 'weekday'), Day(12, 'weekday')]], True),
-    ('mit szólnál hétfőhöz?', [[Year(2020, 'weekday'), Month(12, 'weekday'), Day(14, 'weekday')]], True),
-    ('pénteken ráérek', [[Year(2020, 'weekday'), Month(12, 'weekday'), Day(11, 'weekday')]], True),
-    ('múlt hét kedden beszéltünk', [[Year(2020, 'weekday'), Month(12, 'weekday'), Day(1, 'weekday')]], True),
-    ('szerdán ráérek', [[Year(2020, 'weekday'), Month(12, 'weekday'), Day(16, 'weekday')]], True),
-    ('jövő héten szerdán ráérek', [[Year(2020, 'weekday'), Month(12, 'weekday'), Day(16, 'weekday')]], True)]
+    ('múlt vasárnap', [[Year(2020, 'weekday'), Month(12, 'weekday'), Day(6, 'weekday')]], SearchScopes.NOT_RESTRICTED),
+    ('ezen a heten hetfon', [[Year(2020, 'weekday'), Month(12, 'weekday'), Day(7, 'weekday')]], SearchScopes.NOT_RESTRICTED),
+    ('jövő kedden', [[Year(2020, 'weekday'), Month(12, 'weekday'), Day(15, 'weekday')]], SearchScopes.NOT_RESTRICTED),
+    ('előző szombaton ', [[Year(2020, 'weekday'), Month(12, 'weekday'), Day(5, 'weekday')]], SearchScopes.NOT_RESTRICTED),
+    ('miért nem jöttél tegnap? na majd ma', [], SearchScopes.NOT_RESTRICTED),
+    ('jövő kedden', [[Year(2020, 'weekday'), Month(12, 'weekday'), Day(15, 'weekday')]], SearchScopes.NOT_RESTRICTED),
+    ('szombaton ráérek', [[Year(2020, 'weekday'), Month(12, 'weekday'), Day(12, 'weekday')]], SearchScopes.FUTURE_DAY),
+    ('mit szólnál hétfőhöz?', [[Year(2020, 'weekday'), Month(12, 'weekday'), Day(14, 'weekday')]], SearchScopes.FUTURE_DAY),
+    ('pénteken ráérek', [[Year(2020, 'weekday'), Month(12, 'weekday'), Day(11, 'weekday')]], SearchScopes.FUTURE_DAY),
+    ('múlt hét kedden beszéltünk', [[Year(2020, 'weekday'), Month(12, 'weekday'), Day(1, 'weekday')]], SearchScopes.FUTURE_DAY),
+    ('szerdán ráérek', [[Year(2020, 'weekday'), Month(12, 'weekday'), Day(16, 'weekday')]], SearchScopes.FUTURE_DAY),
+    ('jövő héten szerdán ráérek', [[Year(2020, 'weekday'), Month(12, 'weekday'), Day(16, 'weekday')]], SearchScopes.FUTURE_DAY)]
 
 tf_week = [('múlthéten', [[Year(2020, "week"), Week(49, "week")]]),
            ('múlt hét kedden', [[Year(2020, "week"), Week(49, "week")]]),
@@ -126,11 +162,11 @@ def test_match_iso_date(inp, exp):
     assert date_parts == exp
 
 
-@pytest.mark.parametrize("inp,exp", tf_named_month)
-def test_named_month(inp, exp):
-    now = datetime(2020, 10, 1)
+@pytest.mark.parametrize("inp,exp,search_scope", tf_named_month)
+def test_named_month(inp, exp, search_scope):
+    now = datetime(2020, 10, 10)
 
-    out = match_named_month(inp, now)
+    out = match_named_month(inp, now, search_scope)
     date_parts = []
     for e in out:
         date_parts.append(e['date_parts'])
@@ -148,10 +184,10 @@ def test_match_relative_day(inp, exp):
     assert date_parts == exp
 
 
-@pytest.mark.parametrize("inp,exp,expect_future_day", tf_weekday)
-def test_match_weekday(inp, exp, expect_future_day):
+@pytest.mark.parametrize("inp,exp,search_scope", tf_weekday)
+def test_match_weekday(inp, exp, search_scope):
     now = datetime(2020, 12, 11)  # friday
-    out = match_weekday(inp, now, expect_future_day)
+    out = match_weekday(inp, now, search_scope)
     date_parts = []
     for e in out:
         date_parts.append(e['date_parts'])

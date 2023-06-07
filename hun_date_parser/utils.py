@@ -2,6 +2,7 @@ from typing import Optional
 from copy import copy
 from datetime import date, timedelta
 from dataclasses import dataclass
+from enum import Enum
 
 
 @dataclass
@@ -58,6 +59,12 @@ class OverrideTopWithNow(DateTimePartConatiner):
 @dataclass
 class OverrideBottomWithNow(DateTimePartConatiner):
     pass
+
+
+class SearchScopes(Enum):
+    NOT_RESTRICTED = "not_restricted"
+    PAST_SEARCH = "past_search"
+    FUTURE_DAY = "future_day"
 
 
 def remove_accent(s: str):
@@ -168,3 +175,20 @@ def monday_of_calenderweek(year, week):
     first = date(year, 1, 1)
     base = 1 if first.isocalendar()[1] == 1 else 8
     return first + timedelta(days=base - first.isocalendar()[2] + 7 * (week - 1))
+
+
+def return_on_value_error(value):
+    """
+    When invalid dateparts are provided to the datetime library it throws a value error.
+    For now, this solution is meant to address this issue. Later on we could implement our own sanity check logic.
+    """
+    def decorate(f):
+        def applicator(*args, **kwargs):
+            try:
+                return f(*args, **kwargs)
+            except ValueError:
+                return value
+
+        return applicator
+
+    return decorate
