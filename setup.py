@@ -1,3 +1,6 @@
+import pathlib
+
+import pkg_resources
 import setuptools
 import re
 import hun_date_parser
@@ -5,6 +8,13 @@ import hun_date_parser
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
     long_description = re.sub(r':.*:', '', long_description)  # remove Github emojis
+
+with pathlib.Path('requirements.txt').open() as requirements_txt:
+    install_requires = [
+        str(requirement)
+        for requirement
+        in pkg_resources.parse_requirements(requirements_txt)
+    ]
 
 setuptools.setup(
     name="hun-date-parser",
@@ -15,6 +25,7 @@ setuptools.setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/szegedai/hun-date-parser",
+    install_requires=install_requires,
     packages=setuptools.find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
