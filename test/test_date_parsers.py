@@ -184,10 +184,10 @@ def test_match_relative_day(inp, exp):
     assert date_parts == exp
 
 
-@pytest.mark.parametrize("inp,exp,expect_future_day", tf_weekday)
-def test_match_weekday(inp, exp, expect_future_day):
+@pytest.mark.parametrize("inp,exp,search_scope", tf_weekday)
+def test_match_weekday(inp, exp, search_scope):
     now = datetime(2020, 12, 11)  # friday
-    out = match_weekday(inp, now, expect_future_day)
+    out = match_weekday(inp, now, search_scope)
     date_parts = []
     for e in out:
         date_parts.append(e['date_parts'])

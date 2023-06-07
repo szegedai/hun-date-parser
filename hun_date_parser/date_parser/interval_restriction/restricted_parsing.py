@@ -61,7 +61,7 @@ def extract_datetime_within_interval(interval_start: datetime,
     :param interval_start: Bounding interval start
     :param interval_end: Bounding interval end
     :param query_text: Text to extract datetime interval from
-    :param expect_future_day: Shows if the extracted date will be offset.
+    :param search_scope: Sets the desired time horizont of the search.
     :param fallback_now: When interval restriction is unsuccessful (RELATIVE_TIME_WORD_FALLBACK, OUT_OF_RANGE_FALLBACK)
     the text2datetime function's result is returned, which can be supplied with a pseudo-now datetime
     :return: success flag, restricted time interval
