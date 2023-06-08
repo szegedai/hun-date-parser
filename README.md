@@ -65,8 +65,8 @@ from datetime import datetime
 from hun_date_parser.utils import SearchScopes
 
 text2datetime('augusztus', now=datetime(2023, 6, 7), search_scope=SearchScopes.PAST_SEARCH)
-# [{'start_date': datetime.datetime(2023, 8, 1, 0, 0),
-#   'end_date': datetime.datetime(2023, 8, 31, 23, 59, 59)}]
+# [{'start_date': datetime.datetime(2022, 8, 1, 0, 0),
+#   'end_date': datetime.datetime(2022, 8, 31, 23, 59, 59)}]
 
 text2datetime('péntek', now=datetime(2023, 6, 7), search_scope=SearchScopes.PAST_SEARCH)
 # [{'start_date': datetime.datetime(2023, 6, 2, 0, 0),
