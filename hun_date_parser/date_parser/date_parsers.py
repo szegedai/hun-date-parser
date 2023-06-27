@@ -3,8 +3,8 @@ from typing import Dict, List, Any
 from datetime import datetime, timedelta, date
 from dateutil.relativedelta import relativedelta
 
-from .patterns import (R_ISO_DATE, R_NAMED_MONTH, R_TODAY, R_TOMORROW, R_NTOMORROW, R_YESTERDAY, R_NYESTERDAY,
-                       R_WEEKDAY, R_WEEK, R_YEAR, R_NDAYS_FROM_NOW, R_NWEEKS_FROM_NOW, R_NHOURS_FROM_NOW,
+from .patterns import (R_ISO_DATE, R_REV_ISO_DATE, R_NAMED_MONTH, R_TODAY, R_TOMORROW, R_NTOMORROW, R_YESTERDAY,
+                       R_NYESTERDAY, R_WEEKDAY, R_WEEK, R_YEAR, R_NDAYS_FROM_NOW, R_NWEEKS_FROM_NOW, R_NHOURS_FROM_NOW,
                        R_NMINS_FROM_NOW, R_RELATIVE_MONTH, R_NMINS_PRIOR_NOW, R_NDAYS_PRIOR_NOW, R_NHOURS_PRIOR_NOW,
                        R_NWEEKS_PRIOR_NOW, R_IN_PAST_PERIOD_MINS, R_IN_PAST_PERIOD_HOURS, R_IN_PAST_PERIOD_DAYS,
                        R_IN_PAST_PERIOD_WEEKS, R_IN_PAST_PERIOD_MONTHS, R_IN_PAST_PERIOD_YEARS)
@@ -19,9 +19,17 @@ def match_iso_date(s: str) -> List[Dict[str, Any]]:
     :return: tuple of date parts
     """
     match = re.findall(R_ISO_DATE, s)
+    match_rev = re.findall(R_REV_ISO_DATE, s)
 
     res = []
-    if match:
+    if match_rev:
+        for group in match_rev:
+            group = [int(m.lstrip('0')) for m in group if m.lstrip('0')]
+            res.append({'match': group,
+                        'date_parts': [Year(group[2], 'match_iso_date'),
+                                       Month(group[1], 'match_iso_date'),
+                                       Day(group[0], 'match_iso_date')]})
+    elif match:
         for group in match:
             group = [int(m.lstrip('0')) for m in group if m.lstrip('0')]
 
@@ -41,7 +49,6 @@ def match_iso_date(s: str) -> List[Dict[str, Any]]:
 @return_on_value_error([])
 def match_named_month(s: str, now: datetime,
                       search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED) -> List[Dict[str, Any]]:
-
     def has_month_already_pass(now, month):
         return month < now.month
 
@@ -333,11 +340,11 @@ def match_relative_month(s: str, now: datetime) -> List[Dict[str, Any]]:
             date_parts['date_parts'] = [Year(prev_month.year, 'relative_month'),
                                         Month(prev_month.month, 'relative_month')]
         elif (remove_accent(group).startswith("ezen")
-                or 'ebben' in remove_accent(group)
-                or 'aktualis' in remove_accent(group)):
+              or 'ebben' in remove_accent(group)
+              or 'aktualis' in remove_accent(group)):
             date_parts['date_parts'] = [Year(now.year, 'relative_month'), Month(now.month, 'relative_month')]
         elif ('jovo' in remove_accent(group)
-                or 'kovetkez' in remove_accent(group)):
+              or 'kovetkez' in remove_accent(group)):
             next_month = now.date() + relativedelta(months=1)
             date_parts['date_parts'] = [Year(next_month.year, 'relative_month'),
                                         Month(next_month.month, 'relative_month')]
