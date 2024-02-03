@@ -1,8 +1,8 @@
-from typing import Optional
 from copy import copy
 from datetime import date, timedelta
-from dataclasses import dataclass
 from enum import Enum
+from dataclasses import dataclass
+from typing import Optional
 
 
 @dataclass
@@ -59,6 +59,37 @@ class OverrideTopWithNow(DateTimePartConatiner):
 @dataclass
 class OverrideBottomWithNow(DateTimePartConatiner):
     pass
+
+
+@dataclass
+class MinuteOffset(DateTimePartConatiner):
+    """Indicates that a certain number of days need to be added to a date."""
+    pass
+
+
+@dataclass
+class HourOffset(DateTimePartConatiner):
+    """Indicates that a certain number of days need to be added to a date."""
+    pass
+
+
+@dataclass
+class DayOffset(DateTimePartConatiner):
+    """Indicates that a certain number of days need to be added to a date."""
+    pass
+
+
+@dataclass
+class MonthOffset(DateTimePartConatiner):
+    """Indicates that a certain number of months need to be added to a date."""
+    pass
+
+
+@dataclass
+class YearOffset(DateTimePartConatiner):
+    """Indicates that a certain number of months need to be added to a date."""
+    pass
+
 
 
 class SearchScopes(Enum):

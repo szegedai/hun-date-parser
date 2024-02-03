@@ -7,25 +7,26 @@ from itertools import chain
 from typing import Dict, List, Union
 from copy import copy
 
-from hun_date_parser.date_parser.structure_parsers import match_multi_match, match_interval
+from hun_date_parser.date_parser.structure_parsers import match_multi_match, match_interval, match_duration_match
 from hun_date_parser.date_parser.date_parsers import (match_named_month, match_iso_date, match_weekday,
                                                       match_relative_day,
                                                       match_week, match_named_year, match_n_periods_compared_to_now,
-                                                      match_relative_month, match_in_past_n_periods)
+                                                      match_relative_month, match_in_past_n_periods,
+                                                      match_date_offset)
 from hun_date_parser.date_parser.time_parsers import match_digi_clock, match_time_words, match_now, match_hwords
 from hun_date_parser.utils import (Year, Month, Week, Day, Daypart, Hour, Minute, OverrideTopWithNow, SearchScopes,
                                    OverrideBottomWithNow, monday_of_calenderweek, DateTimePartConatiner,
-                                   return_on_value_error)
+                                   return_on_value_error, filter_offset_objects, apply_offsets_and_return_components)
 
 datelike = Union[datetime, date, time, None]
 
 daypart_mapping = [
-    (3, 5),     # hajnal
-    (6, 10),    # reggel
-    (8, 11),    # délelőtt
-    (12, 18),   # délután
-    (18, 21),   # este
-    (22, 2)     # éjjel
+    (3, 5),  # hajnal
+    (6, 10),  # reggel
+    (8, 11),  # délelőtt
+    (12, 18),  # délután
+    (18, 21),  # este
+    (22, 2)  # éjjel
 ]
 
 
@@ -90,6 +91,25 @@ def match_rules(now: datetime, sentence: str,
                *match_n_periods_compared_to_now(sentence, now),
                *match_relative_month(sentence, now),
                *match_in_past_n_periods(sentence, now)]
+
+    matches = list(chain(*[m['date_parts'] for m in matches]))
+
+    return matches
+
+
+def match_duration_rules(now: datetime, sentence: str,
+                         search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED) -> List:
+    """
+    Given that it as already been established that a duration is being parsed, matches all
+    duration-specific rules against the input text.
+    :param now: Current timestamp to calculate relative dates.
+    :param sentence: Input sentence.
+    :param search_scope: Defines whether the timeframe should be restricted to past or future.
+    :return: Parsed date and time classes.
+    """
+    matches = [
+        *match_date_offset(sentence)
+    ]
 
     matches = list(chain(*[m['date_parts'] for m in matches]))
 
@@ -165,7 +185,7 @@ class DatetimeExtractor:
 
         # this functionality is used to override the bottom or the top of the interval with the current date
         # rules indicate the necessity for this with returning either OverrideBottomWithNow or OverrideTopWithNow
-        override_bottom, override_top = type_isin_list(OverrideBottomWithNow, dateparts),\
+        override_bottom, override_top = type_isin_list(OverrideBottomWithNow, dateparts), \
             type_isin_list(OverrideTopWithNow, dateparts)
 
         pre_first = True
@@ -264,6 +284,11 @@ class DatetimeExtractor:
 
         y, m, d, h, mi, s = res_dt
 
+        # Perform offsetting for duration parsing
+        offset_objects: List = filter_offset_objects(dateparts)
+        if offset_objects:
+            y, m, d, h, mi, s = apply_offsets_and_return_components(y, m, d, h, mi, s, offset_objects)
+
         if self.output_container == 'datetime':
             if bottom and override_bottom:
                 return now
@@ -305,16 +330,48 @@ class DatetimeExtractor:
         parsed_dates = []
 
         for sentence_part in sentence_parts:
+            # Try to determine whether an explicit date interval has been provided
+            # Something like holnap**tol** jovo kedd**ig**
             interval = match_interval(sentence_part)
 
-            if interval:
+            duration_parts = match_duration_match(sentence_part)
+
+            # If explicit interval is detected, parse the start and end dates using that information...
+            # For instance:
+            #   holnap**tol** jovo kedd**ig**:
+            #       start_date: parse_date(holnap)
+            #       end_date: parse_date(jovo kedd)
+            if interval and not duration_parts:
                 interval['start_date'] = 'OPEN' if interval['start_date'] == 'OPEN' else match_rules(self.now, interval[
                     'start_date'], self.search_scope)
                 interval['end_date'] = 'OPEN' if interval['end_date'] == 'OPEN' else match_rules(self.now, interval[
                     'end_date'], self.search_scope)
                 parsed_dates.append(interval)
+
+            # ... another way of explicitly expressing time intervals is with a start date and a duration
+            # For instance:
+            #   holnaptol 5 napig:
+            #       start_date: parse_date(holnap)
+            #       end_date: parse_date(holnap) + offset_with(5 days)
+            elif duration_parts:
+                print("DURATION", duration_parts)
+                from_part, duration_part = duration_parts
+                print("DURATION_PARTS", from_part, "___", duration_part)
+
+                interval['start_date'] = match_rules(self.now, from_part, self.search_scope)
+                interval['end_date'] = match_rules(self.now, from_part, self.search_scope) + \
+                                       match_duration_rules(self.now, duration_part, self.search_scope)
+                parsed_dates.append(interval)
+
+            # ... else try to determine a time interval implicitly.
+            # For instance:
+            #   holnap:
+            #       start_date: parse_date(holnap, bottom=True) --> earliest datetime tomorrow
+            #       end_date: parse_date(holnap, bottom=False)  --> latest datetime tomorrow
             else:
                 parsed_dates += self._get_implicit_intervall(sentence_part)
+
+        print(parsed_dates)
 
         parsed_dates = [extend_start_end(intv) for intv in parsed_dates]
 

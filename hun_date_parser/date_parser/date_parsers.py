@@ -9,7 +9,7 @@ from .patterns import (R_ISO_DATE, R_REV_ISO_DATE, R_NAMED_MONTH, R_TODAY, R_TOM
                        R_NWEEKS_PRIOR_NOW, R_IN_PAST_PERIOD_MINS, R_IN_PAST_PERIOD_HOURS, R_IN_PAST_PERIOD_DAYS,
                        R_IN_PAST_PERIOD_WEEKS, R_IN_PAST_PERIOD_MONTHS, R_IN_PAST_PERIOD_YEARS)
 from hun_date_parser.utils import (remove_accent, word_to_num, Year, Month, Week, Day, Hour, Minute,
-                                   OverrideTopWithNow, SearchScopes, return_on_value_error)
+                                   OverrideTopWithNow, DayOffset, SearchScopes, return_on_value_error)
 
 
 def match_iso_date(s: str) -> List[Dict[str, Any]]:
@@ -417,3 +417,14 @@ def match_in_past_n_periods(s: str, now: datetime) -> List[Dict[str, Any]]:
             res.append(date_parts)
 
     return res
+
+
+def match_date_offset(s: str) -> List[Dict[str, Any]]:
+    fn = 'date_offset'
+    date_parts = {'match': s, 'date_parts': []}
+    n = word_to_num(s)
+
+    if n and n != -1:
+        date_parts['date_parts'].extend([DayOffset(n, fn)])
+
+    return [date_parts]

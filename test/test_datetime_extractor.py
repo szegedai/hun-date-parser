@@ -57,6 +57,13 @@ scenarios = [
     ('az elmúlt egy nap', [datetime(2020, 12, 17), datetime(2020, 12, 18)]),
     ('az elmúlt hét', [datetime(2020, 12, 11), datetime(2020, 12, 18)]),
     ('az elmúlt 1 hét', [datetime(2020, 12, 11), datetime(2020, 12, 18)]),
+    ("holnaptól 5 napig", [datetime(2020, 12, 19), datetime(2020, 12, 24, 23, 59, 59)]),
+    ("holnaptól öt napig", [datetime(2020, 12, 19), datetime(2020, 12, 24, 23, 59, 59)]),
+    ("dec 20-tól 4 napig", [datetime(2020, 12, 20), datetime(2020, 12, 24, 23, 59, 59)]),
+    ("5 napig holnaptól", [datetime(2020, 12, 19), datetime(2020, 12, 24, 23, 59, 59)]),
+    (" öt napig holnaptól", [datetime(2020, 12, 19), datetime(2020, 12, 24, 23, 59, 59)]),
+    ("nagy kalandra megyek 4 napig dec 20-tól ", [datetime(2020, 12, 20), datetime(2020, 12, 24, 23, 59, 59)]),
+    ("nagy kalandra megyek 4 napig vasárnaptól ", [datetime(2020, 12, 20), datetime(2020, 12, 24, 23, 59, 59)]),
 ]
 
 

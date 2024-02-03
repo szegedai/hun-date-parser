@@ -52,3 +52,26 @@ def match_interval(s: str) -> Dict:
             }
 
     return {}
+
+
+def match_duration_match(s: str) -> List[str]:
+    R_TOL_NAPRA = r"(.*-?t[oóöő]l\b)(.*(napra|napig)\b)"
+    R_NAPRA_TOL = r"(.*(napra|napig)\b)(.*-?t[oóöő]l\b)"
+
+    match = re.match(R_TOL_NAPRA, s)
+    if match:
+        groups = match.groups()
+        groups = [m.rstrip().lstrip() for m in groups if m]
+        from_part, duration_part, _ = groups
+
+        return [from_part, duration_part]
+
+    match = re.match(R_NAPRA_TOL, s)
+    if match:
+        groups = match.groups()
+        groups = [m.rstrip().lstrip() for m in groups if m]
+        duration_part, _, from_part = groups
+
+        return [from_part, duration_part]
+
+    return []
