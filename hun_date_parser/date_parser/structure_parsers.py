@@ -2,7 +2,7 @@ import re
 
 from typing import Dict, List
 
-from .patterns import R_MULTI, R_TOLIG, R_TOL, R_IG, R_NAPRA_TOL, R_TOL_NAPRA
+from .patterns import R_MULTI, R_TOLIG, R_TOL, R_IG, R_NAPRA_TOL, R_TOL_NAPRA, R_TOLIG_IMPLIED_END
 
 
 def match_multi_match(s: str) -> List[str]:
@@ -12,7 +12,7 @@ def match_multi_match(s: str) -> List[str]:
     # shouldn't count the input as having multiple matches which need to be parsed separately
     excluding_matches = [
         re.findall(R_TOL_NAPRA, s),
-        re.findall(R_NAPRA_TOL, s)
+        re.findall(R_NAPRA_TOL, s),
     ]
 
     if match and not any(excluding_matches):
@@ -25,6 +25,15 @@ def match_multi_match(s: str) -> List[str]:
 
 
 def match_interval(s: str) -> Dict:
+    # If any of these are matched,
+    # shouldn't count the input as having multiple matches which need to be parsed separately
+    excluding_matches = [
+        re.findall(R_TOLIG_IMPLIED_END, s)
+    ]
+
+    if any(excluding_matches):
+        return {}
+
     match = re.match(R_TOLIG, s)
     if match:
         groups = match.groups()

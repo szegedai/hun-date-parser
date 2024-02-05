@@ -91,6 +91,15 @@ class YearOffset(DateTimePartConatiner):
     pass
 
 
+@dataclass
+class StartDay(DateTimePartConatiner):
+    pass
+
+
+class EndDay(DateTimePartConatiner):
+    pass
+
+
 
 class SearchScopes(Enum):
     NOT_RESTRICTED = "not_restricted"
@@ -223,3 +232,11 @@ def return_on_value_error(value):
         return applicator
 
     return decorate
+
+
+def get_type_if_exists(lst, type_to_filter):
+    filtered_list = [val for val in lst if isinstance(val, type_to_filter)]
+    if filtered_list:
+        return filtered_list[0]
+    else:
+        return []

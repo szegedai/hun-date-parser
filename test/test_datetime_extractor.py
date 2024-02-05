@@ -61,6 +61,8 @@ scenarios = [
     ("holnaptól öt napig", [datetime(2020, 12, 19), datetime(2020, 12, 24, 23, 59, 59)]),
     ("dec 20-tól 4 napig", [datetime(2020, 12, 20), datetime(2020, 12, 24, 23, 59, 59)]),
     ("5 napig holnaptól", [datetime(2020, 12, 19), datetime(2020, 12, 24, 23, 59, 59)]),
+    ("3 fő, 4 csillagos szálloda, 5 napig holnaptól", [datetime(2020, 12, 19), datetime(2020, 12, 24, 23, 59, 59)]),
+    ("a válasz: 5 napra holnaptól", [datetime(2020, 12, 19), datetime(2020, 12, 24, 23, 59, 59)]),
     (" öt napig holnaptól", [datetime(2020, 12, 19), datetime(2020, 12, 24, 23, 59, 59)]),
     ("nagy kalandra megyek 4 napig dec 20-tól ", [datetime(2020, 12, 20), datetime(2020, 12, 24, 23, 59, 59)]),
     ("nagy kalandra megyek 4 napig vasárnaptól ", [datetime(2020, 12, 20), datetime(2020, 12, 24, 23, 59, 59)]),
@@ -69,6 +71,16 @@ scenarios = [
     ("egy hétig tart holnaptól", [datetime(2020, 12, 19), datetime(2020, 12, 26, 23, 59, 59)]),
     ("holnaptól egy hétig", [datetime(2020, 12, 19), datetime(2020, 12, 26, 23, 59, 59)]),
     ("holnaptól két hétig", [datetime(2020, 12, 19), datetime(2021, 1, 2, 23, 59, 59)]),
+    ("holnapi naptól két hétig", [datetime(2020, 12, 19), datetime(2021, 1, 2, 23, 59, 59)]),
+    ("holnaptól kezdődően két hétig", [datetime(2020, 12, 19), datetime(2021, 1, 2, 23, 59, 59)]),
+    ("holnap indulunk és két hétig tart", [datetime(2020, 12, 19), datetime(2021, 1, 2, 23, 59, 59)]),
+    ("holnapi indulással két hétig", [datetime(2020, 12, 19), datetime(2021, 1, 2, 23, 59, 59)]),
+    ("vasárnapi kezdéssel 2 hétig", [datetime(2020, 12, 20), datetime(2021, 1, 3, 23, 59, 59)]),
+    ("dec 20-tól 30-ig", [datetime(2020, 12, 20), datetime(2020, 12, 30, 23, 59, 59)]),
+    ("augusztus 5-től 10-ig", [datetime(2020, 8, 5), datetime(2020, 8, 10, 23, 59, 59)]),
+    ("augusztus 5-től 10-ig 2-en megyünk", [datetime(2020, 8, 5), datetime(2020, 8, 10, 23, 59, 59)]),
+    (" 2-en megyünk augusztus 5-től 10-ig", [datetime(2020, 8, 5), datetime(2020, 8, 10, 23, 59, 59)]),
+    ("február 13-tól 17-ig", [datetime(2020, 2, 13), datetime(2020, 2, 17, 23, 59, 59)])
 ]
 
 

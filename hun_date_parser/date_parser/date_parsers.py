@@ -8,8 +8,9 @@ from .patterns import (R_ISO_DATE, R_REV_ISO_DATE, R_NAMED_MONTH, R_TODAY, R_TOM
                        R_NMINS_FROM_NOW, R_RELATIVE_MONTH, R_NMINS_PRIOR_NOW, R_NDAYS_PRIOR_NOW, R_NHOURS_PRIOR_NOW,
                        R_NWEEKS_PRIOR_NOW, R_IN_PAST_PERIOD_MINS, R_IN_PAST_PERIOD_HOURS, R_IN_PAST_PERIOD_DAYS,
                        R_IN_PAST_PERIOD_WEEKS, R_IN_PAST_PERIOD_MONTHS, R_IN_PAST_PERIOD_YEARS,
-                       R_N_WEEKS, R_N_DAYS)
+                       R_N_WEEKS, R_N_DAYS, R_TOLIG_IMPLIED_END)
 from hun_date_parser.utils import (remove_accent, word_to_num, Year, Month, Week, Day, Hour, Minute,
+                                   StartDay, EndDay,
                                    OverrideTopWithNow, DayOffset, SearchScopes, return_on_value_error)
 
 
@@ -436,7 +437,8 @@ def match_date_offset(s: str) -> List[Dict[str, Any]]:
             date_parts['date_parts'].extend([DayOffset(7 * n, fn)])
 
     elif days_matched:
-        n = word_to_num(s)
+        s_num = days_matched[0]
+        n = word_to_num(s_num)
         if n and n != -1:
             date_parts['date_parts'].extend([DayOffset(n, fn)])
 
@@ -444,3 +446,39 @@ def match_date_offset(s: str) -> List[Dict[str, Any]]:
         return [date_parts]
     else:
         return []
+
+
+@return_on_value_error([])
+def match_named_month_interval(s: str) -> List[Dict[str, Any]]:
+    fn = "named_month_interval"
+    groups = re.findall(R_TOLIG_IMPLIED_END, s)
+
+    months = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'szep', 'okt', 'nov', 'dec']
+
+    res = []
+
+    if groups:
+        group = groups[0]
+        group_res = {'match': group, 'date_parts': []}
+
+        month_extracted, from_day_extracted, till_day_extracted = group
+
+        for i, month in enumerate(months):
+            if month in remove_accent(month_extracted):
+                group_res['date_parts'].append(Month(i + 1, fn))
+                break
+
+        from_day = word_to_num(from_day_extracted)
+        till_day = word_to_num(till_day_extracted)
+
+        if from_day and from_day != -1:
+            group_res['date_parts'].append(StartDay(from_day, fn))
+
+        if till_day and till_day != -1:
+            group_res['date_parts'].append(EndDay(till_day, fn))
+
+        # If something went wrong it's safest to discard everything
+        if len(group_res["date_parts"]) == 3:
+            res.append(group_res)
+
+    return res

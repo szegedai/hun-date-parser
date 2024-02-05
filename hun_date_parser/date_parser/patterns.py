@@ -58,5 +58,8 @@ R_TOL_NAPRA = r"(.*-?t[oóöő]l\b|.*kezd|.*indul)(.*napra|.*napig|.*h[eé]tre|.
 R_NAPRA_TOL = r"(.*napra|.*napig|.*h[eé]tre|.*h[eé]tig\b)(.*-?t[oóöő]l\b|.*kezd|.*indul)"
 
 # Util patterns
-R_N_WEEKS = "(.{1,})h[eé]t"
-R_N_DAYS = "(.{1,})nap"
+R_N_WEEKS = r"\b([ \w]*)\bh[eé]t"
+R_N_DAYS = r"(\b\w+)\b(?=\s+nap)"
+
+# tol-ig dates, ie.: március 20-tol 22-ig
+R_TOLIG_IMPLIED_END = r"(\bjan(?:uár)?|feb(?:ruár)?|márc(?:ius)?|ápr(?:ilis)?|máj(?:us)?|jún(?:ius)?|júl(?:ius)?|aug(?:usztus)?|szept(?:ember)?|okt(?:óber)?|nov(?:ember)?|dec(?:ember)?)\s?(\d+)-t[oóöő]l\s?(\d+)-ig"
