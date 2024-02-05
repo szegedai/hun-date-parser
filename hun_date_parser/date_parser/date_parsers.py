@@ -7,7 +7,8 @@ from .patterns import (R_ISO_DATE, R_REV_ISO_DATE, R_NAMED_MONTH, R_TODAY, R_TOM
                        R_NYESTERDAY, R_WEEKDAY, R_WEEK, R_YEAR, R_NDAYS_FROM_NOW, R_NWEEKS_FROM_NOW, R_NHOURS_FROM_NOW,
                        R_NMINS_FROM_NOW, R_RELATIVE_MONTH, R_NMINS_PRIOR_NOW, R_NDAYS_PRIOR_NOW, R_NHOURS_PRIOR_NOW,
                        R_NWEEKS_PRIOR_NOW, R_IN_PAST_PERIOD_MINS, R_IN_PAST_PERIOD_HOURS, R_IN_PAST_PERIOD_DAYS,
-                       R_IN_PAST_PERIOD_WEEKS, R_IN_PAST_PERIOD_MONTHS, R_IN_PAST_PERIOD_YEARS)
+                       R_IN_PAST_PERIOD_WEEKS, R_IN_PAST_PERIOD_MONTHS, R_IN_PAST_PERIOD_YEARS,
+                       R_N_WEEKS, R_N_DAYS)
 from hun_date_parser.utils import (remove_accent, word_to_num, Year, Month, Week, Day, Hour, Minute,
                                    OverrideTopWithNow, DayOffset, SearchScopes, return_on_value_error)
 
@@ -422,9 +423,24 @@ def match_in_past_n_periods(s: str, now: datetime) -> List[Dict[str, Any]]:
 def match_date_offset(s: str) -> List[Dict[str, Any]]:
     fn = 'date_offset'
     date_parts = {'match': s, 'date_parts': []}
-    n = word_to_num(s)
 
-    if n and n != -1:
-        date_parts['date_parts'].extend([DayOffset(n, fn)])
+    weeks_matched = re.findall(R_N_WEEKS, s)
+    days_matched = re.findall(R_N_DAYS, s)
 
-    return [date_parts]
+    if weeks_matched:
+        # passing the whole string to word_to_num could lead to problems,
+        # as "hét" will be translated to 7
+        s_num = weeks_matched[0]
+        n = word_to_num(s_num)
+        if n and n != -1:
+            date_parts['date_parts'].extend([DayOffset(7 * n, fn)])
+
+    elif days_matched:
+        n = word_to_num(s)
+        if n and n != -1:
+            date_parts['date_parts'].extend([DayOffset(n, fn)])
+
+    if date_parts["date_parts"]:
+        return [date_parts]
+    else:
+        return []

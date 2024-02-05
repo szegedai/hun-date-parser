@@ -52,3 +52,11 @@ R_HOUR_MIN_REV = r'(?:(.*)(?:perc.{0,4}))?? (?:(hajnal[i]?|reggel|d[eé]lel[oő�
 
 # R_MIN = r'(.*)(?:perc)'
 # R_SEC = r'(.*)(?: ?m[áa]sodperc| ?mp)'
+
+# Duration patterns
+R_TOL_NAPRA = r"(.*-?t[oóöő]l\b|.*kezd|.*indul)(.*napra|.*napig|.*h[eé]tre|.*h[eé]tig\b)"
+R_NAPRA_TOL = r"(.*napra|.*napig|.*h[eé]tre|.*h[eé]tig\b)(.*-?t[oóöő]l\b|.*kezd|.*indul)"
+
+# Util patterns
+R_N_WEEKS = "(.{1,})h[eé]t"
+R_N_DAYS = "(.{1,})nap"

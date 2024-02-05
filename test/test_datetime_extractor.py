@@ -64,6 +64,11 @@ scenarios = [
     (" öt napig holnaptól", [datetime(2020, 12, 19), datetime(2020, 12, 24, 23, 59, 59)]),
     ("nagy kalandra megyek 4 napig dec 20-tól ", [datetime(2020, 12, 20), datetime(2020, 12, 24, 23, 59, 59)]),
     ("nagy kalandra megyek 4 napig vasárnaptól ", [datetime(2020, 12, 20), datetime(2020, 12, 24, 23, 59, 59)]),
+    ("a konferencia holnap kezdődik és 5 napig tart", [datetime(2020, 12, 19), datetime(2020, 12, 24, 23, 59, 59)]),
+    ("a konferencia holnap indul és öt napig tart", [datetime(2020, 12, 19), datetime(2020, 12, 24, 23, 59, 59)]),
+    ("egy hétig tart holnaptól", [datetime(2020, 12, 19), datetime(2020, 12, 26, 23, 59, 59)]),
+    ("holnaptól egy hétig", [datetime(2020, 12, 19), datetime(2020, 12, 26, 23, 59, 59)]),
+    ("holnaptól két hétig", [datetime(2020, 12, 19), datetime(2021, 1, 2, 23, 59, 59)]),
 ]
 
 

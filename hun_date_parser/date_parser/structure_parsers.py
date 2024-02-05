@@ -2,13 +2,20 @@ import re
 
 from typing import Dict, List
 
-from .patterns import R_MULTI, R_TOLIG, R_TOL, R_IG
+from .patterns import R_MULTI, R_TOLIG, R_TOL, R_IG, R_NAPRA_TOL, R_TOL_NAPRA
 
 
 def match_multi_match(s: str) -> List[str]:
     match = re.match(R_MULTI, s)
 
-    if match:
+    # If any of these are matched,
+    # shouldn't count the input as having multiple matches which need to be parsed separately
+    excluding_matches = [
+        re.findall(R_TOL_NAPRA, s),
+        re.findall(R_NAPRA_TOL, s)
+    ]
+
+    if match and not any(excluding_matches):
         groups = match.groups()
         groups = [m.rstrip().lstrip() for m in groups if m]
 
@@ -55,14 +62,11 @@ def match_interval(s: str) -> Dict:
 
 
 def match_duration_match(s: str) -> List[str]:
-    R_TOL_NAPRA = r"(.*-?t[oóöő]l\b)(.*(napra|napig)\b)"
-    R_NAPRA_TOL = r"(.*(napra|napig)\b)(.*-?t[oóöő]l\b)"
-
     match = re.match(R_TOL_NAPRA, s)
     if match:
         groups = match.groups()
         groups = [m.rstrip().lstrip() for m in groups if m]
-        from_part, duration_part, _ = groups
+        from_part, duration_part = groups
 
         return [from_part, duration_part]
 
@@ -70,7 +74,7 @@ def match_duration_match(s: str) -> List[str]:
     if match:
         groups = match.groups()
         groups = [m.rstrip().lstrip() for m in groups if m]
-        duration_part, _, from_part = groups
+        duration_part, from_part = groups
 
         return [from_part, duration_part]
 
