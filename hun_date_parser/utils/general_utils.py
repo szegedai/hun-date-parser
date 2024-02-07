@@ -100,7 +100,6 @@ class EndDay(DateTimePartConatiner):
     pass
 
 
-
 class SearchScopes(Enum):
     NOT_RESTRICTED = "not_restricted"
     PAST_SEARCH = "past_search"

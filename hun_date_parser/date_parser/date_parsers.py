@@ -14,6 +14,12 @@ from hun_date_parser.utils import (remove_accent, word_to_num, Year, Month, Week
                                    OverrideTopWithNow, DayOffset, SearchScopes, return_on_value_error)
 
 
+# TODO: Update typing
+# class DateParts(TypedDict):
+#     match: str
+#     date_parts: List[DateTimePartConatiner]
+
+
 def match_iso_date(s: str) -> List[Dict[str, Any]]:
     """
     Match ISO date-like format.
@@ -423,7 +429,7 @@ def match_in_past_n_periods(s: str, now: datetime) -> List[Dict[str, Any]]:
 
 def match_date_offset(s: str) -> List[Dict[str, Any]]:
     fn = 'date_offset'
-    date_parts = {'match': s, 'date_parts': []}
+    date_parts: List[Dict[str, Any]] = [{'match': s, 'date_parts': []}]
 
     weeks_matched = re.findall(R_N_WEEKS, s)
     days_matched = re.findall(R_N_DAYS, s)
@@ -434,16 +440,16 @@ def match_date_offset(s: str) -> List[Dict[str, Any]]:
         s_num = weeks_matched[0]
         n = word_to_num(s_num)
         if n and n != -1:
-            date_parts['date_parts'].extend([DayOffset(7 * n, fn)])
+            date_parts[0]['date_parts'] = [DayOffset(7 * n, fn)]
 
     elif days_matched:
         s_num = days_matched[0]
         n = word_to_num(s_num)
         if n and n != -1:
-            date_parts['date_parts'].extend([DayOffset(n, fn)])
+            date_parts[0]['date_parts'] = [DayOffset(n, fn)]
 
-    if date_parts["date_parts"]:
-        return [date_parts]
+    if date_parts[0]["date_parts"]:
+        return date_parts
     else:
         return []
 
