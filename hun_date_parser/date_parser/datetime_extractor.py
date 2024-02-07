@@ -376,8 +376,6 @@ class DatetimeExtractor:
             else:
                 parsed_dates += self._get_implicit_intervall(sentence_part)
 
-        print(parsed_dates)
-
         parsed_dates = [extend_start_end(intv) for intv in parsed_dates]
 
         parsed_dates = [{'start_date': self.assemble_datetime(self.now, parsed_date['start_date'], bottom=True),
