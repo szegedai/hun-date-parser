@@ -63,3 +63,6 @@ R_N_DAYS = r"(\b\w+)\b(?=\s+nap)"
 
 # tol-ig dates, ie.: március 20-tol 22-ig
 R_TOLIG_IMPLIED_END = r"(\bjan(?:uár)?|feb(?:ruár)?|márc(?:ius)?|ápr(?:ilis)?|máj(?:us)?|jún(?:ius)?|júl(?:ius)?|aug(?:usztus)?|szept(?:ember)?|okt(?:óber)?|nov(?:ember)?|dec(?:ember)?)\s?(\d+)-t[oóöő]l\s?(\d+)-ig"
+
+# kezdo: X ...: Y
+R_START_STATED_END_IMPLIED = r"(?:[kK]ezd|[iI]ndul).{1,20}:\s*([^:]{1,50}?)\s*:\s*([^:]{1,50})$"

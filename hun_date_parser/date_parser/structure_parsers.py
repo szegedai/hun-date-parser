@@ -2,7 +2,8 @@ import re
 
 from typing import Dict, List
 
-from .patterns import R_MULTI, R_TOLIG, R_TOL, R_IG, R_NAPRA_TOL, R_TOL_NAPRA, R_TOLIG_IMPLIED_END
+from .patterns import (R_MULTI, R_TOLIG, R_TOL, R_IG, R_NAPRA_TOL, R_TOL_NAPRA, R_TOLIG_IMPLIED_END,
+                       R_START_STATED_END_IMPLIED)
 
 
 def match_multi_match(s: str) -> List[str]:
@@ -33,6 +34,17 @@ def match_interval(s: str) -> Dict:
 
     if any(excluding_matches):
         return {}
+
+    match = re.match(R_START_STATED_END_IMPLIED, s)
+    if match:
+        groups = match.groups()
+        groups = [m.lstrip().rstrip() for m in groups if m]
+
+        if len(groups) == 2:
+            return {
+                'start_date': groups[0],
+                'end_date': groups[1]
+            }
 
     match = re.match(R_TOLIG, s)
     if match:

@@ -80,7 +80,11 @@ scenarios = [
     ("augusztus 5-től 10-ig", [datetime(2020, 8, 5), datetime(2020, 8, 10, 23, 59, 59)]),
     ("augusztus 5-től 10-ig 2-en megyünk", [datetime(2020, 8, 5), datetime(2020, 8, 10, 23, 59, 59)]),
     (" 2-en megyünk augusztus 5-től 10-ig", [datetime(2020, 8, 5), datetime(2020, 8, 10, 23, 59, 59)]),
-    ("február 13-tól 17-ig", [datetime(2020, 2, 13), datetime(2020, 2, 17, 23, 59, 59)])
+    ("február 13-tól 17-ig", [datetime(2020, 2, 13), datetime(2020, 2, 17, 23, 59, 59)]),
+    ("Kezdő dátum: február 13., végzés dátuma: február 17.", [datetime(2020, 2, 13), datetime(2020, 2, 17, 23, 59, 59)]),
+    ("Induló dátum: február 13., záró dátuma: február 17.", [datetime(2020, 2, 13), datetime(2020, 2, 17, 23, 59, 59)]),
+    ("kezdeti dátum: február 13 eddig tart: február 17", [datetime(2020, 2, 13), datetime(2020, 2, 17, 23, 59, 59)]),
+    ("kezdet: február 13 eddig: feb 17.", [datetime(2020, 2, 13), datetime(2020, 2, 17, 23, 59, 59)]),
 ]
 
 

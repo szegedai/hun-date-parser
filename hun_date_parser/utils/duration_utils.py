@@ -10,15 +10,15 @@ def convert_to_dict(offset_list: List[Union[MinuteOffset, HourOffset, DayOffset,
     param_dict = {'years': 0, 'months': 0, 'days': 0, 'hours': 0, 'minutes': 0}
     for item in offset_list:
         if isinstance(item, MinuteOffset):
-            param_dict['minutes'] = item.value
+            param_dict['minutes'] = item.value if item.value is not None else 0
         elif isinstance(item, HourOffset):
-            param_dict['hours'] = item.value
+            param_dict['hours'] = item.value if item.value is not None else 0
         elif isinstance(item, DayOffset):
-            param_dict['days'] = item.value
+            param_dict['days'] = item.value if item.value is not None else 0
         elif isinstance(item, MonthOffset):
-            param_dict['months'] += item.value
+            param_dict['months'] += item.value if item.value is not None else 0
         elif isinstance(item, YearOffset):
-            param_dict['years'] += item.value
+            param_dict['years'] += item.value if item.value is not None else 0
 
     return param_dict
 
@@ -45,7 +45,7 @@ def add_time(original_datetime, years=0, months=0, weeks=0, days=0, hours=0, min
 
 def apply_offsets_and_return_components(
         y: int, m: int, d: int, h: int, mi: int, s: int,
-        offset_list: List[Union[DayOffset, MonthOffset, YearOffset]]
+        offset_list: List[Union[MinuteOffset, HourOffset, DayOffset, MonthOffset, YearOffset]]
 ) -> tuple:
     param_dict: dict = convert_to_dict(offset_list)
     original_datetime = datetime(y, m, d, h, mi, s)
@@ -54,7 +54,7 @@ def apply_offsets_and_return_components(
             new_datetime.hour, new_datetime.minute, new_datetime.second)
 
 
-def filter_offset_objects(input_list: List[Any]) -> List[Union[DayOffset, MonthOffset, YearOffset]]:
+def filter_offset_objects(input_list: Union[List[Any], str]) -> List[Any]:
     """
     Filters the input list to keep only the offset objects (DayOffset, MonthOffset, YearOffset).
 
@@ -64,6 +64,9 @@ def filter_offset_objects(input_list: List[Any]) -> List[Union[DayOffset, MonthO
     Returns:
     - A list containing only DayOffset, MonthOffset, and YearOffset objects.
     """
+    if type(input_list) == str:
+        return []
+
     # Filter the list to include only instances of DayOffset, MonthOffset, or YearOffset
     filtered_list: List[Union[DayOffset, MonthOffset, YearOffset]] = [
         item for item in input_list if isinstance(item, (DayOffset, MonthOffset, YearOffset))
