@@ -143,7 +143,18 @@ def word_to_num(s: str):
             'nyolcvan',
             'kilencven']
 
-    nums = ['nulla', 'egy', ('ketto', 'ket'), 'harom', 'negy', 'ot', 'hat', 'het', 'nyolc', 'kilenc']
+    nums = [
+        'nulla',
+        ('egy', "elseje", "elsejé"),
+        ('ketto', 'ket', 'masod'),
+        ('harom', 'harmad'),
+        'negy',
+        'ot',
+        'hat',
+        'het',
+        'nyolc',
+        'kilenc'
+    ]
 
     for i, dec in enumerate(decs):
         if isinstance(dec, tuple):

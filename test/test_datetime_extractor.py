@@ -67,6 +67,7 @@ scenarios = [
     ("nagy kalandra megyek 4 napig dec 20-tól ", [datetime(2020, 12, 20), datetime(2020, 12, 24, 23, 59, 59)]),
     ("nagy kalandra megyek 4 napig vasárnaptól ", [datetime(2020, 12, 20), datetime(2020, 12, 24, 23, 59, 59)]),
     ("a konferencia holnap kezdődik és 5 napig tart", [datetime(2020, 12, 19), datetime(2020, 12, 24, 23, 59, 59)]),
+    ("a konferencia holnap kezdődik és 5 napos tart", [datetime(2020, 12, 19), datetime(2020, 12, 24, 23, 59, 59)]),
     ("a konferencia holnap indul és öt napig tart", [datetime(2020, 12, 19), datetime(2020, 12, 24, 23, 59, 59)]),
     ("egy hétig tart holnaptól", [datetime(2020, 12, 19), datetime(2020, 12, 26, 23, 59, 59)]),
     ("holnaptól egy hétig", [datetime(2020, 12, 19), datetime(2020, 12, 26, 23, 59, 59)]),
@@ -85,6 +86,12 @@ scenarios = [
     ("Induló dátum: február 13., záró dátuma: február 17.", [datetime(2020, 2, 13), datetime(2020, 2, 17, 23, 59, 59)]),
     ("kezdeti dátum: február 13 eddig tart: február 17", [datetime(2020, 2, 13), datetime(2020, 2, 17, 23, 59, 59)]),
     ("kezdet: február 13 eddig: feb 17.", [datetime(2020, 2, 13), datetime(2020, 2, 17, 23, 59, 59)]),
+    ("február három", [datetime(2020, 2, 3), datetime(2020, 2, 3, 23, 59, 59)]),
+    ("február harmadika", [datetime(2020, 2, 3), datetime(2020, 2, 3, 23, 59, 59)]),
+    ("február elseje", [datetime(2020, 2, 1), datetime(2020, 2, 1, 23, 59, 59)]),
+    ("március elsején", [datetime(2020, 3, 1), datetime(2020, 3, 1, 23, 59, 59)]),
+    ("március tizenegy", [datetime(2020, 3, 11), datetime(2020, 3, 11, 23, 59, 59)]),
+    ("március tizenegytől április elsejéig", [datetime(2020, 3, 11), datetime(2020, 4, 1, 23, 59, 59)]),
 ]
 
 
@@ -183,6 +190,11 @@ tf_past_search_scenarios = [
     ("augusztus", [datetime(2022, 8, 1, 0, 0, 0), datetime(2022, 8, 31, 23, 59, 59)], SearchScopes.PAST_SEARCH),
     ("augusztus", [datetime(2023, 8, 1, 0, 0, 0), datetime(2023, 8, 31, 23, 59, 59)], SearchScopes.NOT_RESTRICTED),
     ("augusztus", [datetime(2023, 8, 1, 0, 0, 0), datetime(2023, 8, 31, 23, 59, 59)], SearchScopes.FUTURE_DAY),
+    ("augusztus 11-től 17-ig", [datetime(2023, 8, 11, 0, 0, 0), datetime(2023, 8, 17, 23, 59, 59)], SearchScopes.FUTURE_DAY),
+    ("augusztus 11-től 17-ig", [datetime(2022, 8, 11, 0, 0, 0), datetime(2022, 8, 17, 23, 59, 59)], SearchScopes.PAST_SEARCH),
+    ("augusztus 11-től szeptember 17-ig", [datetime(2022, 8, 11, 0, 0, 0), datetime(2022, 9, 17, 23, 59, 59)], SearchScopes.PAST_SEARCH),
+    ("kezdő dátum: augusztus 11 eddig: szeptember 17-ig", [datetime(2022, 8, 11, 0, 0, 0), datetime(2022, 9, 17, 23, 59, 59)], SearchScopes.PAST_SEARCH),
+    ("kezdő dátum: augusztus 11 eddig: szeptember 17-ig", [datetime(2023, 8, 11, 0, 0, 0), datetime(2023, 9, 17, 23, 59, 59)], SearchScopes.FUTURE_DAY),
 ]
 
 

@@ -9,7 +9,7 @@ R_IG = r'([:\w ]*-?ig\b)'
 # hyper day level patterns
 R_ISO_DATE = r'(\b\d{4,4})(?:[-\\/\. ] ?(1[0-2]|0?[1-9]))?(?:[-\\/\. ] ?(1[0-9]|2[0-9]|3[01]|0?[1-9]))?'
 R_REV_ISO_DATE = r'\b(1[0-9]|2[0-9]|3[01]|0?[1-9])[-\\/\. ] ?(1[0-2]|0?[1-9])[-\\/\. ] ?(\b\d{4,4})'
-R_NAMED_MONTH = r'(j[oöő]v[oöő].*?|tavaly.*?)?(\bjan(?:\b|\.|u[aá]r){1}|\bfeb(?:\b|r\.|\.|ru[aá]r){1}|\bm[aá]r(?:\b|c\b|c\.|\.|cius){1}|\b[aá]pr(?:\b|\.|ilis){1}\b|m[aá]j(?:\b|\.|us){1}|\bj[uú]n(?:\b|\.|ius){1}|\bj[uú]l(?:\b|\.|ius){1}|\baug(?:\b|\.|usztus){1}|\bszep(?:t\b|t\.|\b|\.|tember){1}|\bokt(?:\b|\.|[oó]ber){1}|\bnov(?:\b|\.|ember){1}|\bdec(?:\b|\.|ember){1})(?: ([1-3][0-9]|[1-9]))?'
+R_NAMED_MONTH = r'(j[oöő]v[oöő].*?|tavaly.*?)?(\bjan(?:\b|\.|u[aá]r){1}|\bfeb(?:\b|r\.|\.|ru[aá]r){1}|\bm[aá]r(?:\b|c\b|c\.|\.|cius){1}|\b[aá]pr(?:\b|\.|ilis){1}\b|m[aá]j(?:\b|\.|us){1}|\bj[uú]n(?:\b|\.|ius){1}|\bj[uú]l(?:\b|\.|ius){1}|\baug(?:\b|\.|usztus){1}|\bszep(?:t\b|t\.|\b|\.|tember){1}|\bokt(?:\b|\.|[oó]ber){1}|\bnov(?:\b|\.|ember){1}|\bdec(?:\b|\.|ember))(?: ([1-3][0-9]|[1-9]|egy.{0,5}|kett[őöo].{0,5}|h[aá]rom.{0,5}|n[eée]gy.{0,5}|öt.{0,5}|hat.{0,5}|h[eé]t.{0,5}|nyolc.{0,5}|kilenc.{0,5}|tíz.{0,5}|tizen.{0,10}|huszon.{0,10}|harminc.{0,10}|elsej[eé].{0,5}|második[aá].{0,5}|harmadik[aá].{0,5}|negyedik[eé].{0,5}|ötödik[eé].{0,5}|hatodik[aá].{0,5}|hetedik[eé].{0,5}|nyolcadik[aá].{0,5}|kilencedik[eé].{0,5}|tizedik[eé].{0,5}|tizen.{0,10}|huszadik[aá].{0,5}|huszon.{0,10}|harmincadik[aá].{0,5}))?'
 R_RELATIVE_MONTH = r'(?:(\blegut[oó]bbi|\butols[oó]|\bmúlt|\but[oó]bbi|\bezen|\bebben|\baktu[aá]lis|\bj[oöő]v[oöő]|\bk[oö]vetkez[oőö]|\bk[oö]vetkezend[oőö]).*)? a?h[oó]nap'
 
 R_WEEKDAY = r'(?:(el[oő]z[oő]|m[uú]lt|ezen|j[oöő]v[oöő]).*)?(h[eé]tf[oő]|kedd|szerd[aá]|cs[uü]t[oö]rt[oö]k|p[eé]ntek|szombat|vas[aá]rnap)'
@@ -54,8 +54,8 @@ R_HOUR_MIN_REV = r'(?:(.*)(?:perc.{0,4}))?? (?:(hajnal[i]?|reggel|d[eé]lel[oő�
 # R_SEC = r'(.*)(?: ?m[áa]sodperc| ?mp)'
 
 # Duration patterns
-R_TOL_NAPRA = r"(.*-?t[oóöő]l\b|.*kezd|.*indul)(.*napra|.*napig|.*h[eé]tre|.*h[eé]tig\b)"
-R_NAPRA_TOL = r"(.*napra|.*napig|.*h[eé]tre|.*h[eé]tig\b)(.*-?t[oóöő]l\b|.*kezd|.*indul)"
+R_TOL_NAPRA = r"(.*-?t[oóöő]l\b|.*kezd|.*indul)(.*napra|.*napig|.*napos|.*h[eé]tre|.*h[eé]tig|.*hetes\b)"
+R_NAPRA_TOL = r"(.*napra|.*napig|.*napos|.*h[eé]tre|.*h[eé]tig|.*hetes\b)(.*-?t[oóöő]l\b|.*kezd|.*indul)"
 
 # Util patterns
 R_N_WEEKS = r"\b([ \w]*)\bh[eé]t"
