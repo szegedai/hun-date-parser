@@ -130,7 +130,7 @@ def match_relative_day(s: str, now: datetime) -> List[Dict[str, Any]]:
     res = []
     for group in groups:
 
-        if type(group) != str:
+        if not isinstance(group, str):
             group = [m for m in group if m][0]
 
         if 'ma' in group or 'má' in group:

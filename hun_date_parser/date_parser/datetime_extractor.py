@@ -136,7 +136,7 @@ def extend_start_end(interval: Dict) -> Dict:
 
 
 def type_isin_list(date_type: type, lst: Union[List, str]) -> bool:
-    if type(lst) == str:
+    if isinstance(lst, str):
         return False
 
     matches = [pot_dp for pot_dp in lst if isinstance(pot_dp, date_type)]

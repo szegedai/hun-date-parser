@@ -64,7 +64,7 @@ def filter_offset_objects(input_list: Union[List[Any], str]) -> List[Any]:
     Returns:
     - A list containing only DayOffset, MonthOffset, and YearOffset objects.
     """
-    if type(input_list) == str:
+    if isinstance(input_list, str):
         return []
 
     # Filter the list to include only instances of DayOffset, MonthOffset, or YearOffset

@@ -146,7 +146,7 @@ def word_to_num(s: str):
     nums = ['nulla', 'egy', ('ketto', 'ket'), 'harom', 'negy', 'ot', 'hat', 'het', 'nyolc', 'kilenc']
 
     for i, dec in enumerate(decs):
-        if type(dec) == tuple:
+        if isinstance(dec, tuple):
             for syn in dec:
                 if syn in _s:
                     res['dec'] = (i+1) * 10
@@ -163,7 +163,7 @@ def word_to_num(s: str):
         res['dec'] = 0
 
     for i, num in enumerate(nums):
-        if type(num) == tuple:
+        if isinstance(num, tuple):
             for num_syn in num:
                 if '<DEL>' + num_syn in _s or ' ' + num_syn in _s:
                     res['num'] = i
