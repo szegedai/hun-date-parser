@@ -1,11 +1,12 @@
 import pytest
 from datetime import datetime
 
-from hun_date_parser.date_parser.date_parsers import Year, Month, Week, Day, OverrideTopWithNow
+from hun_date_parser.date_parser.date_parsers import Year, Month, Week, Day, OverrideTopWithNow, DayOffset
 from hun_date_parser.date_parser.date_parsers import (match_iso_date, match_named_month, match_relative_day,
                                                       match_weekday,
                                                       match_week, match_named_year, match_relative_month,
-                                                      match_n_periods_compared_to_now, match_in_past_n_periods)
+                                                      match_n_periods_compared_to_now, match_in_past_n_periods,
+                                                      match_date_offset)
 from hun_date_parser.utils import SearchScopes
 
 
@@ -172,6 +173,14 @@ tf_in_past_n_periods = [
     ("az előző sport nap teljesítménye", []),
 ]
 
+tf_date_offset = [
+    ("5 napig", [[DayOffset(5, "date_offset")]]),
+    ("öt napig", [[DayOffset(5, "date_offset")]]),
+    ("egy hétig", [[DayOffset(7, "date_offset")]]),
+    ("3 hét", [[DayOffset(21, "date_offset")]]),
+    ("az előző sport nap teljesítménye", []),
+]
+
 
 @pytest.mark.parametrize("inp,exp", tf_iso_date)
 def test_match_iso_date(inp, exp):
@@ -258,6 +267,15 @@ def test_match_n_periods_compared_to_now(inp, exp):
 def test_match_in_past_n_periods(inp, exp):
     now = datetime(2023, 5, 20)
     out = match_in_past_n_periods(inp, now)
+    date_parts = []
+    for e in out:
+        date_parts.append(e['date_parts'])
+    assert date_parts == exp
+
+
+@pytest.mark.parametrize("inp,exp", tf_date_offset)
+def test_match_date_offset(inp, exp):
+    out = match_date_offset(inp)
     date_parts = []
     for e in out:
         date_parts.append(e['date_parts'])

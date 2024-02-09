@@ -1,8 +1,8 @@
-from typing import Optional
 from copy import copy
-from datetime import date, timedelta
-from dataclasses import dataclass
+from datetime import date, timedelta, datetime
 from enum import Enum
+from dataclasses import dataclass
+from typing import Optional
 
 
 @dataclass
@@ -61,6 +61,45 @@ class OverrideBottomWithNow(DateTimePartConatiner):
     pass
 
 
+@dataclass
+class MinuteOffset(DateTimePartConatiner):
+    """Indicates that a certain number of days need to be added to a date."""
+    pass
+
+
+@dataclass
+class HourOffset(DateTimePartConatiner):
+    """Indicates that a certain number of days need to be added to a date."""
+    pass
+
+
+@dataclass
+class DayOffset(DateTimePartConatiner):
+    """Indicates that a certain number of days need to be added to a date."""
+    pass
+
+
+@dataclass
+class MonthOffset(DateTimePartConatiner):
+    """Indicates that a certain number of months need to be added to a date."""
+    pass
+
+
+@dataclass
+class YearOffset(DateTimePartConatiner):
+    """Indicates that a certain number of months need to be added to a date."""
+    pass
+
+
+@dataclass
+class StartDay(DateTimePartConatiner):
+    pass
+
+
+class EndDay(DateTimePartConatiner):
+    pass
+
+
 class SearchScopes(Enum):
     NOT_RESTRICTED = "not_restricted"
     PAST_SEARCH = "past_search"
@@ -104,10 +143,21 @@ def word_to_num(s: str):
             'nyolcvan',
             'kilencven']
 
-    nums = ['nulla', 'egy', ('ketto', 'ket'), 'harom', 'negy', 'ot', 'hat', 'het', 'nyolc', 'kilenc']
+    nums = [
+        'nulla',
+        ('egy', "elseje", "elsejé"),
+        ('ketto', 'ket', 'masod'),
+        ('harom', 'harmad'),
+        'negy',
+        'ot',
+        'hat',
+        'het',
+        'nyolc',
+        'kilenc'
+    ]
 
     for i, dec in enumerate(decs):
-        if type(dec) == tuple:
+        if isinstance(dec, tuple):
             for syn in dec:
                 if syn in _s:
                     res['dec'] = (i+1) * 10
@@ -124,7 +174,7 @@ def word_to_num(s: str):
         res['dec'] = 0
 
     for i, num in enumerate(nums):
-        if type(num) == tuple:
+        if isinstance(num, tuple):
             for num_syn in num:
                 if '<DEL>' + num_syn in _s or ' ' + num_syn in _s:
                     res['num'] = i
@@ -192,3 +242,18 @@ def return_on_value_error(value):
         return applicator
 
     return decorate
+
+
+def get_type_if_exists(lst, type_to_filter):
+    filtered_list = [val for val in lst if isinstance(val, type_to_filter)]
+    if filtered_list:
+        return filtered_list[0]
+    else:
+        return []
+
+
+def is_smaller_date_or_none(dt1: datetime, dt2: datetime):
+    if dt1 is None or dt2 is None:
+        return True
+    else:
+        return dt1 <= dt2

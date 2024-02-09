@@ -101,8 +101,8 @@ def extract_datetime_within_interval(interval_start: datetime,
             response_candidates.append((4, response_type, restricted_date))
             continue
 
-        assert type(interval_start) == datetime and type(r['start_date']) == datetime
-        assert type(interval_end) == datetime and type(r['end_date']) == datetime
+        assert isinstance(interval_start, datetime) and isinstance(r['start_date'], datetime)
+        assert isinstance(interval_end, datetime) and isinstance(r['end_date'], datetime)
         if not (interval_start <= r['start_date'] and r['end_date'] <= interval_end):
             # Extracted datetime is out of expected interval...
             response_type = ExtractWithinRangeSuccess.OUT_OF_RANGE_FALLBACK

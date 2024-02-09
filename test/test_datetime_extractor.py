@@ -57,6 +57,41 @@ scenarios = [
     ('az elmúlt egy nap', [datetime(2020, 12, 17), datetime(2020, 12, 18)]),
     ('az elmúlt hét', [datetime(2020, 12, 11), datetime(2020, 12, 18)]),
     ('az elmúlt 1 hét', [datetime(2020, 12, 11), datetime(2020, 12, 18)]),
+    ("holnaptól 5 napig", [datetime(2020, 12, 19), datetime(2020, 12, 24, 23, 59, 59)]),
+    ("holnaptól öt napig", [datetime(2020, 12, 19), datetime(2020, 12, 24, 23, 59, 59)]),
+    ("dec 20-tól 4 napig", [datetime(2020, 12, 20), datetime(2020, 12, 24, 23, 59, 59)]),
+    ("5 napig holnaptól", [datetime(2020, 12, 19), datetime(2020, 12, 24, 23, 59, 59)]),
+    ("3 fő, 4 csillagos szálloda, 5 napig holnaptól", [datetime(2020, 12, 19), datetime(2020, 12, 24, 23, 59, 59)]),
+    ("a válasz: 5 napra holnaptól", [datetime(2020, 12, 19), datetime(2020, 12, 24, 23, 59, 59)]),
+    (" öt napig holnaptól", [datetime(2020, 12, 19), datetime(2020, 12, 24, 23, 59, 59)]),
+    ("nagy kalandra megyek 4 napig dec 20-tól ", [datetime(2020, 12, 20), datetime(2020, 12, 24, 23, 59, 59)]),
+    ("nagy kalandra megyek 4 napig vasárnaptól ", [datetime(2020, 12, 20), datetime(2020, 12, 24, 23, 59, 59)]),
+    ("a konferencia holnap kezdődik és 5 napig tart", [datetime(2020, 12, 19), datetime(2020, 12, 24, 23, 59, 59)]),
+    ("a konferencia holnap kezdődik és 5 napos tart", [datetime(2020, 12, 19), datetime(2020, 12, 24, 23, 59, 59)]),
+    ("a konferencia holnap indul és öt napig tart", [datetime(2020, 12, 19), datetime(2020, 12, 24, 23, 59, 59)]),
+    ("egy hétig tart holnaptól", [datetime(2020, 12, 19), datetime(2020, 12, 26, 23, 59, 59)]),
+    ("holnaptól egy hétig", [datetime(2020, 12, 19), datetime(2020, 12, 26, 23, 59, 59)]),
+    ("holnaptól két hétig", [datetime(2020, 12, 19), datetime(2021, 1, 2, 23, 59, 59)]),
+    ("holnapi naptól két hétig", [datetime(2020, 12, 19), datetime(2021, 1, 2, 23, 59, 59)]),
+    ("holnaptól kezdődően két hétig", [datetime(2020, 12, 19), datetime(2021, 1, 2, 23, 59, 59)]),
+    ("holnap indulunk és két hétig tart", [datetime(2020, 12, 19), datetime(2021, 1, 2, 23, 59, 59)]),
+    ("holnapi indulással két hétig", [datetime(2020, 12, 19), datetime(2021, 1, 2, 23, 59, 59)]),
+    ("vasárnapi kezdéssel 2 hétig", [datetime(2020, 12, 20), datetime(2021, 1, 3, 23, 59, 59)]),
+    ("dec 20-tól 30-ig", [datetime(2020, 12, 20), datetime(2020, 12, 30, 23, 59, 59)]),
+    ("augusztus 5-től 10-ig", [datetime(2020, 8, 5), datetime(2020, 8, 10, 23, 59, 59)]),
+    ("augusztus 5-től 10-ig 2-en megyünk", [datetime(2020, 8, 5), datetime(2020, 8, 10, 23, 59, 59)]),
+    (" 2-en megyünk augusztus 5-től 10-ig", [datetime(2020, 8, 5), datetime(2020, 8, 10, 23, 59, 59)]),
+    ("február 13-tól 17-ig", [datetime(2020, 2, 13), datetime(2020, 2, 17, 23, 59, 59)]),
+    ("Kezdő dátum: február 13., végzés dátuma: február 17.", [datetime(2020, 2, 13), datetime(2020, 2, 17, 23, 59, 59)]),
+    ("Induló dátum: február 13., záró dátuma: február 17.", [datetime(2020, 2, 13), datetime(2020, 2, 17, 23, 59, 59)]),
+    ("kezdeti dátum: február 13 eddig tart: február 17", [datetime(2020, 2, 13), datetime(2020, 2, 17, 23, 59, 59)]),
+    ("kezdet: február 13 eddig: feb 17.", [datetime(2020, 2, 13), datetime(2020, 2, 17, 23, 59, 59)]),
+    ("február három", [datetime(2020, 2, 3), datetime(2020, 2, 3, 23, 59, 59)]),
+    ("február harmadika", [datetime(2020, 2, 3), datetime(2020, 2, 3, 23, 59, 59)]),
+    ("február elseje", [datetime(2020, 2, 1), datetime(2020, 2, 1, 23, 59, 59)]),
+    ("március elsején", [datetime(2020, 3, 1), datetime(2020, 3, 1, 23, 59, 59)]),
+    ("március tizenegy", [datetime(2020, 3, 11), datetime(2020, 3, 11, 23, 59, 59)]),
+    ("március tizenegytől április elsejéig", [datetime(2020, 3, 11), datetime(2020, 4, 1, 23, 59, 59)]),
 ]
 
 
@@ -155,6 +190,11 @@ tf_past_search_scenarios = [
     ("augusztus", [datetime(2022, 8, 1, 0, 0, 0), datetime(2022, 8, 31, 23, 59, 59)], SearchScopes.PAST_SEARCH),
     ("augusztus", [datetime(2023, 8, 1, 0, 0, 0), datetime(2023, 8, 31, 23, 59, 59)], SearchScopes.NOT_RESTRICTED),
     ("augusztus", [datetime(2023, 8, 1, 0, 0, 0), datetime(2023, 8, 31, 23, 59, 59)], SearchScopes.FUTURE_DAY),
+    ("augusztus 11-től 17-ig", [datetime(2023, 8, 11, 0, 0, 0), datetime(2023, 8, 17, 23, 59, 59)], SearchScopes.FUTURE_DAY),
+    ("augusztus 11-től 17-ig", [datetime(2022, 8, 11, 0, 0, 0), datetime(2022, 8, 17, 23, 59, 59)], SearchScopes.PAST_SEARCH),
+    ("augusztus 11-től szeptember 17-ig", [datetime(2022, 8, 11, 0, 0, 0), datetime(2022, 9, 17, 23, 59, 59)], SearchScopes.PAST_SEARCH),
+    ("kezdő dátum: augusztus 11 eddig: szeptember 17-ig", [datetime(2022, 8, 11, 0, 0, 0), datetime(2022, 9, 17, 23, 59, 59)], SearchScopes.PAST_SEARCH),
+    ("kezdő dátum: augusztus 11 eddig: szeptember 17-ig", [datetime(2023, 8, 11, 0, 0, 0), datetime(2023, 9, 17, 23, 59, 59)], SearchScopes.FUTURE_DAY),
 ]
 
 
@@ -172,7 +212,9 @@ def test_past_search(inp_txt, resp, search_scope):
 
 tf_bad_dates = [
     "január 32",
-    "június 31"
+    "június 31",
+    "március 32-től április 35-ig",
+    "május 5-től április 3-ig"
 ]
 
 
@@ -183,3 +225,18 @@ def test_bad_dates(inp_txt):
     parsed_date = de.parse_datetime(inp_txt)
     assert parsed_date == []
 
+
+tf_partial_bad_dates = [
+    ("március 32-től április elsejéig", [None, datetime(2023, 4, 1, 23, 59, 59)]),
+]
+
+
+@pytest.mark.parametrize("inp_txt, resp", tf_partial_bad_dates)
+def test_partial_bad_dates(inp_txt, resp):
+    st, end = resp
+    now = datetime(2023, 6, 1)
+    de = DatetimeExtractor(now)
+    parsed_date = de.parse_datetime(inp_txt)
+    assert len(parsed_date) == 1
+    assert parsed_date[0]["start_date"] == st
+    assert parsed_date[0]["end_date"] == end
