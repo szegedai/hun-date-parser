@@ -15,7 +15,7 @@ from hun_date_parser.date_parser.date_parsers import (match_named_month, match_i
                                                       match_date_offset, match_named_month_interval)
 from hun_date_parser.date_parser.time_parsers import match_digi_clock, match_time_words, match_now, match_hwords
 from hun_date_parser.utils import (Year, Month, Week, Day, Daypart, Hour, Minute, StartDay, EndDay, get_type_if_exists,
-                                   OverrideTopWithNow, SearchScopes,
+                                   OverrideTopWithNow, SearchScopes, is_smaller_date_or_none,
                                    OverrideBottomWithNow, monday_of_calenderweek, DateTimePartConatiner,
                                    return_on_value_error, filter_offset_objects, apply_offsets_and_return_components)
 
@@ -382,6 +382,13 @@ class DatetimeExtractor:
                          'end_date': self.assemble_datetime(self.now, parsed_date['end_date'], bottom=False)}
                         for parsed_date in parsed_dates]
 
-        parsed_dates = [intv for intv in parsed_dates if intv['start_date'] or intv['end_date']]
+        # remove results where
+        # - both start and end dates are None
+        # - or where the end date is smaller than the start
+        parsed_dates = [
+            intv for intv in parsed_dates if
+            (intv['start_date'] or intv['end_date']) and
+            is_smaller_date_or_none(intv['start_date'], intv['end_date'])
+        ]
 
         return parsed_dates

@@ -212,7 +212,9 @@ def test_past_search(inp_txt, resp, search_scope):
 
 tf_bad_dates = [
     "január 32",
-    "június 31"
+    "június 31",
+    "március 32-től április 35-ig",
+    "május 5-től április 3-ig"
 ]
 
 
@@ -223,3 +225,18 @@ def test_bad_dates(inp_txt):
     parsed_date = de.parse_datetime(inp_txt)
     assert parsed_date == []
 
+
+tf_partial_bad_dates = [
+    ("március 32-től április elsejéig", [None, datetime(2023, 4, 1, 23, 59, 59)]),
+]
+
+
+@pytest.mark.parametrize("inp_txt, resp", tf_partial_bad_dates)
+def test_partial_bad_dates(inp_txt, resp):
+    st, end = resp
+    now = datetime(2023, 6, 1)
+    de = DatetimeExtractor(now)
+    parsed_date = de.parse_datetime(inp_txt)
+    assert len(parsed_date) == 1
+    assert parsed_date[0]["start_date"] == st
+    assert parsed_date[0]["end_date"] == end

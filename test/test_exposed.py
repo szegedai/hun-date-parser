@@ -1,3 +1,4 @@
+import pytest
 from datetime import datetime, date, time
 
 from hun_date_parser import datetime2text, text2datetime, text2date, text2time
@@ -11,13 +12,19 @@ def test_datetime2text():
     assert len([c for c in candidates['times'] if c]) == 4
 
 
-def test_text2datetime():
-    now = datetime(2020, 12, 27)
-    tf = [('ma', [{'start_date': datetime(2020, 12, 27), 'end_date': datetime(2020, 12, 27, 23, 59, 59)}]),
-          ('ma reggel', [{'start_date': datetime(2020, 12, 27, 6), 'end_date': datetime(2020, 12, 27, 10, 59, 59)}])]
+tf_t2d = [
+    ('ma', [{'start_date': datetime(2020, 12, 27), 'end_date': datetime(2020, 12, 27, 23, 59, 59)}]),
+    ('ma reggel', [{'start_date': datetime(2020, 12, 27, 6), 'end_date': datetime(2020, 12, 27, 10, 59, 59)}]),
+    ('ma reggeltől tegnap estig', []),
+    ('Egerben leszek december 28-ától 2 napig',
+     [{'start_date': datetime(2020, 12, 28), 'end_date': datetime(2020, 12, 30, 23, 59, 59)}]),
+]
 
-    for inp, out in tf:
-        assert text2datetime(inp, now=now) == out
+
+@pytest.mark.parametrize("inp, out", tf_t2d)
+def test_text2datetime(inp, out):
+    now = datetime(2020, 12, 27)
+    assert text2datetime(inp, now=now) == out
 
 
 def test_text2date():

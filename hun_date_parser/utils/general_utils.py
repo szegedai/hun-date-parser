@@ -1,5 +1,5 @@
 from copy import copy
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from enum import Enum
 from dataclasses import dataclass
 from typing import Optional
@@ -250,3 +250,10 @@ def get_type_if_exists(lst, type_to_filter):
         return filtered_list[0]
     else:
         return []
+
+
+def is_smaller_date_or_none(dt1: datetime, dt2: datetime):
+    if dt1 is None or dt2 is None:
+        return True
+    else:
+        return dt1 <= dt2
