@@ -307,7 +307,11 @@ def match_named_year(s: str, now: datetime) -> List[Dict[str, Any]]:
             date_parts['date_parts'] = [Year(now.year - 2, 'named_year')]
         elif 'tavaly' in remove_accent(group):
             date_parts['date_parts'] = [Year(now.year - 1, 'named_year')]
-        elif 'iden' in remove_accent(group):
+        elif (
+                'iden' in remove_accent(group) or
+                'idei' in remove_accent(group) or
+                'ebben az evben' in remove_accent(group)
+        ):
             date_parts['date_parts'] = [Year(now.year, 'named_year')]
         elif 'jovo' in remove_accent(group):
             date_parts['date_parts'] = [Year(now.year + 1, 'named_year')]
