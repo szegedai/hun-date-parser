@@ -20,8 +20,6 @@ Install and try the package with `pip install hun-date-parser`
 
 ## :fire: Usage
 
-If not specified otherwise, relative dates (eg.: tomorrow, next week, etc.) are calculated relative to the current datetime, at the time when the function is called. The `now` parameter can be used for parsing relative datetimes relative to any timestamp other than the current time.
-
 ```python
 from hun_date_parser import text2datetime
 from datetime import datetime
@@ -46,6 +44,9 @@ text2datetime('2020 decemberétől 2021 januárig', now=datetime(2020, 12, 27))
 text2datetime('2021 januárig', now=datetime(2020, 12, 27))
 # [{'start_date': None, 'end_date': datetime.datetime(2021, 1, 31, 23, 59, 59)}]
 ```
+
+If not specified otherwise, relative dates (eg.: tomorrow, next week, etc.) are calculated relative to the current datetime, at the time when the function is called. The `now` parameter can be used for parsing relative datetimes relative to any timestamp other than the current time.
+
 ### Supported formats
 
 
