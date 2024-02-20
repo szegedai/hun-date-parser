@@ -47,6 +47,43 @@ text2datetime('2020 decemberétől 2021 januárig', now=datetime(2020, 12, 27))
 text2datetime('2021 januárig', now=datetime(2020, 12, 27))
 # [{'start_date': None, 'end_date': datetime.datetime(2021, 1, 31, 23, 59, 59)}]
 ```
+### Supported formats
+
+
+Our parser implements a rule-based strategy to interpret a diverse array of date and time formats, utilizing grammatical inflection to parse intervals.
+
+The following formats are currently supported:
+
+#### Date Formats:
+- **ISO Standard Dates**: dates formatted to the ISO 8601 standard.
+  - Examples: `2020-01-15`, `2020-12-30-án`, `2020.12.29`.
+- **Named Months**: months indicated by name, optionally with day numbers and/or year. Day numbers may be expressed lexically.
+  - Examples: `tavaly február`, `2020 február 3`, `jövő március`, `jövő február 12-én`, `március elsején`.
+- **Relative Time References**: relative days, weeks, months, or years.
+  - Examples: `tegnap`, `ma`, `holnap`, `idén`, `tavaly`, `múlt héten`, `a múlt hónapban`, `idei események`.
+- **Named Days of the Week**: references to specific weekdays, accounting for past, present, and future contexts.
+  - Examples: `múlt vasárnap`, `kedden`, `ezen a heten hétfőn`, `jövő héten szerdán`.
+- **Counted Time Frames**: expressions indicating a number of days or weeks ago or in the future.
+  - Examples: `1 héttel ezelőtt`, `6 nappal ezelőtt`, `5 nap múlva`.
+- **Historical Periods**: periods up to the present date, defined by days, weeks, months, or years.
+  - Examples: `az előző két hétben`, `az előző két évi adatok`, `az előző 10 nap eredménye`.
+
+#### Time Formats:
+- **Digital Clock Format**: time expressed in digital clock notation.
+  - Examples: `18:12-kor`, `06:45`.
+- **Natural Language Time**: time described in conversational terms.
+  - Examples: `este fél 8`, `reggel nyolc előtt hat perccel`, `nyolc óra nyolc perckor`, `20 óra 49 perckor`, `este negyed 8 előtt 6 perccel`.
+- **Abbreviated Time Formats**: certain abbreviated forms of time expression.
+  - Examples: `16h-kor`.
+
+#### Interval Formats:
+- **Inflection-Implied Ranges**: intervals detected through grammatical inflections, indicating a start and end point.
+  - Examples: `február 13-tól 17-ig`, `keddtől péntekig`, `januártól februárig`, `2020-10-12-től 2020-11-01-ig`.
+- **Open-Ended Intervals**: expressions where the start or end of the interval is unspecified, using inflections to imply boundaries.
+  - Examples: `keddtől`, `február elsejéig`.
+
+
+### Setting search scope in case of ambiguous input
 
 For the function `text2datetime` the parameter `search_scope` is used to inform what is the desired time interval to parse the inputs.
 
@@ -76,6 +113,8 @@ text2datetime('péntek', now=datetime(2023, 6, 7), search_scope=SearchScopes.NOT
 # [{'start_date': datetime.datetime(2023, 6, 9, 0, 0),
 #   'end_date': datetime.datetime(2023, 6, 9, 23, 59, 59)}]
 ```
+
+### Datetime to text
 
 The library is also capable of turning datetime objects into their Hungarian text representation.
 
