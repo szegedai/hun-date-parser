@@ -92,6 +92,13 @@ scenarios = [
     ("március elsején", [datetime(2020, 3, 1), datetime(2020, 3, 1, 23, 59, 59)]),
     ("március tizenegy", [datetime(2020, 3, 11), datetime(2020, 3, 11, 23, 59, 59)]),
     ("március tizenegytől április elsejéig", [datetime(2020, 3, 11), datetime(2020, 4, 1, 23, 59, 59)]),
+    ("tavalyi események", [datetime(2019, 1, 1), datetime(2019, 12, 31, 23, 59, 59)]),
+    ("a tavalyi események", [datetime(2019, 1, 1), datetime(2019, 12, 31, 23, 59, 59)]),
+    ("a tavaly történtek", [datetime(2019, 1, 1), datetime(2019, 12, 31, 23, 59, 59)]),
+    ("idei események", [datetime(2020, 1, 1), datetime(2020, 12, 31, 23, 59, 59)]),
+    ("az idei események", [datetime(2020, 1, 1), datetime(2020, 12, 31, 23, 59, 59)]),
+    ("az idén történtek", [datetime(2020, 1, 1), datetime(2020, 12, 31, 23, 59, 59)]),
+    ("az ebben az évben történtek", [datetime(2020, 1, 1), datetime(2020, 12, 31, 23, 59, 59)]),
 ]
 
 
