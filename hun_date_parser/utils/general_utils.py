@@ -102,8 +102,13 @@ class EndDay(DateTimePartConatiner):
 
 class SearchScopes(Enum):
     NOT_RESTRICTED = "not_restricted"
+    PRACTICAL_NOT_RESTRICTED = "practical_not_restricted"
     PAST_SEARCH = "past_search"
     FUTURE_DAY = "future_day"
+
+
+def is_year_realistic(year: int) -> bool:
+    return 1900 < year < 2100
 
 
 def remove_accent(s: str):
