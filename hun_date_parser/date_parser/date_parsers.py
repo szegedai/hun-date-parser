@@ -21,12 +21,17 @@ from hun_date_parser.utils import (remove_accent, word_to_num, Year, Month, Week
 
 
 def match_iso_date(s: str,
-                   search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED) -> List[Dict[str, Any]]:
+                   realistic_year_restriction: bool = True) -> List[Dict[str, Any]]:
     """
     Match ISO date-like format.
     :param s: textual input
+    :param realistic_year_restriction: whether to restrict year candidate to 1900-->2100 range
     :return: tuple of date parts
     """
+
+    pattern = r'\b\d{4} (darab|forint|huf|eur|usd|ft|fo)\b'
+    s = re.sub(pattern, '', s.lower())
+
     match = re.findall(R_ISO_DATE, s)
     match_rev = re.findall(R_REV_ISO_DATE, s)
 
@@ -35,7 +40,7 @@ def match_iso_date(s: str,
         for group in match_rev:
             group = [int(m.lstrip('0')) for m in group if m.lstrip('0')]
 
-            if search_scope == SearchScopes.PRACTICAL_NOT_RESTRICTED and not is_year_realistic(group[2]):
+            if realistic_year_restriction and not is_year_realistic(group[2]):
                 continue
 
             res.append({'match': group,
@@ -46,7 +51,7 @@ def match_iso_date(s: str,
         for group in match:
             group = [int(m.lstrip('0')) for m in group if m.lstrip('0')]
 
-            if search_scope == SearchScopes.PRACTICAL_NOT_RESTRICTED and not is_year_realistic(group[0]):
+            if realistic_year_restriction and not is_year_realistic(group[0]):
                 continue
 
             if len(group) == 1:

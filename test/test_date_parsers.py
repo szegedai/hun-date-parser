@@ -75,38 +75,39 @@ tf_match_relative_day = [
 ]
 
 tf_iso_date = [
-    ('2020-01-15', [[Year(2020, 'match_iso_date'), Month(1, 'match_iso_date'), Day(15, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED),
-    ('legyen 2020-01 elején', [[Year(2020, 'match_iso_date'), Month(1, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED),
-    ('2001-ben történt', [[Year(2001, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED),
-    ('2020-12-30-án', [[Year(2020, 'match_iso_date'), Month(12, 'match_iso_date'), Day(30, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED),
+    ('2020-01-15', [[Year(2020, 'match_iso_date'), Month(1, 'match_iso_date'), Day(15, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED, None),
+    ('legyen 2020-01 elején', [[Year(2020, 'match_iso_date'), Month(1, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED, None),
+    ('2001-ben történt', [[Year(2001, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED, None),
+    ('2020-12-30-án', [[Year(2020, 'match_iso_date'), Month(12, 'match_iso_date'), Day(30, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED, None),
     ('2020-12-30-án 2020.12.29',
      [[Year(2020, 'match_iso_date'), Month(12, 'match_iso_date'), Day(30, 'match_iso_date')],
-      [Year(2020, 'match_iso_date'), Month(12, 'match_iso_date'), Day(29, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED),
-    ('2020 12 30-án', [[Year(2020, 'match_iso_date'), Month(12, 'match_iso_date'), Day(30, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED),
-    ('a 1 1 1 b', [], SearchScopes.NOT_RESTRICTED),
-    ('abcd 2020 1 15 abd', [[Year(2020, 'match_iso_date'), Month(1, 'match_iso_date'), Day(15, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED),
-    ('abcd 2020. 1. 15. abd', [[Year(2020, 'match_iso_date'), Month(1, 'match_iso_date'), Day(15, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED),
-    ('abcd 2020 01 15 abd', [[Year(2020, 'match_iso_date'), Month(1, 'match_iso_date'), Day(15, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED),
-    ('2020 01 15', [[Year(2020, 'match_iso_date'), Month(1, 'match_iso_date'), Day(15, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED),
-    ('2020. 01. 15', [[Year(2020, 'match_iso_date'), Month(1, 'match_iso_date'), Day(15, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED),
-    ('2020. 01. 15.', [[Year(2020, 'match_iso_date'), Month(1, 'match_iso_date'), Day(15, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED),
-    ('15 01 2020', [[Year(2020, 'match_iso_date'), Month(1, 'match_iso_date'), Day(15, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED),
-    ('abcd 2020 01 15 10', [[Year(2020, 'match_iso_date'), Month(1, 'match_iso_date'), Day(15, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED),
-    ('ekkor: 15-01-2020', [[Year(2020, 'match_iso_date'), Month(1, 'match_iso_date'), Day(15, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED),
-    ('ekkor: 15. 01. 2020', [[Year(2020, 'match_iso_date'), Month(1, 'match_iso_date'), Day(15, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED),
-    ('ekkor: 01. 2020', [[Year(2020, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED),
-    ('ekkor 08 08 2023', [[Year(2023, 'match_iso_date'), Month(8, 'match_iso_date'), Day(8, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED),
-    ('ekkor 08. 08. 2023.', [[Year(2023, 'match_iso_date'), Month(8, 'match_iso_date'), Day(8, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED),
-    ('ekkor 2023. 08. 08. ', [[Year(2023, 'match_iso_date'), Month(8, 'match_iso_date'), Day(8, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED),
-    ('ekkor 2023. 08. 08 abc', [[Year(2023, 'match_iso_date'), Month(8, 'match_iso_date'), Day(8, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED),
-    ('ekkor 2023 08. 08 abc', [[Year(2023, 'match_iso_date'), Month(8, 'match_iso_date'), Day(8, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED),
-    ('ekkor 36 08 2023', [[Year(2023, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED),
-    ('1923 július', [[Year(1923, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED),
-    ('1923 július', [[Year(1923, 'match_iso_date')]], SearchScopes.PRACTICAL_NOT_RESTRICTED),
-    ('1889 július', [], SearchScopes.PRACTICAL_NOT_RESTRICTED),
-    ('1901 július', [[Year(1901, 'match_iso_date')]], SearchScopes.PRACTICAL_NOT_RESTRICTED),
-    ('8000 forint', [], SearchScopes.PRACTICAL_NOT_RESTRICTED),
-    ('8000 forint', [[Year(8000, 'match_iso_date')]], SearchScopes.PAST_SEARCH),
+      [Year(2020, 'match_iso_date'), Month(12, 'match_iso_date'), Day(29, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED, None),
+    ('2020 12 30-án', [[Year(2020, 'match_iso_date'), Month(12, 'match_iso_date'), Day(30, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED, None),
+    ('a 1 1 1 b', [], SearchScopes.NOT_RESTRICTED, None),
+    ('abcd 2020 1 15 abd', [[Year(2020, 'match_iso_date'), Month(1, 'match_iso_date'), Day(15, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED, None),
+    ('abcd 2020. 1. 15. abd', [[Year(2020, 'match_iso_date'), Month(1, 'match_iso_date'), Day(15, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED, None),
+    ('abcd 2020 01 15 abd', [[Year(2020, 'match_iso_date'), Month(1, 'match_iso_date'), Day(15, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED, None),
+    ('2020 01 15', [[Year(2020, 'match_iso_date'), Month(1, 'match_iso_date'), Day(15, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED, None),
+    ('2020. 01. 15', [[Year(2020, 'match_iso_date'), Month(1, 'match_iso_date'), Day(15, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED, None),
+    ('2020. 01. 15.', [[Year(2020, 'match_iso_date'), Month(1, 'match_iso_date'), Day(15, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED, None),
+    ('15 01 2020', [[Year(2020, 'match_iso_date'), Month(1, 'match_iso_date'), Day(15, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED, None),
+    ('abcd 2020 01 15 10', [[Year(2020, 'match_iso_date'), Month(1, 'match_iso_date'), Day(15, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED, None),
+    ('ekkor: 15-01-2020', [[Year(2020, 'match_iso_date'), Month(1, 'match_iso_date'), Day(15, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED, None),
+    ('ekkor: 15. 01. 2020', [[Year(2020, 'match_iso_date'), Month(1, 'match_iso_date'), Day(15, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED, None),
+    ('ekkor: 01. 2020', [[Year(2020, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED, None),
+    ('ekkor 08 08 2023', [[Year(2023, 'match_iso_date'), Month(8, 'match_iso_date'), Day(8, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED, None),
+    ('ekkor 08. 08. 2023.', [[Year(2023, 'match_iso_date'), Month(8, 'match_iso_date'), Day(8, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED, None),
+    ('ekkor 2023. 08. 08. ', [[Year(2023, 'match_iso_date'), Month(8, 'match_iso_date'), Day(8, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED, None),
+    ('ekkor 2023. 08. 08 abc', [[Year(2023, 'match_iso_date'), Month(8, 'match_iso_date'), Day(8, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED, None),
+    ('ekkor 2023 08. 08 abc', [[Year(2023, 'match_iso_date'), Month(8, 'match_iso_date'), Day(8, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED, None),
+    ('ekkor 36 08 2023', [[Year(2023, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED, None),
+    ('1923 július', [[Year(1923, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED, None),
+    ('1923 július', [[Year(1923, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED, True),
+    ('1889 július', [], SearchScopes.NOT_RESTRICTED, True),
+    ('1901 július', [[Year(1901, 'match_iso_date')]], SearchScopes.NOT_RESTRICTED, True),
+    ('8000 forint', [], SearchScopes.NOT_RESTRICTED, True),
+    ('8000', [[Year(8000, 'match_iso_date')]], SearchScopes.PAST_SEARCH, False),
+    ('8000 forint', [], SearchScopes.PAST_SEARCH, False),
 ]
 
 tf_weekday = [
@@ -188,14 +189,21 @@ tf_date_offset = [
 ]
 
 
-@pytest.mark.parametrize("inp,exp,search_scope", tf_iso_date)
-def test_match_iso_date(inp, exp, search_scope):
-    out = match_iso_date(inp, search_scope=search_scope)
-    date_parts = []
-    for e in out:
-        date_parts.append(e['date_parts'])
-    assert date_parts == exp
-
+@pytest.mark.parametrize("inp,exp,search_scope,realistic_year_restriction", tf_iso_date)
+def test_match_iso_date(inp, exp, search_scope, realistic_year_restriction):
+    if realistic_year_restriction is None:
+        for year_restriction in [True, False]:
+            out = match_iso_date(inp, realistic_year_restriction=year_restriction)
+            date_parts = []
+            for e in out:
+                date_parts.append(e['date_parts'])
+            assert date_parts == exp
+    else:
+        out = match_iso_date(inp, realistic_year_restriction=realistic_year_restriction)
+        date_parts = []
+        for e in out:
+            date_parts.append(e['date_parts'])
+        assert date_parts == exp
 
 @pytest.mark.parametrize("inp,exp,search_scope", tf_named_month)
 def test_named_month(inp, exp, search_scope):
