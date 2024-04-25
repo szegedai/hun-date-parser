@@ -32,55 +32,68 @@ daypart_mapping = [
 
 
 def text2datetime(input_sentence: str, now: datetime = datetime.now(),
-                  search_scope: SearchScopes = SearchScopes.PRACTICAL_NOT_RESTRICTED) -> List[Dict[str, datelike]]:
+                  search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED,
+                  realistic_year_required: bool = True) -> List[Dict[str, datelike]]:
     """
     Returns the list of datetime intervals found in the input sentence.
     :param input_sentence: Input sentence string.
     :param now: Current timestamp to calculate relative dates.
     :param search_scope: Defines whether the timeframe should be restricted to past or future.
+    :param realistic_year_required: Defines whether to restrict year candidates to be between 1900 and 2100.
     :return: list of datetime interval dictionaries
     """
-    datetime_extractor = DatetimeExtractor(now=now, output_container='datetime', search_scope=search_scope)
+    datetime_extractor = DatetimeExtractor(now=now,
+                                           output_container='datetime',
+                                           search_scope=search_scope,
+                                           realistic_year_required=realistic_year_required)
     return datetime_extractor.parse_datetime(sentence=input_sentence)
 
 
 def text2date(input_sentence: str, now: datetime = datetime.now(),
-              search_scope: SearchScopes = SearchScopes.PRACTICAL_NOT_RESTRICTED) -> List[Dict[str, datelike]]:
+              search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED,
+              realistic_year_required: bool = True) -> List[Dict[str, datelike]]:
     """
     Returns the list of date intervals found in the input sentence.
     :param input_sentence: Input sentence string.
     :param now: Current timestamp to calculate relative dates.
     :param search_scope: Defines whether the timeframe should be restricted to past or future.
+    :param realistic_year_required: Defines whether to restrict year candidates to be between 1900 and 2100.
     :return: list of date interval dictionaries
     """
-    datetime_extractor = DatetimeExtractor(now=now, output_container='date', search_scope=search_scope)
+    datetime_extractor = DatetimeExtractor(now=now, output_container='date',
+                                           search_scope=search_scope, realistic_year_required=realistic_year_required)
     return datetime_extractor.parse_datetime(sentence=input_sentence)
 
 
 def text2time(input_sentence: str, now: datetime = datetime.now(),
-              search_scope: SearchScopes = SearchScopes.PRACTICAL_NOT_RESTRICTED) -> List[Dict[str, datelike]]:
+              search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED,
+              realistic_year_required: bool = True) -> List[Dict[str, datelike]]:
     """
     Returns the list of time intervals found in the input sentence.
     :param input_sentence: Input sentence string.
     :param now: Current timestamp to calculate relative dates.
     :param search_scope: Defines whether the timeframe should be restricted to past or future.
+    :param realistic_year_required: Defines whether to restrict year candidates to be between 1900 and 2100.
     :return: list of time interval dictionaries
     """
-    datetime_extractor = DatetimeExtractor(now=now, output_container='time', search_scope=search_scope)
+    datetime_extractor = DatetimeExtractor(now=now, output_container='time',
+                                           search_scope=search_scope, realistic_year_required=realistic_year_required)
     return datetime_extractor.parse_datetime(sentence=input_sentence)
 
 
 def match_rules(now: datetime, sentence: str,
-                search_scope: SearchScopes = SearchScopes.PRACTICAL_NOT_RESTRICTED) -> List:
+                search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED,
+                realistic_year_required: bool = True) -> List:
     """
     Matches all rules against input text.
     :param now: Current timestamp to calculate relative dates.
     :param sentence: Input sentence.
     :param search_scope: Defines whether the timeframe should be restricted to past or future.
+    :param realistic_year_required: Defines whether to restrict year candidates to be between 1900 and 2100.
     :return: Parsed date and time classes.
     """
     matches = [*match_named_month(sentence, now, search_scope),
-               *match_iso_date(sentence, search_scope),
+               *match_iso_date(sentence, realistic_year_required),
                *match_relative_day(sentence, now),
                *match_weekday(sentence, now, search_scope),
                *match_week(sentence, now),
@@ -100,13 +113,15 @@ def match_rules(now: datetime, sentence: str,
 
 
 def match_duration_rules(now: datetime, sentence: str,
-                         search_scope: SearchScopes = SearchScopes.PRACTICAL_NOT_RESTRICTED) -> List:
+                         search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED,
+                         realistic_year_required: bool = True) -> List:
     """
     Given that it as already been established that a duration is being parsed, matches all
     duration-specific rules against the input text.
     :param now: Current timestamp to calculate relative dates.
     :param sentence: Input sentence.
     :param search_scope: Defines whether the timeframe should be restricted to past or future.
+    :param realistic_year_required: Defines whether to restrict year candidates to be between 1900 and 2100.
     :return: Parsed date and time classes.
     """
     matches = [
@@ -150,18 +165,21 @@ class DatetimeExtractor:
     """
 
     def __init__(self, now: datetime = datetime.now(), output_container: str = 'datetime',
-                 search_scope: SearchScopes = SearchScopes.PRACTICAL_NOT_RESTRICTED) -> None:
+                 search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED,
+                 realistic_year_required: bool = True) -> None:
         """
         :param now: Current timestamp to calculate relative dates.
         :param output_container: datetime object to populate with datetime parts
         :param search_scope: Defines whether the timeframe should be restricted to past or future.
+        :param realistic_year_required: Defines whether to restrict year candidates to be between 1900 and 2100.
         """
         self.now = now
         self.output_container = output_container
         self.search_scope = search_scope
+        self.realistic_year_required = realistic_year_required
 
     def _get_implicit_intervall(self, sentence_part: str):
-        matches = match_rules(self.now, sentence_part, self.search_scope)
+        matches = match_rules(self.now, sentence_part, self.search_scope, self.realistic_year_required)
         return [{'start_date': matches, 'end_date': matches}]
 
     @return_on_value_error(None)
@@ -350,9 +368,9 @@ class DatetimeExtractor:
             #       end_date: parse_date(jovo kedd)
             if interval and not duration_parts:
                 interval['start_date'] = 'OPEN' if interval['start_date'] == 'OPEN' else match_rules(self.now, interval[
-                    'start_date'], self.search_scope)
+                    'start_date'], self.search_scope, self.realistic_year_required)
                 interval['end_date'] = 'OPEN' if interval['end_date'] == 'OPEN' else match_rules(self.now, interval[
-                    'end_date'], self.search_scope)
+                    'end_date'], self.search_scope, self.realistic_year_required)
                 parsed_dates.append(interval)
 
             # ... another way of explicitly expressing time intervals is with a start date and a duration
@@ -363,8 +381,10 @@ class DatetimeExtractor:
             elif duration_parts:
                 from_part, duration_part = duration_parts
 
-                interval['start_date'] = match_rules(self.now, from_part, self.search_scope)
-                interval['end_date'] = match_rules(self.now, from_part, self.search_scope) + match_duration_rules(
+                interval['start_date'] = match_rules(self.now, from_part, self.search_scope,self.realistic_year_required)
+                interval['end_date'] = match_rules(self.now, from_part,
+                                                   self.search_scope,
+                                                   self.realistic_year_required) + match_duration_rules(
                     self.now, duration_part, self.search_scope)
                 parsed_dates.append(interval)
 

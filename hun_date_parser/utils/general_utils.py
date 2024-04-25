@@ -102,7 +102,6 @@ class EndDay(DateTimePartConatiner):
 
 class SearchScopes(Enum):
     NOT_RESTRICTED = "not_restricted"
-    PRACTICAL_NOT_RESTRICTED = "practical_not_restricted"
     PAST_SEARCH = "past_search"
     FUTURE_DAY = "future_day"
 

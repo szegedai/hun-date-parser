@@ -86,17 +86,18 @@ The following formats are currently supported:
 ### Setting search scope in case of ambiguous input
 
 For the function `text2datetime`, the parameter `search_scope` is used to specify the desired time interval for parsing inputs.
-
-- The default value, `SearchScopes.PRACTICAL_NOT_RESTRICTED`, does not restrict whether the scope of the search is in the past or the future. However, to minimize false matches, it generally restricts year mentions to be between 1900 and 2100.
+- The default value, `SearchScopes.NOT_RESTRICTED`, does not restrict whether the scope of the search is in the past or the future.
   - For example, when Tuesday is parsed, the date for the Tuesday of the given week will be returned, without considering whether that date is in the past or the future.
-  - As the number 3000 is unlikely to be considered a year value in everyday contexts, so it is ignored.
-  - The output datetime can still be later than 2100 or earlier than 1900 with mentions of 'Counted Time Frames' (e.g., `100000 nap múlva`).
-- `SearchScopes.NOT_RESTRICTED` is similar to `SearchScopes.PRACTICAL_NOT_RESTRICTED` but applies no restrictions at all regarding the range of valid years.
 - To prefer future dates in case of ambiguity, use the value `SearchScopes.FUTURE_DAY`.
   - In this case, when Tuesday is parsed, the function will return the nearest Tuesday in the future, not necessarily the current week's Tuesday.
 - Similarly, to search in the past, nudging the library to prefer past dates is possible with the value `SearchScopes.PAST_SEARCH`.
   - For instance, if May is parsed by the function, with this setting, and if this year's May is still in the future, last year's May will be returned.
   - Please note that when there's no ambiguity, the function can still return future or past dates, even when a different preference is specified.
+
+The flag `realistic_year_required` can be set in order to minimize false matches, it generally restricts year mentions to be between 1900 and 2100.
+  - It defaults to true.
+  - As the number 3000 is unlikely to be considered a year value in everyday contexts, it is ignored.
+  - The output datetime can still be later than 2100 or earlier than 1900 with mentions of 'Counted Time Frames' (e.g., `100000 nap múlva`).
 
 An example:
 ```python

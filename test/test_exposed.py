@@ -15,25 +15,32 @@ def test_datetime2text():
 
 tf_t2d = [
     ('ma', [{'start_date': datetime(2020, 12, 27), 'end_date': datetime(2020, 12, 27, 23, 59, 59)}],
-     SearchScopes.NOT_RESTRICTED),
+     SearchScopes.NOT_RESTRICTED, True),
     ('ma reggel', [{'start_date': datetime(2020, 12, 27, 6), 'end_date': datetime(2020, 12, 27, 10, 59, 59)}],
-     SearchScopes.NOT_RESTRICTED),
-    ('ma reggeltől tegnap estig', [], SearchScopes.NOT_RESTRICTED),
+     SearchScopes.NOT_RESTRICTED, True),
+    ('ma reggeltől tegnap estig', [], SearchScopes.NOT_RESTRICTED, True),
     ('Egerben leszek december 28-ától 2 napig',
      [{'start_date': datetime(2020, 12, 28), 'end_date': datetime(2020, 12, 30, 23, 59, 59)}],
-     SearchScopes.NOT_RESTRICTED),
-    ('8000 forint', [], SearchScopes.PRACTICAL_NOT_RESTRICTED),
-    ('8000 forint', [{'start_date': datetime(8000, 1, 1), 'end_date': datetime(8000, 12, 31, 23, 59, 59)}],
-     SearchScopes.NOT_RESTRICTED),
-    ('8000 forint', [{'start_date': datetime(8000, 1, 1), 'end_date': datetime(8000, 12, 31, 23, 59, 59)}],
-     SearchScopes.FUTURE_DAY),
+     SearchScopes.NOT_RESTRICTED, True),
+    ('8000 forint', [], SearchScopes.NOT_RESTRICTED, True),
+    ('8000 forint', [], SearchScopes.PAST_SEARCH, True),
+    ('8000', [], SearchScopes.NOT_RESTRICTED, True),
+    ('8000', [], SearchScopes.PAST_SEARCH, True),
+    ('8000', [{'start_date': datetime(8000, 1, 1), 'end_date': datetime(8000, 12, 31, 23, 59, 59)}],
+     SearchScopes.NOT_RESTRICTED, False),
+    ('8000', [{'start_date': datetime(8000, 1, 1), 'end_date': datetime(8000, 12, 31, 23, 59, 59)}],
+     SearchScopes.PAST_SEARCH, False),
+    ('8000', [{'start_date': datetime(8000, 1, 1), 'end_date': datetime(8000, 12, 31, 23, 59, 59)}],
+     SearchScopes.FUTURE_DAY, False),
+    ('8000 forint', [], SearchScopes.FUTURE_DAY, False),
 ]
 
 
-@pytest.mark.parametrize("inp, out, search_scope", tf_t2d)
-def test_text2datetime(inp, out, search_scope):
+@pytest.mark.parametrize("inp, out, search_scope, realistic_year_restriction", tf_t2d)
+def test_text2datetime(inp, out, search_scope, realistic_year_restriction):
     now = datetime(2020, 12, 27)
-    assert text2datetime(inp, now=now, search_scope=search_scope) == out
+    assert text2datetime(inp, now=now, search_scope=search_scope,
+                         realistic_year_required=realistic_year_restriction) == out
 
 
 def test_text2date():
@@ -52,12 +59,13 @@ def test_text2date():
 def test_text2date_no_restriction():
     now = datetime(2020, 12, 27)
     tf = [
-        ('8000 Forint', [{'start_date': date(8000, 1, 1), 'end_date': date(8000, 12, 31)}]),
+        ('8000', [{'start_date': date(8000, 1, 1), 'end_date': date(8000, 12, 31)}]),
+        ('8000 forint', []),
         ("MZ/X kr.u. 3000-ben született", [{'start_date': date(3000, 1, 1), 'end_date': date(3000, 12, 31)}])
     ]
 
     for inp, out in tf:
-        assert text2date(inp, now=now, search_scope=SearchScopes.NOT_RESTRICTED) == out
+        assert text2date(inp, now=now, search_scope=SearchScopes.NOT_RESTRICTED, realistic_year_required=False) == out
 
 
 def test_text2time():
