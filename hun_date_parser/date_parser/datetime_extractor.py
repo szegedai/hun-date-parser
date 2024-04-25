@@ -381,7 +381,8 @@ class DatetimeExtractor:
             elif duration_parts:
                 from_part, duration_part = duration_parts
 
-                interval['start_date'] = match_rules(self.now, from_part, self.search_scope,self.realistic_year_required)
+                interval['start_date'] = match_rules(self.now, from_part, self.search_scope,
+                                                     self.realistic_year_required)
                 interval['end_date'] = match_rules(self.now, from_part,
                                                    self.search_scope,
                                                    self.realistic_year_required) + match_duration_rules(
