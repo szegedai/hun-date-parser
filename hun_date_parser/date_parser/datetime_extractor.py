@@ -386,7 +386,7 @@ class DatetimeExtractor:
                 interval['end_date'] = match_rules(self.now, from_part,
                                                    self.search_scope,
                                                    self.realistic_year_required) + match_duration_rules(
-                    self.now, duration_part, self.search_scope)
+                    self.now, duration_part, self.search_scope, self.realistic_year_required)
                 parsed_dates.append(interval)
 
             # ... else try to determine a time interval implicitly.
