@@ -43,6 +43,16 @@ def test_text2datetime(inp, out, search_scope, realistic_year_restriction):
                          realistic_year_required=realistic_year_restriction) == out
 
 
+@pytest.mark.parametrize("inp, out, search_scope, realistic_year_restriction", tf_t2d)
+def test_text2datetime_default(inp, out, search_scope, realistic_year_restriction):
+
+    if not realistic_year_restriction or search_scope != SearchScopes.NOT_RESTRICTED:
+        return
+
+    now = datetime(2020, 12, 27)
+    assert text2datetime(inp, now=now) == out
+
+
 def test_text2date():
     now = datetime(2020, 12, 27)
     tf = [('ma', [{'start_date': date(2020, 12, 27), 'end_date': date(2020, 12, 27)}]),
