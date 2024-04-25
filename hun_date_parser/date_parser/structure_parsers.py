@@ -6,7 +6,7 @@ from .patterns import (R_MULTI, R_TOLIG, R_TOL, R_IG, R_NAPRA_TOL, R_TOL_NAPRA, 
                        R_START_STATED_END_IMPLIED)
 
 
-def match_multi_match(s: str) -> List[str]:
+def match_multi_match(s: str):
     match = re.match(R_MULTI, s)
 
     # If any of these are matched,

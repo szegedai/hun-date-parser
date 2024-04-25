@@ -10,7 +10,7 @@ from .patterns import (R_ISO_DATE, R_REV_ISO_DATE, R_NAMED_MONTH, R_TODAY, R_TOM
                        R_IN_PAST_PERIOD_WEEKS, R_IN_PAST_PERIOD_MONTHS, R_IN_PAST_PERIOD_YEARS,
                        R_N_WEEKS, R_N_DAYS, R_TOLIG_IMPLIED_END)
 from hun_date_parser.utils import (remove_accent, word_to_num, Year, Month, Week, Day, Hour, Minute,
-                                   StartDay, EndDay,
+                                   StartDay, EndDay, is_year_realistic,
                                    OverrideTopWithNow, DayOffset, SearchScopes, return_on_value_error)
 
 
@@ -20,7 +20,8 @@ from hun_date_parser.utils import (remove_accent, word_to_num, Year, Month, Week
 #     date_parts: List[DateTimePartConatiner]
 
 
-def match_iso_date(s: str) -> List[Dict[str, Any]]:
+def match_iso_date(s: str,
+                   search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED) -> List[Dict[str, Any]]:
     """
     Match ISO date-like format.
     :param s: textual input
@@ -33,6 +34,10 @@ def match_iso_date(s: str) -> List[Dict[str, Any]]:
     if match_rev:
         for group in match_rev:
             group = [int(m.lstrip('0')) for m in group if m.lstrip('0')]
+
+            if search_scope == SearchScopes.PRACTICAL_NOT_RESTRICTED and not is_year_realistic(group[2]):
+                continue
+
             res.append({'match': group,
                         'date_parts': [Year(group[2], 'match_iso_date'),
                                        Month(group[1], 'match_iso_date'),
@@ -40,6 +45,9 @@ def match_iso_date(s: str) -> List[Dict[str, Any]]:
     elif match:
         for group in match:
             group = [int(m.lstrip('0')) for m in group if m.lstrip('0')]
+
+            if search_scope == SearchScopes.PRACTICAL_NOT_RESTRICTED and not is_year_realistic(group[0]):
+                continue
 
             if len(group) == 1:
                 res.append({'match': group, 'date_parts': [Year(group[0], 'match_iso_date')]})

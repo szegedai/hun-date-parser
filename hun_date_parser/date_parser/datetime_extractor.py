@@ -32,7 +32,7 @@ daypart_mapping = [
 
 
 def text2datetime(input_sentence: str, now: datetime = datetime.now(),
-                  search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED) -> List[Dict[str, datelike]]:
+                  search_scope: SearchScopes = SearchScopes.PRACTICAL_NOT_RESTRICTED) -> List[Dict[str, datelike]]:
     """
     Returns the list of datetime intervals found in the input sentence.
     :param input_sentence: Input sentence string.
@@ -45,7 +45,7 @@ def text2datetime(input_sentence: str, now: datetime = datetime.now(),
 
 
 def text2date(input_sentence: str, now: datetime = datetime.now(),
-              search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED) -> List[Dict[str, datelike]]:
+              search_scope: SearchScopes = SearchScopes.PRACTICAL_NOT_RESTRICTED) -> List[Dict[str, datelike]]:
     """
     Returns the list of date intervals found in the input sentence.
     :param input_sentence: Input sentence string.
@@ -58,7 +58,7 @@ def text2date(input_sentence: str, now: datetime = datetime.now(),
 
 
 def text2time(input_sentence: str, now: datetime = datetime.now(),
-              search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED) -> List[Dict[str, datelike]]:
+              search_scope: SearchScopes = SearchScopes.PRACTICAL_NOT_RESTRICTED) -> List[Dict[str, datelike]]:
     """
     Returns the list of time intervals found in the input sentence.
     :param input_sentence: Input sentence string.
@@ -71,7 +71,7 @@ def text2time(input_sentence: str, now: datetime = datetime.now(),
 
 
 def match_rules(now: datetime, sentence: str,
-                search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED) -> List:
+                search_scope: SearchScopes = SearchScopes.PRACTICAL_NOT_RESTRICTED) -> List:
     """
     Matches all rules against input text.
     :param now: Current timestamp to calculate relative dates.
@@ -80,7 +80,7 @@ def match_rules(now: datetime, sentence: str,
     :return: Parsed date and time classes.
     """
     matches = [*match_named_month(sentence, now, search_scope),
-               *match_iso_date(sentence),
+               *match_iso_date(sentence, search_scope),
                *match_relative_day(sentence, now),
                *match_weekday(sentence, now, search_scope),
                *match_week(sentence, now),
@@ -100,7 +100,7 @@ def match_rules(now: datetime, sentence: str,
 
 
 def match_duration_rules(now: datetime, sentence: str,
-                         search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED) -> List:
+                         search_scope: SearchScopes = SearchScopes.PRACTICAL_NOT_RESTRICTED) -> List:
     """
     Given that it as already been established that a duration is being parsed, matches all
     duration-specific rules against the input text.
@@ -150,7 +150,7 @@ class DatetimeExtractor:
     """
 
     def __init__(self, now: datetime = datetime.now(), output_container: str = 'datetime',
-                 search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED) -> None:
+                 search_scope: SearchScopes = SearchScopes.PRACTICAL_NOT_RESTRICTED) -> None:
         """
         :param now: Current timestamp to calculate relative dates.
         :param output_container: datetime object to populate with datetime parts
