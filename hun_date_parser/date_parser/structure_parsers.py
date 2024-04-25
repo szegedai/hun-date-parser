@@ -18,7 +18,7 @@ def match_multi_match(s: str):
 
     if match and not any(excluding_matches):
         groups = match.groups()
-        groups = tuple([m.rstrip().lstrip() for m in groups if m])
+        groups = [m.rstrip().lstrip() for m in groups if m]
 
         return groups
 
@@ -38,7 +38,7 @@ def match_interval(s: str) -> Dict:
     match = re.match(R_START_STATED_END_IMPLIED, s)
     if match:
         groups = match.groups()
-        groups = tuple([m.lstrip().rstrip() for m in groups if m])
+        groups = [m.lstrip().rstrip() for m in groups if m]
 
         if len(groups) == 2:
             return {
@@ -49,7 +49,7 @@ def match_interval(s: str) -> Dict:
     match = re.match(R_TOLIG, s)
     if match:
         groups = match.groups()
-        groups = tuple([m.lstrip().rstrip() for m in groups if m])
+        groups = [m.lstrip().rstrip() for m in groups if m]
 
         if len(groups) == 2:
             return {
@@ -60,7 +60,7 @@ def match_interval(s: str) -> Dict:
     match = re.match(R_TOL, s)
     if match:
         groups = match.groups()
-        groups = tuple([m.lstrip().rstrip() for m in groups if m])
+        groups = [m.lstrip().rstrip() for m in groups if m]
 
         if len(groups) == 1:
             return {
@@ -71,7 +71,7 @@ def match_interval(s: str) -> Dict:
     match = re.match(R_IG, s)
     if match:
         groups = match.groups()
-        groups = tuple([m.lstrip().rstrip() for m in groups if m])
+        groups = [m.lstrip().rstrip() for m in groups if m]
 
         if len(groups) == 1:
             return {
@@ -86,7 +86,7 @@ def match_duration_match(s: str) -> List[str]:
     match = re.match(R_TOL_NAPRA, s)
     if match:
         groups = match.groups()
-        groups = tuple([m.rstrip().lstrip() for m in groups if m])
+        groups = [m.rstrip().lstrip() for m in groups if m]
         from_part, duration_part = groups
 
         return [from_part, duration_part]
@@ -94,7 +94,7 @@ def match_duration_match(s: str) -> List[str]:
     match = re.match(R_NAPRA_TOL, s)
     if match:
         groups = match.groups()
-        groups = tuple([m.rstrip().lstrip() for m in groups if m])
+        groups = [m.rstrip().lstrip() for m in groups if m]
         duration_part, from_part = groups
 
         return [from_part, duration_part]
