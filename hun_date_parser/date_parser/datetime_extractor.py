@@ -65,7 +65,8 @@ def text2date(input_sentence: str, now: datetime = datetime.now(),
     """
     try:
         datetime_extractor = DatetimeExtractor(now=now, output_container='date',
-                                               search_scope=search_scope, realistic_year_required=realistic_year_required)
+                                               search_scope=search_scope,
+                                               realistic_year_required=realistic_year_required)
         return datetime_extractor.parse_datetime(sentence=input_sentence)
     except:
         return []
@@ -84,7 +85,8 @@ def text2time(input_sentence: str, now: datetime = datetime.now(),
     """
     try:
         datetime_extractor = DatetimeExtractor(now=now, output_container='time',
-                                               search_scope=search_scope, realistic_year_required=realistic_year_required)
+                                               search_scope=search_scope,
+                                               realistic_year_required=realistic_year_required)
         return datetime_extractor.parse_datetime(sentence=input_sentence)
     except:
         return []
