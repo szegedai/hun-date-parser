@@ -3,4 +3,4 @@ from hun_date_parser.date_parser.datetime_extractor import DatetimeExtractor, te
 
 __all__ = ["DatetimeTextualizer", "DatetimeExtractor", "datetime2text", "text2datetime", "text2date", "text2time"]
 
-__version__ = "0.2.6"
+__version__ = "0.2.7"

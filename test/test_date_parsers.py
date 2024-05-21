@@ -108,6 +108,8 @@ tf_iso_date = [
     ('8000 forint', [], SearchScopes.NOT_RESTRICTED, True),
     ('8000', [[Year(8000, 'match_iso_date')]], SearchScopes.PAST_SEARCH, False),
     ('8000 forint', [], SearchScopes.PAST_SEARCH, False),
+    ('0000', [], SearchScopes.NOT_RESTRICTED, False),
+    ('0000', [], SearchScopes.NOT_RESTRICTED, True),
 ]
 
 tf_weekday = [

@@ -51,6 +51,9 @@ def match_iso_date(s: str,
         for group in match:
             group = [int(m.lstrip('0')) for m in group if m.lstrip('0')]
 
+            if not group:
+                continue
+
             if realistic_year_restriction and not is_year_realistic(group[0]):
                 continue
 
