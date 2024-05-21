@@ -42,11 +42,14 @@ def text2datetime(input_sentence: str, now: datetime = datetime.now(),
     :param realistic_year_required: Defines whether to restrict year candidates to be between 1900 and 2100.
     :return: list of datetime interval dictionaries
     """
-    datetime_extractor = DatetimeExtractor(now=now,
-                                           output_container='datetime',
-                                           search_scope=search_scope,
-                                           realistic_year_required=realistic_year_required)
-    return datetime_extractor.parse_datetime(sentence=input_sentence)
+    try:
+        datetime_extractor = DatetimeExtractor(now=now,
+                                               output_container='datetime',
+                                               search_scope=search_scope,
+                                               realistic_year_required=realistic_year_required)
+        return datetime_extractor.parse_datetime(sentence=input_sentence)
+    except:
+        return []
 
 
 def text2date(input_sentence: str, now: datetime = datetime.now(),
@@ -60,9 +63,12 @@ def text2date(input_sentence: str, now: datetime = datetime.now(),
     :param realistic_year_required: Defines whether to restrict year candidates to be between 1900 and 2100.
     :return: list of date interval dictionaries
     """
-    datetime_extractor = DatetimeExtractor(now=now, output_container='date',
-                                           search_scope=search_scope, realistic_year_required=realistic_year_required)
-    return datetime_extractor.parse_datetime(sentence=input_sentence)
+    try:
+        datetime_extractor = DatetimeExtractor(now=now, output_container='date',
+                                               search_scope=search_scope, realistic_year_required=realistic_year_required)
+        return datetime_extractor.parse_datetime(sentence=input_sentence)
+    except:
+        return []
 
 
 def text2time(input_sentence: str, now: datetime = datetime.now(),
@@ -76,9 +82,12 @@ def text2time(input_sentence: str, now: datetime = datetime.now(),
     :param realistic_year_required: Defines whether to restrict year candidates to be between 1900 and 2100.
     :return: list of time interval dictionaries
     """
-    datetime_extractor = DatetimeExtractor(now=now, output_container='time',
-                                           search_scope=search_scope, realistic_year_required=realistic_year_required)
-    return datetime_extractor.parse_datetime(sentence=input_sentence)
+    try:
+        datetime_extractor = DatetimeExtractor(now=now, output_container='time',
+                                               search_scope=search_scope, realistic_year_required=realistic_year_required)
+        return datetime_extractor.parse_datetime(sentence=input_sentence)
+    except:
+        return []
 
 
 def match_rules(now: datetime, sentence: str,
