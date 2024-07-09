@@ -2,8 +2,8 @@
 R_MULTI = r'(.*)\bvagy\b(.*)|(.*)\bés\b(.*)'
 
 # schemas
-R_TOLIG = r'(.*-?t[oóöő]l\b)(.*-?ig\b)'
-R_TOL = r'([:\w ]*-?t[oóöő]l\b).*'
+R_TOLIG = r'(.*-?t[oóöő]l\b|.* [oó]ta\b)(.*-?ig\b)'
+R_TOL = r'([:\w ]*-?t[oóöő]l\b|.* [oó]ta\b).*'
 R_IG = r'([:\w ]*-?ig\b)'
 
 # hyper day level patterns
