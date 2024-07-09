@@ -1,4 +1,4 @@
-from typing import List, TypedDict
+from typing import List, TypedDict, Optional
 
 import re
 
@@ -63,3 +63,12 @@ def duration_parser(s: str) -> DateParts:
     }
 
     return results
+
+
+def parse_duration(s: str) -> Optional[int]:
+    results = duration_parser(s)
+
+    if results["date_parts"]:
+        return results["date_parts"][0].value
+    else:
+        return None
