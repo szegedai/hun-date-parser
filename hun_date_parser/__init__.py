@@ -5,4 +5,4 @@ from hun_date_parser.duration_parser.duration_parsers import parse_duration
 __all__ = ["DatetimeTextualizer", "DatetimeExtractor", "datetime2text", "text2datetime", "text2date", "text2time",
            "parse_duration"]
 
-__version__ = "0.2.8"
+__version__ = "0.2.9"

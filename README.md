@@ -118,6 +118,21 @@ text2datetime('péntek', now=datetime(2023, 6, 7), search_scope=SearchScopes.NOT
 #   'end_date': datetime.datetime(2023, 6, 9, 23, 59, 59)}]
 ```
 
+### Duration Parsing
+
+The duration parser can extract the duration in minutes from various expressions found in sentences.
+
+#### Recognized Formats
+
+The parser is capable of understanding a variety of duration expressions. Here are the primary formats it recognizes:
+
+- Hour and Minute Combination:
+  - Examples: `1 óra 45 perc`, `egy óra 30 perc`, `2 óra 15 perc`
+- Hour Only:
+  - Examples: `1 óra`, `egy óra`, `2 órát`, `3,5 óra`
+- Quarter Hour Phrases:
+  - Examples: `háromnegyed óra`, `egy és negyed óra`, `kettő és fél óra`
+
 ### Datetime to text
 
 The library is also capable of turning datetime objects into their Hungarian text representation.
