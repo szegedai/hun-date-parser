@@ -99,6 +99,11 @@ scenarios = [
     ("az idei események", [datetime(2020, 1, 1), datetime(2020, 12, 31, 23, 59, 59)]),
     ("az idén történtek", [datetime(2020, 1, 1), datetime(2020, 12, 31, 23, 59, 59)]),
     ("az ebben az évben történtek", [datetime(2020, 1, 1), datetime(2020, 12, 31, 23, 59, 59)]),
+    ("bejövő hívás májusban", [datetime(2020, 5, 1), datetime(2020, 5, 31, 23, 59, 59)]),
+    ("jövök májusban", [datetime(2020, 5, 1), datetime(2020, 5, 31, 23, 59, 59)]),
+    (" május óta", [datetime(2020, 5, 1), None]),
+    (" május 5 óta", [datetime(2020, 5, 5), None]),
+    (" majus 5 ota", [datetime(2020, 5, 5), None]),
 ]
 
 

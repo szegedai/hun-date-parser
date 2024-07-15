@@ -121,7 +121,9 @@ def match_named_month(s: str, now: datetime,
             continue
 
         if bool(group[0].strip(" ")):
-            if 'jovo' in remove_accent(group[0]):
+            if ('jovo' in remove_accent(group[0])
+                    # hack
+                    and 'jovok' not in remove_accent(group[0])):
                 group_res['date_parts'].append(Year(now.year + 1, 'named_month'))
             elif 'tavaly' in remove_accent(group[0]):
                 group_res['date_parts'].append(Year(now.year - 1, 'named_month'))
