@@ -1,4 +1,4 @@
-from typing import List, TypedDict, Optional
+from typing import TypedDict, Optional, Sequence
 import re
 from hun_date_parser.utils import DateTimePartConatiner, remove_accent, word_to_num, Minute
 from hun_date_parser.date_parser.patterns import R_HOUR_MIN_D, R_HOUR_HOUR_D, R_HOUR_D
@@ -6,7 +6,7 @@ from hun_date_parser.date_parser.patterns import R_HOUR_MIN_D, R_HOUR_HOUR_D, R_
 
 class DateParts(TypedDict):
     match: str
-    date_parts: List[DateTimePartConatiner]
+    date_parts: Sequence[DateTimePartConatiner]
 
 
 def convert_hour_to_minutes(hour_str: Optional[str]) -> float:
