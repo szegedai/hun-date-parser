@@ -133,6 +133,15 @@ The parser is capable of understanding a variety of duration expressions. Here a
 - Quarter Hour Phrases:
   - Examples: `háromnegyed óra`, `egy és negyed óra`, `kettő és fél óra`
 
+
+```python
+from hun_date_parser import parse_duration
+
+print(parse_duration('45 perc'))  # Output: 45
+
+print(parse_duration('1 és negyed óra'))  # Output: 75
+```
+
 ### Datetime to text
 
 The library is also capable of turning datetime objects into their Hungarian text representation.
