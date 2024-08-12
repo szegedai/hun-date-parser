@@ -252,12 +252,11 @@ class DatetimeExtractor:
                 if _dp_match and _dp_match.value is not None:
                     has_date = True
                     pre_first = False
-                    if type_isin_list(StartDay, dateparts) and bottom:
-                        res_dt.append(get_type_if_exists(dateparts, StartDay).value)
-                    elif type_isin_list(EndDay, dateparts) and not bottom:
-                        res_dt.append(get_type_if_exists(dateparts, EndDay).value)
-                    else:
-                        res_dt.append(_dp_match.value)
+                    res_dt.append(_dp_match.value)
+                elif type_isin_list(StartDay, dateparts) and bottom:
+                    res_dt.append(get_type_if_exists(dateparts, StartDay).value)
+                elif type_isin_list(EndDay, dateparts) and not bottom:
+                    res_dt.append(get_type_if_exists(dateparts, EndDay).value)
                 elif pre_first:
                     res_dt.append(now.day)
                 elif bottom:

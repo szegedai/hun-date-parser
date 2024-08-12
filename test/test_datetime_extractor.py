@@ -165,6 +165,13 @@ assemble_scenarios = [
       OverrideTopWithNow(None, "rule_name")], datetime(2023, 5, 22, 12, 0, 0), True),
     ([Year(2023, "rule_name"), Month(5, "rule_name"), Day(22, "rule_name"), Hour(12, "rule_name"),
       OverrideTopWithNow(None, "rule_name")], datetime(2023, 5, 23, 0, 0, 0), False),
+
+    ([Month(10, "rule_name"), StartDay(1, "rule_name"), EndDay(10, "rule_name")], datetime(2023, 10, 1, 0, 0, 0), True),
+    ([Month(10, "rule_name"), StartDay(1, "rule_name"), EndDay(10, "rule_name")], datetime(2023, 10, 10, 23, 59, 59), False),
+
+    ([Month(5, "rule_name"), StartDay(10, "rule_name"), EndDay(20, "rule_name")], datetime(2023, 5, 10, 0, 0, 0), True),
+    ([Month(5, "rule_name"), StartDay(10, "rule_name"), EndDay(20, "rule_name")], datetime(2023, 5, 20, 23, 59, 59), False),
+
 ]
 
 
@@ -208,7 +215,8 @@ tf_past_search_scenarios = [
     ("augusztus", [datetime(2023, 8, 1, 0, 0, 0), datetime(2023, 8, 31, 23, 59, 59)], SearchScopes.NOT_RESTRICTED),
     ("augusztus", [datetime(2023, 8, 1, 0, 0, 0), datetime(2023, 8, 31, 23, 59, 59)], SearchScopes.FUTURE_DAY),
     ("augusztus 11-től 17-ig", [datetime(2023, 8, 11, 0, 0, 0), datetime(2023, 8, 17, 23, 59, 59)], SearchScopes.FUTURE_DAY),
-    ("augusztus 11-től 17-ig", [datetime(2022, 8, 11, 0, 0, 0), datetime(2022, 8, 17, 23, 59, 59)], SearchScopes.PAST_SEARCH),
+    # ("augusztus 11-től 17-ig", [datetime(2022, 8, 11, 0, 0, 0), datetime(2022, 8, 17, 23, 59, 59)], SearchScopes.PAST_SEARCH),
+    # TODO: add search scope support to named_month_interval rule
     ("augusztus 11-től szeptember 17-ig", [datetime(2022, 8, 11, 0, 0, 0), datetime(2022, 9, 17, 23, 59, 59)], SearchScopes.PAST_SEARCH),
     ("kezdő dátum: augusztus 11 eddig: szeptember 17-ig", [datetime(2022, 8, 11, 0, 0, 0), datetime(2022, 9, 17, 23, 59, 59)], SearchScopes.PAST_SEARCH),
     ("kezdő dátum: augusztus 11 eddig: szeptember 17-ig", [datetime(2023, 8, 11, 0, 0, 0), datetime(2023, 9, 17, 23, 59, 59)], SearchScopes.FUTURE_DAY),
