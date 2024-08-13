@@ -1,4 +1,5 @@
 import re
+import calendar
 from typing import Dict, List, Any
 from datetime import datetime, timedelta, date
 from dateutil.relativedelta import relativedelta
@@ -8,7 +9,7 @@ from .patterns import (R_ISO_DATE, R_REV_ISO_DATE, R_NAMED_MONTH, R_TODAY, R_TOM
                        R_NMINS_FROM_NOW, R_RELATIVE_MONTH, R_NMINS_PRIOR_NOW, R_NDAYS_PRIOR_NOW, R_NHOURS_PRIOR_NOW,
                        R_NWEEKS_PRIOR_NOW, R_IN_PAST_PERIOD_MINS, R_IN_PAST_PERIOD_HOURS, R_IN_PAST_PERIOD_DAYS,
                        R_IN_PAST_PERIOD_WEEKS, R_IN_PAST_PERIOD_MONTHS, R_IN_PAST_PERIOD_YEARS,
-                       R_N_WEEKS, R_N_DAYS, R_TOLIG_IMPLIED_END)
+                       R_N_WEEKS, R_N_DAYS, R_TOLIG_IMPLIED_END, R_NAMED_MONTH_SME)
 from hun_date_parser.utils import (remove_accent, word_to_num, Year, Month, Week, Day, Hour, Minute,
                                    StartDay, EndDay, is_year_realistic,
                                    OverrideTopWithNow, DayOffset, SearchScopes, return_on_value_error)
@@ -75,6 +76,10 @@ def match_named_month(s: str, now: datetime,
                       search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED) -> List[Dict[str, Any]]:
     def has_month_already_pass(now, month):
         return month < now.month
+
+    # If any of these other rules match, prefer those...
+    if re.findall(R_TOLIG_IMPLIED_END, s) or re.findall(R_NAMED_MONTH_SME, s):
+        return []
 
     groups = re.findall(R_NAMED_MONTH, s)
     months = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'szep', 'okt', 'nov', 'dec']
@@ -508,5 +513,89 @@ def match_named_month_interval(s: str) -> List[Dict[str, Any]]:
         # If something went wrong it's safest to discard everything
         if len(group_res["date_parts"]) == 3:
             res.append(group_res)
+
+    return res
+
+
+@return_on_value_error([])
+def match_named_month_start_mid_end(
+        s: str,
+        now: datetime,
+        search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED
+) -> List[Dict[str, Any]]:
+    def has_month_already_pass(now, month):
+        return month < now.month
+
+    def get_last_day(y, m):
+        _, last_day = calendar.monthrange(y, m)
+        return last_day
+
+    groups = re.findall(R_NAMED_MONTH_SME, s)
+    months = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'szep', 'okt', 'nov', 'dec']
+
+    res = []
+    groups = [(mod, m, d.lstrip('0')) if
+              d else (mod, m, '') for mod, m, d in groups]
+
+    for group in groups:
+        group_res = {'match': group, 'date_parts': []}
+
+        month_detected = None
+        for i, month in enumerate(months):
+            if month in remove_accent(group[1]):
+                group_res['date_parts'].append(Month(i + 1, 'named_month_sme'))
+                month_detected = i + 1
+                break
+
+        missing_month_end = False
+        if bool(group[2].strip(" ")) and month_detected is not None:
+            if "elej" in remove_accent(group[2]):
+                group_res['date_parts'].extend([StartDay(1, 'named_month_sme'), EndDay(10, 'named_month_sme')])
+            elif "kozep" in remove_accent(group[2]):
+                group_res['date_parts'].extend([StartDay(10, 'named_month_sme'), EndDay(20, 'named_month_sme')])
+            elif "veg" in remove_accent(group[2]):
+                group_res['date_parts'].extend([StartDay(20, 'named_month_sme')])
+                missing_month_end = True  # can't calculate last day of the month without knowing the year+month
+
+        detected_date_assumed_horizont = None
+        if month_detected is not None:
+            if now.month == month_detected:
+                detected_date_assumed_horizont = "current"
+            elif has_month_already_pass(now, month_detected):
+                detected_date_assumed_horizont = "past"
+            else:
+                detected_date_assumed_horizont = "future"
+
+        if month_detected is None:
+            continue
+
+        year_detected = now.year
+        if bool(group[0].strip(" ")):
+            year_detected_ = word_to_num(group[0])
+            if year_detected_ != -1:
+                group_res['date_parts'].append(Year(year_detected_, 'named_month_sme'))
+                year_detected = year_detected_
+            else:
+                if ('jovo' in remove_accent(group[0])
+                        # hack
+                        and 'jovok' not in remove_accent(group[0])):
+                    group_res['date_parts'].append(Year(now.year + 1, 'named_month_sme'))
+                    year_detected = now.year + 1
+                elif 'tavaly' in remove_accent(group[0]):
+                    group_res['date_parts'].append(Year(now.year - 1, 'named_month_sme'))
+                    year_detected = now.year - 1
+        else:
+            if search_scope == SearchScopes.FUTURE_DAY and detected_date_assumed_horizont == "past":
+                group_res['date_parts'].append(Year(now.year + 1, 'named_month_sme'))
+                year_detected = now.year + 1
+            elif search_scope == SearchScopes.PAST_SEARCH and detected_date_assumed_horizont == "future":
+                group_res['date_parts'].append(Year(now.year - 1, 'named_month_sme'))
+                year_detected = now.year - 1
+
+        if missing_month_end:
+            last_day = get_last_day(year_detected, month_detected)
+            group_res['date_parts'].append(EndDay(last_day, 'named_month_sme'))
+
+        res.append(group_res)
 
     return res

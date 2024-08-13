@@ -1,12 +1,13 @@
 import pytest
 from datetime import datetime
 
-from hun_date_parser.date_parser.date_parsers import Year, Month, Week, Day, OverrideTopWithNow, DayOffset
+from hun_date_parser.date_parser.date_parsers import (Year, Month, Week, Day, OverrideTopWithNow, DayOffset,
+                                                      StartDay, EndDay)
 from hun_date_parser.date_parser.date_parsers import (match_iso_date, match_named_month, match_relative_day,
                                                       match_weekday,
                                                       match_week, match_named_year, match_relative_month,
                                                       match_n_periods_compared_to_now, match_in_past_n_periods,
-                                                      match_date_offset)
+                                                      match_date_offset, match_named_month_start_mid_end)
 from hun_date_parser.utils import SearchScopes
 
 
@@ -61,6 +62,18 @@ tf_named_month = [
      SearchScopes.FUTURE_DAY),
     ('október', [[Month(10, 'named_month')]],
      SearchScopes.PAST_SEARCH),
+]
+
+tf_named_month_start_mid_end = [
+    ('jan eleje', [[Month(1, 'named_month_sme'), StartDay(1, 'named_month_sme'), EndDay(10, 'named_month_sme')]], SearchScopes.NOT_RESTRICTED),
+    ('2023 febr. közepe', [[Month(2, 'named_month_sme'), StartDay(10, 'named_month_sme'), EndDay(20, 'named_month_sme'), Year(2023, 'named_month_sme')]], SearchScopes.NOT_RESTRICTED),
+    ('január közepén', [[Month(1, 'named_month_sme'), StartDay(10, 'named_month_sme'), EndDay(20, 'named_month_sme')]], SearchScopes.NOT_RESTRICTED),
+    ('jövő január közepén', [[Month(1, 'named_month_sme'), StartDay(10, 'named_month_sme'), EndDay(20, 'named_month_sme'), Year(2021, 'named_month_sme')]], SearchScopes.NOT_RESTRICTED),
+    ('2023 febr. vége', [[Month(2, 'named_month_sme'), StartDay(20, 'named_month_sme'), Year(2023, 'named_month_sme'), EndDay(28, 'named_month_sme')]], SearchScopes.NOT_RESTRICTED),
+    ('2024 aug vége', [[Month(8, 'named_month_sme'), StartDay(20, 'named_month_sme'), Year(2024, 'named_month_sme'), EndDay(31, 'named_month_sme')]], SearchScopes.NOT_RESTRICTED),
+    (' november közepén', [[Month(11, 'named_month_sme'), StartDay(10, 'named_month_sme'), EndDay(20, 'named_month_sme'), Year(2019, 'named_month_sme')]], SearchScopes.PAST_SEARCH),
+    (' május végén', [[Month(5, 'named_month_sme'), StartDay(20, 'named_month_sme'), Year(2021, 'named_month_sme'), EndDay(31, 'named_month_sme')]], SearchScopes.FUTURE_DAY),
+    (' április végén', [[Month(4, 'named_month_sme'), StartDay(20, 'named_month_sme'), Year(2021, 'named_month_sme'), EndDay(30, 'named_month_sme')]], SearchScopes.FUTURE_DAY),
 ]
 
 tf_match_relative_day = [
@@ -215,6 +228,18 @@ def test_named_month(inp, exp, search_scope):
     date_parts = []
     for e in out:
         date_parts.append(e['date_parts'])
+    assert date_parts == exp
+
+
+@pytest.mark.parametrize("inp,exp,search_scope", tf_named_month_start_mid_end)
+def test_named_month_start_mid_end(inp, exp, search_scope):
+    now = datetime(2020, 10, 10)
+
+    out = match_named_month_start_mid_end(inp, now, search_scope)
+    date_parts = []
+    for e in out:
+        date_parts.append(e['date_parts'])
+
     assert date_parts == exp
 
 

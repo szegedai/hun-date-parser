@@ -12,7 +12,8 @@ from hun_date_parser.date_parser.date_parsers import (match_named_month, match_i
                                                       match_relative_day,
                                                       match_week, match_named_year, match_n_periods_compared_to_now,
                                                       match_relative_month, match_in_past_n_periods,
-                                                      match_date_offset, match_named_month_interval)
+                                                      match_date_offset, match_named_month_interval,
+                                                      match_named_month_start_mid_end)
 from hun_date_parser.date_parser.time_parsers import match_digi_clock, match_time_words, match_now, match_hwords
 from hun_date_parser.utils import (Year, Month, Week, Day, Daypart, Hour, Minute, StartDay, EndDay, get_type_if_exists,
                                    OverrideTopWithNow, SearchScopes, is_smaller_date_or_none,
@@ -107,7 +108,8 @@ def match_rules(now: datetime, sentence: str,
                *match_n_periods_compared_to_now(sentence, now),
                *match_relative_month(sentence, now),
                *match_in_past_n_periods(sentence, now),
-               *match_named_month_interval(sentence)]
+               *match_named_month_interval(sentence),
+               *match_named_month_start_mid_end(sentence, now)]
 
     matches = list(chain(*[m['date_parts'] for m in matches]))
 
@@ -252,12 +254,11 @@ class DatetimeExtractor:
                 if _dp_match and _dp_match.value is not None:
                     has_date = True
                     pre_first = False
-                    if type_isin_list(StartDay, dateparts) and bottom:
-                        res_dt.append(get_type_if_exists(dateparts, StartDay).value)
-                    elif type_isin_list(EndDay, dateparts) and not bottom:
-                        res_dt.append(get_type_if_exists(dateparts, EndDay).value)
-                    else:
-                        res_dt.append(_dp_match.value)
+                    res_dt.append(_dp_match.value)
+                elif type_isin_list(StartDay, dateparts) and bottom:
+                    res_dt.append(get_type_if_exists(dateparts, StartDay).value)
+                elif type_isin_list(EndDay, dateparts) and not bottom:
+                    res_dt.append(get_type_if_exists(dateparts, EndDay).value)
                 elif pre_first:
                     res_dt.append(now.day)
                 elif bottom:

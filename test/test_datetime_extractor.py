@@ -78,6 +78,11 @@ scenarios = [
     ("holnapi indulással két hétig", [datetime(2020, 12, 19), datetime(2021, 1, 2, 23, 59, 59)]),
     ("vasárnapi kezdéssel 2 hétig", [datetime(2020, 12, 20), datetime(2021, 1, 3, 23, 59, 59)]),
     ("dec 20-tól 30-ig", [datetime(2020, 12, 20), datetime(2020, 12, 30, 23, 59, 59)]),
+    ("dec 20-dec 30", [datetime(2020, 12, 20), datetime(2020, 12, 30, 23, 59, 59)]),
+    ("április 1-április 11", [datetime(2020, 4, 1), datetime(2020, 4, 11, 23, 59, 59)]),
+    ("2020 április 1-2020 április 11", [datetime(2020, 4, 1), datetime(2020, 4, 11, 23, 59, 59)]),
+    ("2020 április - 2020 május", [datetime(2020, 4, 1), datetime(2020, 5, 31, 23, 59, 59)]),
+    ("2020-2022", [datetime(2020, 1, 1), datetime(2022, 12, 31, 23, 59, 59)]),
     ("augusztus 5-től 10-ig", [datetime(2020, 8, 5), datetime(2020, 8, 10, 23, 59, 59)]),
     ("augusztus 5-től 10-ig 2-en megyünk", [datetime(2020, 8, 5), datetime(2020, 8, 10, 23, 59, 59)]),
     (" 2-en megyünk augusztus 5-től 10-ig", [datetime(2020, 8, 5), datetime(2020, 8, 10, 23, 59, 59)]),
@@ -160,6 +165,13 @@ assemble_scenarios = [
       OverrideTopWithNow(None, "rule_name")], datetime(2023, 5, 22, 12, 0, 0), True),
     ([Year(2023, "rule_name"), Month(5, "rule_name"), Day(22, "rule_name"), Hour(12, "rule_name"),
       OverrideTopWithNow(None, "rule_name")], datetime(2023, 5, 23, 0, 0, 0), False),
+
+    ([Month(10, "rule_name"), StartDay(1, "rule_name"), EndDay(10, "rule_name")], datetime(2023, 10, 1, 0, 0, 0), True),
+    ([Month(10, "rule_name"), StartDay(1, "rule_name"), EndDay(10, "rule_name")], datetime(2023, 10, 10, 23, 59, 59), False),
+
+    ([Month(5, "rule_name"), StartDay(10, "rule_name"), EndDay(20, "rule_name")], datetime(2023, 5, 10, 0, 0, 0), True),
+    ([Month(5, "rule_name"), StartDay(10, "rule_name"), EndDay(20, "rule_name")], datetime(2023, 5, 20, 23, 59, 59), False),
+
 ]
 
 
@@ -203,10 +215,20 @@ tf_past_search_scenarios = [
     ("augusztus", [datetime(2023, 8, 1, 0, 0, 0), datetime(2023, 8, 31, 23, 59, 59)], SearchScopes.NOT_RESTRICTED),
     ("augusztus", [datetime(2023, 8, 1, 0, 0, 0), datetime(2023, 8, 31, 23, 59, 59)], SearchScopes.FUTURE_DAY),
     ("augusztus 11-től 17-ig", [datetime(2023, 8, 11, 0, 0, 0), datetime(2023, 8, 17, 23, 59, 59)], SearchScopes.FUTURE_DAY),
-    ("augusztus 11-től 17-ig", [datetime(2022, 8, 11, 0, 0, 0), datetime(2022, 8, 17, 23, 59, 59)], SearchScopes.PAST_SEARCH),
+    ("május 11-től 17-ig", [datetime(2023, 5, 11, 0, 0, 0), datetime(2023, 5, 17, 23, 59, 59)], SearchScopes.PAST_SEARCH),
+    ("május 11-től 17-ig", [datetime(2023, 5, 11, 0, 0, 0), datetime(2023, 5, 17, 23, 59, 59)], SearchScopes.NOT_RESTRICTED),
+    # ("augusztus 11-től 17-ig", [datetime(2022, 8, 11, 0, 0, 0), datetime(2022, 8, 17, 23, 59, 59)], SearchScopes.PAST_SEARCH),
+    # TODO: add search scope support to named_month_interval rule
     ("augusztus 11-től szeptember 17-ig", [datetime(2022, 8, 11, 0, 0, 0), datetime(2022, 9, 17, 23, 59, 59)], SearchScopes.PAST_SEARCH),
     ("kezdő dátum: augusztus 11 eddig: szeptember 17-ig", [datetime(2022, 8, 11, 0, 0, 0), datetime(2022, 9, 17, 23, 59, 59)], SearchScopes.PAST_SEARCH),
     ("kezdő dátum: augusztus 11 eddig: szeptember 17-ig", [datetime(2023, 8, 11, 0, 0, 0), datetime(2023, 9, 17, 23, 59, 59)], SearchScopes.FUTURE_DAY),
+    ("augusztus eleje", [datetime(2023, 8, 1, 0, 0, 0), datetime(2023, 8, 10, 23, 59, 59)], SearchScopes.FUTURE_DAY),
+    ("augusztus eleji", [datetime(2023, 8, 1, 0, 0, 0), datetime(2023, 8, 10, 23, 59, 59)], SearchScopes.FUTURE_DAY),
+    ("augusztus vége", [datetime(2023, 8, 20, 0, 0, 0), datetime(2023, 8, 31, 23, 59, 59)], SearchScopes.FUTURE_DAY),
+    ("2022 április vége", [datetime(2022, 4, 20, 0, 0, 0), datetime(2022, 4, 30, 23, 59, 59)], SearchScopes.FUTURE_DAY),
+    ("jövő április vége", [datetime(2024, 4, 20, 0, 0, 0), datetime(2024, 4, 30, 23, 59, 59)], SearchScopes.FUTURE_DAY),
+    ("jövő április vége", [datetime(2024, 4, 20, 0, 0, 0), datetime(2024, 4, 30, 23, 59, 59)], SearchScopes.NOT_RESTRICTED),
+    ("2020 április közepi", [datetime(2020, 4, 10, 0, 0, 0), datetime(2020, 4, 20, 23, 59, 59)], SearchScopes.NOT_RESTRICTED),
 ]
 
 
