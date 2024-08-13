@@ -65,15 +65,15 @@ tf_named_month = [
 ]
 
 tf_named_month_start_mid_end = [
-    ('jan eleje', [[Month(1, 'named_month'), StartDay(1, 'named_month'), EndDay(10, 'named_month')]], SearchScopes.NOT_RESTRICTED),
-    ('2023 febr. közepe', [[Month(2, 'named_month'), StartDay(10, 'named_month'), EndDay(20, 'named_month'), Year(2023, 'named_month')]], SearchScopes.NOT_RESTRICTED),
-    ('január közepén', [[Month(1, 'named_month'), StartDay(10, 'named_month'), EndDay(20, 'named_month')]], SearchScopes.NOT_RESTRICTED),
-    ('jövő január közepén', [[Month(1, 'named_month'), StartDay(10, 'named_month'), EndDay(20, 'named_month'), Year(2021, 'named_month')]], SearchScopes.NOT_RESTRICTED),
-    ('2023 febr. vége', [[Month(2, 'named_month'), StartDay(20, 'named_month'), Year(2023, 'named_month'), EndDay(28, 'named_month')]], SearchScopes.NOT_RESTRICTED),
-    ('2024 aug vége', [[Month(8, 'named_month'), StartDay(20, 'named_month'), Year(2024, 'named_month'), EndDay(31, 'named_month')]], SearchScopes.NOT_RESTRICTED),
-    (' november közepén', [[Month(11, 'named_month'), StartDay(10, 'named_month'), EndDay(20, 'named_month'), Year(2019, 'named_month')]], SearchScopes.PAST_SEARCH),
-    (' május végén', [[Month(5, 'named_month'), StartDay(20, 'named_month'), Year(2021, 'named_month'), EndDay(31, 'named_month')]], SearchScopes.FUTURE_DAY),
-    (' április végén', [[Month(4, 'named_month'), StartDay(20, 'named_month'), Year(2021, 'named_month'), EndDay(30, 'named_month')]], SearchScopes.FUTURE_DAY),
+    ('jan eleje', [[Month(1, 'named_month_sme'), StartDay(1, 'named_month_sme'), EndDay(10, 'named_month_sme')]], SearchScopes.NOT_RESTRICTED),
+    ('2023 febr. közepe', [[Month(2, 'named_month_sme'), StartDay(10, 'named_month_sme'), EndDay(20, 'named_month_sme'), Year(2023, 'named_month_sme')]], SearchScopes.NOT_RESTRICTED),
+    ('január közepén', [[Month(1, 'named_month_sme'), StartDay(10, 'named_month_sme'), EndDay(20, 'named_month_sme')]], SearchScopes.NOT_RESTRICTED),
+    ('jövő január közepén', [[Month(1, 'named_month_sme'), StartDay(10, 'named_month_sme'), EndDay(20, 'named_month_sme'), Year(2021, 'named_month_sme')]], SearchScopes.NOT_RESTRICTED),
+    ('2023 febr. vége', [[Month(2, 'named_month_sme'), StartDay(20, 'named_month_sme'), Year(2023, 'named_month_sme'), EndDay(28, 'named_month_sme')]], SearchScopes.NOT_RESTRICTED),
+    ('2024 aug vége', [[Month(8, 'named_month_sme'), StartDay(20, 'named_month_sme'), Year(2024, 'named_month_sme'), EndDay(31, 'named_month_sme')]], SearchScopes.NOT_RESTRICTED),
+    (' november közepén', [[Month(11, 'named_month_sme'), StartDay(10, 'named_month_sme'), EndDay(20, 'named_month_sme'), Year(2019, 'named_month_sme')]], SearchScopes.PAST_SEARCH),
+    (' május végén', [[Month(5, 'named_month_sme'), StartDay(20, 'named_month_sme'), Year(2021, 'named_month_sme'), EndDay(31, 'named_month_sme')]], SearchScopes.FUTURE_DAY),
+    (' április végén', [[Month(4, 'named_month_sme'), StartDay(20, 'named_month_sme'), Year(2021, 'named_month_sme'), EndDay(30, 'named_month_sme')]], SearchScopes.FUTURE_DAY),
 ]
 
 tf_match_relative_day = [
@@ -240,7 +240,6 @@ def test_named_month_start_mid_end(inp, exp, search_scope):
     for e in out:
         date_parts.append(e['date_parts'])
 
-    print(date_parts, exp)
     assert date_parts == exp
 
 

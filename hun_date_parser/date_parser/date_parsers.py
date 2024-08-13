@@ -77,7 +77,8 @@ def match_named_month(s: str, now: datetime,
     def has_month_already_pass(now, month):
         return month < now.month
 
-    if re.findall(R_TOLIG_IMPLIED_END, s):
+    # If any of these other rules match, prefer those...
+    if re.findall(R_TOLIG_IMPLIED_END, s) or re.findall(R_NAMED_MONTH_SME, s):
         return []
 
     groups = re.findall(R_NAMED_MONTH, s)
@@ -535,26 +536,24 @@ def match_named_month_start_mid_end(
     groups = [(mod, m, d.lstrip('0')) if
               d else (mod, m, '') for mod, m, d in groups]
 
-    print(groups)
-
     for group in groups:
         group_res = {'match': group, 'date_parts': []}
 
         month_detected = None
         for i, month in enumerate(months):
             if month in remove_accent(group[1]):
-                group_res['date_parts'].append(Month(i + 1, 'named_month'))
+                group_res['date_parts'].append(Month(i + 1, 'named_month_sme'))
                 month_detected = i + 1
                 break
 
         missing_month_end = False
         if bool(group[2].strip(" ")) and month_detected is not None:
             if "elej" in remove_accent(group[2]):
-                group_res['date_parts'].extend([StartDay(1, 'named_month'), EndDay(10, 'named_month')])
+                group_res['date_parts'].extend([StartDay(1, 'named_month_sme'), EndDay(10, 'named_month_sme')])
             elif "kozep" in remove_accent(group[2]):
-                group_res['date_parts'].extend([StartDay(10, 'named_month'), EndDay(20, 'named_month')])
+                group_res['date_parts'].extend([StartDay(10, 'named_month_sme'), EndDay(20, 'named_month_sme')])
             elif "veg" in remove_accent(group[2]):
-                group_res['date_parts'].extend([StartDay(20, 'named_month')])
+                group_res['date_parts'].extend([StartDay(20, 'named_month_sme')])
                 missing_month_end = True  # can't calculate last day of the month without knowing the year+month
 
         detected_date_assumed_horizont = None
@@ -569,32 +568,32 @@ def match_named_month_start_mid_end(
         if month_detected is None:
             continue
 
-        year_detected = None
+        year_detected = now.year
         if bool(group[0].strip(" ")):
             year_detected_ = word_to_num(group[0])
             if year_detected_ != -1:
-                group_res['date_parts'].append(Year(year_detected_, 'named_month'))
+                group_res['date_parts'].append(Year(year_detected_, 'named_month_sme'))
                 year_detected = year_detected_
             else:
                 if ('jovo' in remove_accent(group[0])
                         # hack
                         and 'jovok' not in remove_accent(group[0])):
-                    group_res['date_parts'].append(Year(now.year + 1, 'named_month'))
+                    group_res['date_parts'].append(Year(now.year + 1, 'named_month_sme'))
                     year_detected = now.year + 1
                 elif 'tavaly' in remove_accent(group[0]):
-                    group_res['date_parts'].append(Year(now.year - 1, 'named_month'))
+                    group_res['date_parts'].append(Year(now.year - 1, 'named_month_sme'))
                     year_detected = now.year - 1
         else:
             if search_scope == SearchScopes.FUTURE_DAY and detected_date_assumed_horizont == "past":
-                group_res['date_parts'].append(Year(now.year + 1, 'named_month'))
+                group_res['date_parts'].append(Year(now.year + 1, 'named_month_sme'))
                 year_detected = now.year + 1
             elif search_scope == SearchScopes.PAST_SEARCH and detected_date_assumed_horizont == "future":
-                group_res['date_parts'].append(Year(now.year - 1, 'named_month'))
+                group_res['date_parts'].append(Year(now.year - 1, 'named_month_sme'))
                 year_detected = now.year - 1
 
         if missing_month_end:
             last_day = get_last_day(year_detected, month_detected)
-            group_res['date_parts'].append(EndDay(last_day, 'named_month'))
+            group_res['date_parts'].append(EndDay(last_day, 'named_month_sme'))
 
         res.append(group_res)
 

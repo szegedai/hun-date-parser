@@ -220,6 +220,13 @@ tf_past_search_scenarios = [
     ("augusztus 11-től szeptember 17-ig", [datetime(2022, 8, 11, 0, 0, 0), datetime(2022, 9, 17, 23, 59, 59)], SearchScopes.PAST_SEARCH),
     ("kezdő dátum: augusztus 11 eddig: szeptember 17-ig", [datetime(2022, 8, 11, 0, 0, 0), datetime(2022, 9, 17, 23, 59, 59)], SearchScopes.PAST_SEARCH),
     ("kezdő dátum: augusztus 11 eddig: szeptember 17-ig", [datetime(2023, 8, 11, 0, 0, 0), datetime(2023, 9, 17, 23, 59, 59)], SearchScopes.FUTURE_DAY),
+    ("augusztus eleje", [datetime(2023, 8, 1, 0, 0, 0), datetime(2023, 8, 10, 23, 59, 59)], SearchScopes.FUTURE_DAY),
+    ("augusztus eleji", [datetime(2023, 8, 1, 0, 0, 0), datetime(2023, 8, 10, 23, 59, 59)], SearchScopes.FUTURE_DAY),
+    ("augusztus vége", [datetime(2023, 8, 20, 0, 0, 0), datetime(2023, 8, 31, 23, 59, 59)], SearchScopes.FUTURE_DAY),
+    ("2022 április vége", [datetime(2022, 4, 20, 0, 0, 0), datetime(2022, 4, 30, 23, 59, 59)], SearchScopes.FUTURE_DAY),
+    ("jövő április vége", [datetime(2024, 4, 20, 0, 0, 0), datetime(2024, 4, 30, 23, 59, 59)], SearchScopes.FUTURE_DAY),
+    ("jövő április vége", [datetime(2024, 4, 20, 0, 0, 0), datetime(2024, 4, 30, 23, 59, 59)], SearchScopes.NOT_RESTRICTED),
+    ("2020 április közepi", [datetime(2020, 4, 10, 0, 0, 0), datetime(2020, 4, 20, 23, 59, 59)], SearchScopes.NOT_RESTRICTED),
 ]
 
 
