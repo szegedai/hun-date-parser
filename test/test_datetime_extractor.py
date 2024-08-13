@@ -215,6 +215,8 @@ tf_past_search_scenarios = [
     ("augusztus", [datetime(2023, 8, 1, 0, 0, 0), datetime(2023, 8, 31, 23, 59, 59)], SearchScopes.NOT_RESTRICTED),
     ("augusztus", [datetime(2023, 8, 1, 0, 0, 0), datetime(2023, 8, 31, 23, 59, 59)], SearchScopes.FUTURE_DAY),
     ("augusztus 11-től 17-ig", [datetime(2023, 8, 11, 0, 0, 0), datetime(2023, 8, 17, 23, 59, 59)], SearchScopes.FUTURE_DAY),
+    ("május 11-től 17-ig", [datetime(2023, 5, 11, 0, 0, 0), datetime(2023, 5, 17, 23, 59, 59)], SearchScopes.PAST_SEARCH),
+    ("május 11-től 17-ig", [datetime(2023, 5, 11, 0, 0, 0), datetime(2023, 5, 17, 23, 59, 59)], SearchScopes.NOT_RESTRICTED),
     # ("augusztus 11-től 17-ig", [datetime(2022, 8, 11, 0, 0, 0), datetime(2022, 8, 17, 23, 59, 59)], SearchScopes.PAST_SEARCH),
     # TODO: add search scope support to named_month_interval rule
     ("augusztus 11-től szeptember 17-ig", [datetime(2022, 8, 11, 0, 0, 0), datetime(2022, 9, 17, 23, 59, 59)], SearchScopes.PAST_SEARCH),

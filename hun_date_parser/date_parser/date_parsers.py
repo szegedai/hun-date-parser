@@ -517,6 +517,7 @@ def match_named_month_interval(s: str) -> List[Dict[str, Any]]:
     return res
 
 
+@return_on_value_error([])
 def match_named_month_start_mid_end(
         s: str,
         now: datetime,
