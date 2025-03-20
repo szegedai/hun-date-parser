@@ -10,8 +10,31 @@ tf_durations = [
     ("45 percre ", [Minute(45, "duration_parser")]),
     ("50 perces", [Minute(50, "duration_parser")]),
     ("120 perc", [Minute(120, "duration_parser")]),
+    
+    # 15 min variants
+    ("negyed óra", [Minute(15, "duration_parser")]),
+    ("negyed órát", [Minute(15, "duration_parser")]),
+    ("negyed órára", [Minute(15, "duration_parser")]),
+    ("negyedórára", [Minute(15, "duration_parser")]),
+    ("negyedórát", [Minute(15, "duration_parser")]),
     ("negyed óráig", [Minute(15, "duration_parser")]),
+    
+    # 45 min variants
     (" háromnegyed óra", [Minute(45, "duration_parser")]),
+    ("háromnegyed órát", [Minute(45, "duration_parser")]),
+    ("háromnegyed órára", [Minute(45, "duration_parser")]),
+    ("háromnegyedórát", [Minute(45, "duration_parser")]),
+    ("háromnegyedórára", [Minute(45, "duration_parser")]),
+    ("3 negyedóra", [Minute(45, "duration_parser")]),
+    
+    # 90 min variants
+    ("másfél óra", [Minute(90, "duration_parser")]),
+    ("másfélóra", [Minute(90, "duration_parser")]),
+    ("másfél órára", [Minute(90, "duration_parser")]),
+    ("másfél órát", [Minute(90, "duration_parser")]),
+    ("másfélórára", [Minute(90, "duration_parser")]),
+    ("másfélórát", [Minute(90, "duration_parser")]),
+    
     ("25 perc", [Minute(25, "duration_parser")]),
     ("26 perc", [Minute(26, "duration_parser")]),
     ("1 óra 25 perc", [Minute(85, "duration_parser")]),
