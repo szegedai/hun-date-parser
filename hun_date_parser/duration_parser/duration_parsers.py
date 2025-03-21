@@ -1,7 +1,7 @@
 from typing import TypedDict, Optional, Sequence
 import re
 from hun_date_parser.utils import DateTimePartConatiner, remove_accent, word_to_num, Minute
-from hun_date_parser.date_parser.patterns import R_HOUR_MIN_D, R_HOUR_HOUR_D, R_HOUR_D
+from hun_date_parser.date_parser.patterns import R_HOUR_MIN_D, R_HOUR_HOUR_D, R_HOUR_D, R_SPECIAL_HOUR_D
 
 
 class DateParts(TypedDict):
@@ -9,14 +9,14 @@ class DateParts(TypedDict):
     date_parts: Sequence[DateTimePartConatiner]
 
 
-def convert_hour_to_minutes(hour_str: Optional[str]) -> float:
+def convert_hour_to_minutes(hour_str: Optional[str]) -> int:
     """Converts an hour string to minutes, handling special cases."""
     if hour_str is None:
         return 0
     if ",5" in hour_str:
         hour_num = word_to_num(hour_str.replace(",5", ""))
         if hour_num != -1:
-            return (hour_num + 0.5) * 60
+            return int((hour_num + 0.5) * 60)
     else:
         hour_num = word_to_num(hour_str)
         if hour_num != -1:
@@ -31,34 +31,48 @@ def convert_quarter_hour(hour_str: Optional[str]) -> int:
     hour_str_no_accent = remove_accent(hour_str)
     if "haromnegyed" in hour_str_no_accent:
         return 45
-    if "negyed" in hour_str:
+    if "negyed" in hour_str_no_accent and "haromnegyed" not in hour_str_no_accent:
         return 15
-    if "fel" in hour_str_no_accent:
+    if "fel" in hour_str_no_accent and "masfel" not in hour_str_no_accent:
         return 30
+    if "masfel" in hour_str_no_accent:
+        return 90
     return 0
 
 
 def duration_parser(s: str) -> DateParts:
-    match = re.match(R_HOUR_MIN_D, s)
-    if match:
-        hour_w, min_w = match.groups()
-        mins_1 = convert_hour_to_minutes(hour_w)
-        mins_2 = word_to_num(min_w)
-        res_mins = mins_1 + mins_2
+    # First handle '3 negyedóra' pattern
+    if re.search(r'3\s+negyed', s):
+        res_mins = 45
+    # Handle all háromnegyed forms
+    elif re.search(r'h[aá]romnegyed\s*[oó]r[aá](?:[tr][aá])?', s):
+        res_mins = 45
     else:
-        match = re.match(R_HOUR_D, s)
+        match = re.match(R_HOUR_MIN_D, s)
         if match:
-            hour_w = match.groups()[0]
-            res_mins = convert_hour_to_minutes(hour_w)
+            hour_w, min_w = match.groups()
+            mins_1 = convert_hour_to_minutes(hour_w)
+            mins_2 = word_to_num(min_w)
+            res_mins = mins_1 + mins_2
         else:
-            match = re.match(R_HOUR_HOUR_D, s)
+            match = re.match(R_HOUR_D, s)
             if match:
-                hour_w, hour_w_2 = match.groups()
-                mins_1 = convert_hour_to_minutes(hour_w)
-                mins_2 = convert_quarter_hour(hour_w_2)
-                res_mins = mins_1 + mins_2
+                hour_w = match.groups()[0]
+                res_mins = convert_hour_to_minutes(hour_w)
             else:
-                res_mins = 0
+                match = re.match(R_HOUR_HOUR_D, s)
+                if match:
+                    hour_w, hour_w_2 = match.groups()
+                    mins_1 = convert_hour_to_minutes(hour_w)
+                    mins_2 = convert_quarter_hour(hour_w_2)
+                    res_mins = mins_1 + mins_2
+                else:
+                    match = re.match(R_SPECIAL_HOUR_D, s)
+                    if match:
+                        special_hour = match.groups()[0]
+                        res_mins = convert_quarter_hour(special_hour)
+                    else:
+                        res_mins = 0
 
     res_date_parts = [Minute(res_mins, "duration_parser")] if res_mins > 0 else []
 

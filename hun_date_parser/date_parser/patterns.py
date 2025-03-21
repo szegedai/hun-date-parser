@@ -77,5 +77,6 @@ R_START_STATED_END_IMPLIED = r"(?:[kK]ezd|[iI]ndul).{1,20}:\s*([^:]{1,50}?)\s*:\
 
 # Duration
 R_HOUR_MIN_D = r'.*?(?:([0-9]{1,2}|nulla|egy|kett[oöő]|h[aá]rom|n[eé]gy|[öo]t|hat|h[eé]t|nyolc|kilenc|t[ií]z|tizenegy|tizenkett[oő]|tizenh[aá]rom|tizenn[eé]gy|tizen[oö]t|tizenhat|tizenh[eé]t|tizennyolc|tizenkilenc|h[uú]sz|huszonegy|huszonkett[oöő]|huszonkettő|huszonhárom) [óo]ra)? ?([a-zA-Z0-9]{1,15}) perc'
+R_SPECIAL_HOUR_D = r'.*?(negyed|h[aá]romnegyed|m[aá]sf[eé]l)(?:[oó]r[aá](?:[tr]?[aá]?)).*'  # e.g. negyedóra, másfélórát, másfélórára
 R_HOUR_D = r'.*?(?:([0-9]{1,2}|nulla|egy|kett[oöő]|h[aá]rom|n[eé]gy|[öo]t|hat|h[eé]t|nyolc|kilenc|t[ií]z|tizenegy|tizenkett[oő]|tizenh[aá]rom|tizenn[eé]gy|tizen[oö]t|tizenhat|tizenh[eé]t|tizennyolc|tizenkilenc|h[uú]sz|huszonegy|huszonkett[oöő]|huszonkettő|huszonhárom|[0-9],5)) ?[óo]r[aá]?'
-R_HOUR_HOUR_D = r'.*?(?:([0-9]{1,2}|egy|kett[oöő]|h[aá]rom|n[eé]gy|[öo]t|hat|h[eé]t|nyolc|kilenc|t[ií]z)?(?: [eé]s )? ?(h[aá]romnegyed|negyed|f[eé]l) ?[oó]r[aá])'
+R_HOUR_HOUR_D = r'.*?(?:([0-9]{1,2}|egy|kett[oöő]|h[aá]rom|n[eé]gy|[öo]t|hat|h[eé]t|nyolc|kilenc|t[ií]z)?(?: [eé]s )? ?(h[aá]romnegyed|negyed|f[eé]l|m[aá]sf[eé]l) ?[oó]r[aá])'
