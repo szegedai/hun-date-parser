@@ -142,6 +142,48 @@ print(parse_duration('45 perc'))  # Output: 45
 print(parse_duration('1 és negyed óra'))  # Output: 75
 ```
 
+### Frequency Parsing
+
+The frequency parser can identify recurring time patterns from Hungarian text expressions.
+
+#### Recognized Formats
+
+The parser recognizes standard frequency expressions in Hungarian:
+
+- Daily Frequencies:
+  - Examples: `napi`, `naponta`, `minden nap`
+- Weekly Frequencies:
+  - Examples: `heti`, `hetente`, `minden héten`, `heti rendszerességgel`
+- Fortnightly Frequencies:
+  - Examples: `kétheti`, `kéthetente`
+- Monthly Frequencies:
+  - Examples: `havi`, `havonta`, `minden hónapban`, `havi rendszerességgel` 
+- Quarterly Frequencies:
+  - Examples: `negyedévente`, `minden negyedévben`
+- Half-yearly Frequencies:
+  - Examples: `félévente`, `minden félévben`
+- Yearly Frequencies:
+  - Examples: `évente`, `minden évben`
+
+```python
+from hun_date_parser import parse_frequency
+from hun_date_parser.frequency_parser import Frequency
+
+print(parse_frequency('napi'))  # Output: Frequency.DAILY
+print(parse_frequency('hetente'))  # Output: Frequency.WEEKLY
+print(parse_frequency('kétheti'))  # Output: Frequency.FORTNIGHTLY
+print(parse_frequency('havonta'))  # Output: Frequency.MONTHLY
+print(parse_frequency('negyedévente'))  # Output: Frequency.QUARTERLY
+print(parse_frequency('félévente'))  # Output: Frequency.EVERY_HALF_YEAR
+print(parse_frequency('évente'))  # Output: Frequency.YEARLY
+```
+
+#### Current Limitations
+
+- The parser doesn't yet support complex frequencies like `naponta kétszer` (twice a day)
+- Specific weekday expressions like `minden kedden` (every Tuesday) aren't currently recognized
+- Expressions like `minden második pénteken` (every second Friday) or `minden hónap első hétfőjén` (first Monday of every month) aren't supported
+
 ### Datetime to text
 
 The library is also capable of turning datetime objects into their Hungarian text representation.
