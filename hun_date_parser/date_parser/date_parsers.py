@@ -485,14 +485,13 @@ def match_day_of_month(s: str, now: datetime) -> List[Dict[str, Any]]:
     """
     Match standalone day of month expressions in Hungarian.
     This includes formats like "5-én", "elsején", "harmadikán", etc.
-    
     :param s: The input string
     :param now: Current datetime for context
     :return: List of matching date parts
     """
     fn = 'day_of_month'
     res = []
-    
+
     # Match numeric day with suffix: 1-én, 2-a, 3-át, 1-jén, 1-jei, 2-i, etc.
     numeric_days = re.findall(R_DAYNUM_SUFFIX, s)
     for match in numeric_days:
@@ -503,14 +502,14 @@ def match_day_of_month(s: str, now: datetime) -> List[Dict[str, Any]]:
                 res.append({'match': day_str + '-' + suffix, 'date_parts': [Day(day_num, fn)]})
         except ValueError:
             pass
-    
+
     # Match day names: elseje, másodika, etc.
     day_names = re.findall(R_DAYNAME, s)
     for day_name in day_names:
         day_num = word_to_num(day_name)
         if day_num != -1 and 1 <= day_num <= 31:
             res.append({'match': day_name, 'date_parts': [Day(day_num, fn)]})
-    
+
     return res
 
 
