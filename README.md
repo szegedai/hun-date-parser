@@ -167,6 +167,7 @@ The parser recognizes standard frequency expressions in Hungarian:
 
 ```python
 from hun_date_parser import parse_frequency
+from hun_date_parser.frequency_parser import Frequency
 
 print(parse_frequency('napi'))  # Output: Frequency.DAILY
 print(parse_frequency('hetente'))  # Output: Frequency.WEEKLY
