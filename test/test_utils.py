@@ -11,6 +11,8 @@ def test_remove_accent():
 
 tf_word_to_num = [
     ('egy', 1),
+    ('elsejétől', 1),
+    ('másodikától', 2),
     ('tizenegy', 11),
     ('húsz', 20),
     ('kilencvenhat', 96),

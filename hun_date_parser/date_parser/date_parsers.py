@@ -9,7 +9,7 @@ from .patterns import (R_ISO_DATE, R_REV_ISO_DATE, R_NAMED_MONTH, R_TODAY, R_TOM
                        R_NMINS_FROM_NOW, R_RELATIVE_MONTH, R_NMINS_PRIOR_NOW, R_NDAYS_PRIOR_NOW, R_NHOURS_PRIOR_NOW,
                        R_NWEEKS_PRIOR_NOW, R_IN_PAST_PERIOD_MINS, R_IN_PAST_PERIOD_HOURS, R_IN_PAST_PERIOD_DAYS,
                        R_IN_PAST_PERIOD_WEEKS, R_IN_PAST_PERIOD_MONTHS, R_IN_PAST_PERIOD_YEARS,
-                       R_N_WEEKS, R_N_DAYS, R_TOLIG_IMPLIED_END, R_NAMED_MONTH_SME)
+                       R_N_WEEKS, R_N_DAYS, R_TOLIG_IMPLIED_END, R_NAMED_MONTH_SME, R_DAYNUM_SUFFIX, R_DAYNAME)
 from hun_date_parser.utils import (remove_accent, word_to_num, Year, Month, Week, Day, Hour, Minute,
                                    StartDay, EndDay, is_year_realistic,
                                    OverrideTopWithNow, DayOffset, SearchScopes, return_on_value_error)
@@ -479,6 +479,39 @@ def match_date_offset(s: str) -> List[Dict[str, Any]]:
         return date_parts
     else:
         return []
+
+
+def match_day_of_month(s: str, now: datetime) -> List[Dict[str, Any]]:
+    """
+    Match standalone day of month expressions in Hungarian.
+    This includes formats like "5-én", "elsején", "harmadikán", etc.
+    
+    :param s: The input string
+    :param now: Current datetime for context
+    :return: List of matching date parts
+    """
+    fn = 'day_of_month'
+    res = []
+    
+    # Match numeric day with suffix: 1-én, 2-a, 3-át, 1-jén, 1-jei, 2-i, etc.
+    numeric_days = re.findall(R_DAYNUM_SUFFIX, s)
+    for match in numeric_days:
+        day_str, suffix = match
+        try:
+            day_num = int(day_str)
+            if 1 <= day_num <= 31:  # Valid day range
+                res.append({'match': day_str + '-' + suffix, 'date_parts': [Day(day_num, fn)]})
+        except ValueError:
+            pass
+    
+    # Match day names: elseje, másodika, etc.
+    day_names = re.findall(R_DAYNAME, s)
+    for day_name in day_names:
+        day_num = word_to_num(day_name)
+        if day_num != -1 and 1 <= day_num <= 31:
+            res.append({'match': day_name, 'date_parts': [Day(day_num, fn)]})
+    
+    return res
 
 
 @return_on_value_error([])

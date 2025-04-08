@@ -12,28 +12,150 @@ from hun_date_parser.utils import SearchScopes
 
 
 tf_named_month = [
+    # Basic month formats with days
     ('jan 20-án', [[Month(1, 'named_month'), Day(20, 'named_month')]], SearchScopes.NOT_RESTRICTED),
     ('2020 febr. 4', [[Month(2, 'named_month'), Day(4, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    
+    # Full month names
     ('január', [[Month(1, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('február', [[Month(2, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('március', [[Month(3, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('április', [[Month(4, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('május', [[Month(5, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('június', [[Month(6, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('július', [[Month(7, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('augusztus', [[Month(8, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('szeptember', [[Month(9, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('október', [[Month(10, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('november', [[Month(11, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('december', [[Month(12, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    
+    # Months with -ban/-ben suffix (in)
+    ('januárban', [[Month(1, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('februárban', [[Month(2, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('márciusban', [[Month(3, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('áprilisban', [[Month(4, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('májusban', [[Month(5, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('júniusban', [[Month(6, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('júliusban', [[Month(7, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('augusztusban', [[Month(8, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('szeptemberben', [[Month(9, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('októberben', [[Month(10, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('novemberben', [[Month(11, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('decemberben', [[Month(12, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    
+    # Months with -tól/-től suffix (from)
+    ('januártól', [[Month(1, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('februártól', [[Month(2, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('márciustól', [[Month(3, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('áprilistól', [[Month(4, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('májustól', [[Month(5, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('júniustól', [[Month(6, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('júliustól', [[Month(7, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('augusztustól', [[Month(8, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('szeptembertől', [[Month(9, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('októbertől', [[Month(10, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('novembertől', [[Month(11, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('decembertől', [[Month(12, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    
+    # Abbreviated month names
+    ('jan', [[Month(1, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('feb', [[Month(2, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('már', [[Month(3, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('márc', [[Month(3, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('ápr', [[Month(4, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('máj', [[Month(5, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('jún', [[Month(6, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('júl', [[Month(7, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('aug', [[Month(8, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('szept', [[Month(9, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('okt', [[Month(10, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('nov', [[Month(11, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('dec', [[Month(12, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    
+    # Abbreviated month names with dots
+    ('jan.', [[Month(1, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('febr.', [[Month(2, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('márc.', [[Month(3, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('ápr.', [[Month(4, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('máj.', [[Month(5, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('jún.', [[Month(6, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('júl.', [[Month(7, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('aug.', [[Month(8, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('szept.', [[Month(9, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('okt.', [[Month(10, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('nov.', [[Month(11, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('dec.', [[Month(12, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    
+    # Non-accented variants
+    ('januar', [[Month(1, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('februar', [[Month(2, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('marcius', [[Month(3, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('aprilis', [[Month(4, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('majus', [[Month(5, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('junius', [[Month(6, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('julius', [[Month(7, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('augusztus', [[Month(8, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('szeptember', [[Month(9, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('oktober', [[Month(10, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('november', [[Month(11, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('december', [[Month(12, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    
+    # Non-accented variants with suffixes
+    ('januarban', [[Month(1, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('februarban', [[Month(2, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('marciusban', [[Month(3, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('aprilisban', [[Month(4, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('majusban', [[Month(5, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('juniusban', [[Month(6, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('juliusban', [[Month(7, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('augusztusban', [[Month(8, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('szeptemberben', [[Month(9, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('oktoberben', [[Month(10, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('novemberben', [[Month(11, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('decemberben', [[Month(12, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    
+    ('januartol', [[Month(1, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('februartol', [[Month(2, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('marciustol', [[Month(3, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('aprilistol', [[Month(4, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('majustol', [[Month(5, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('juniustol', [[Month(6, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('juliustol', [[Month(7, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('augusztustol', [[Month(8, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('szeptembertol', [[Month(9, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('oktobertol', [[Month(10, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('novembertol', [[Month(11, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('decembertol', [[Month(12, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    
+    # With whitespace
     (' február ', [[Month(2, 'named_month')]], SearchScopes.NOT_RESTRICTED),
-    ('janos', [], SearchScopes.NOT_RESTRICTED),
-    ('', [], SearchScopes.NOT_RESTRICTED),
+    
+    # Month with year combinations
     ('2020 július', [[Month(7, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('tavaly február ', [[Month(2, 'named_month'), Year(2019, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    
+    # Month with interval expressions
     ('2020 június - augusztus 30', [[Month(6, 'named_month')], [Month(8, 'named_month'), Day(30, 'named_month')]],
      SearchScopes.NOT_RESTRICTED),
     ('június 20 - július 30',
      [[Month(6, 'named_month'), Day(20, 'named_month')], [Month(7, 'named_month'), Day(30, 'named_month')]],
      SearchScopes.NOT_RESTRICTED),
-    ('tavaly február ', [[Month(2, 'named_month'), Year(2019, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    
+    # Month with day combinations
+    ('ápr 15', [[Month(4, 'named_month'), Day(15, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('május 15', [[Month(5, 'named_month'), Day(15, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    ('április 1', [[Month(4, 'named_month'), Day(1, 'named_month')]], SearchScopes.NOT_RESTRICTED),
+    
+    # Month, day, and year combinations
     ('legyen jövő február 12-én', [[Month(2, 'named_month'), Day(12, 'named_month'), Year(2021, 'named_month')]],
      SearchScopes.NOT_RESTRICTED),
     ('legyen jövő év február 12-én', [[Month(2, 'named_month'), Day(12, 'named_month'), Year(2021, 'named_month')]],
      SearchScopes.NOT_RESTRICTED),
-    ('ápr 15', [[Month(4, 'named_month'), Day(15, 'named_month')]], SearchScopes.NOT_RESTRICTED),
-    ('május 15', [[Month(5, 'named_month'), Day(15, 'named_month')]], SearchScopes.NOT_RESTRICTED),
-    ('április 1', [[Month(4, 'named_month'), Day(1, 'named_month')]], SearchScopes.NOT_RESTRICTED),
     ('legyen jövőre február 12-én', [[Month(2, 'named_month'), Day(12, 'named_month'), Year(2021, 'named_month')]],
      SearchScopes.NOT_RESTRICTED),
+    
+    # With search scopes
     ('május 15', [[Month(5, 'named_month'), Day(15, 'named_month'), Year(2021, 'named_month')]],
      SearchScopes.FUTURE_DAY),
     ('május 15', [[Month(5, 'named_month'), Day(15, 'named_month')]],
@@ -62,6 +184,10 @@ tf_named_month = [
      SearchScopes.FUTURE_DAY),
     ('október', [[Month(10, 'named_month')]],
      SearchScopes.PAST_SEARCH),
+     
+    # Non-matching cases
+    ('janos', [], SearchScopes.NOT_RESTRICTED),
+    ('', [], SearchScopes.NOT_RESTRICTED),
 ]
 
 tf_named_month_start_mid_end = [
@@ -222,6 +348,9 @@ def test_match_iso_date(inp, exp, search_scope, realistic_year_restriction):
 
 @pytest.mark.parametrize("inp,exp,search_scope", tf_named_month)
 def test_named_month(inp, exp, search_scope):
+
+    print(inp, exp)
+
     now = datetime(2020, 10, 10)
 
     out = match_named_month(inp, now, search_scope)
