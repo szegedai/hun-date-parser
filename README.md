@@ -144,7 +144,7 @@ print(parse_duration('1 és negyed óra'))  # Output: 75
 
 ### Frequency Parsing
 
-The frequency parser can identify recurring time patterns from Hungarian text expressions.
+The frequency parser can identify recurring time patterns from Hungarian text expressions and returns the match position information.
 
 #### Recognized Formats
 
@@ -169,13 +169,23 @@ The parser recognizes standard frequency expressions in Hungarian:
 from hun_date_parser import parse_frequency
 from hun_date_parser.frequency_parser import Frequency
 
-print(parse_frequency('napi'))  # Output: Frequency.DAILY
-print(parse_frequency('hetente'))  # Output: Frequency.WEEKLY
-print(parse_frequency('kétheti'))  # Output: Frequency.FORTNIGHTLY
-print(parse_frequency('havonta'))  # Output: Frequency.MONTHLY
-print(parse_frequency('negyedévente'))  # Output: Frequency.QUARTERLY
-print(parse_frequency('félévente'))  # Output: Frequency.EVERY_HALF_YEAR
-print(parse_frequency('évente'))  # Output: Frequency.YEARLY
+# The function returns a dictionary with frequency value and position information
+result = parse_frequency('napi')
+# result: {'frequency': Frequency.DAILY, 'start': 0, 'end': 4}
+
+print(parse_frequency('hetente')['frequency'])  # Output: Frequency.WEEKLY
+print(parse_frequency('kétheti')['frequency'])  # Output: Frequency.FORTNIGHTLY
+print(parse_frequency('havonta')['frequency'])  # Output: Frequency.MONTHLY
+print(parse_frequency('negyedévente')['frequency'])  # Output: Frequency.QUARTERLY
+print(parse_frequency('félévente')['frequency'])  # Output: Frequency.EVERY_HALF_YEAR
+print(parse_frequency('évente')['frequency'])  # Output: Frequency.YEARLY
+
+# Since Frequency is a string-based enum, values can be used as strings
+print(str(parse_frequency('naponta')['frequency']))  # Output: "DAILY"
+
+# Example with text context and positions
+result = parse_frequency('Találkozzunk hetente a parkban')
+# result: {'frequency': Frequency.WEEKLY, 'start': 12, 'end': 19}
 ```
 
 #### Current Limitations

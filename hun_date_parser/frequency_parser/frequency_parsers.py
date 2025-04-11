@@ -15,12 +15,12 @@ class Frequency(str, Enum):
     YEARLY = "YEARLY"
 
 
-def parse_frequency(s: str) -> Optional[str]:
+def parse_frequency(s: str) -> Optional[dict]:
     """
-    Returns the frequency value found in the input string.
+    Returns the frequency value found in the input string along with match start and end indices.
 
     :param s: Input string containing the frequency information in Hungarian.
-    :return: The standardized frequency value as a string, or None if no valid frequency is found.
+    :return: Dictionary with frequency value, start and end indices, or None if no valid frequency is found.
     """
     s = s.lower().strip()
     s_no_accent = remove_accent(s)
@@ -44,7 +44,12 @@ def parse_frequency(s: str) -> Optional[str]:
     }
 
     for pattern, freq_value in frequency_map.items():
-        if re.search(pattern, s_no_accent):
-            return freq_value
+        match = re.search(pattern, s_no_accent)
+        if match:
+            return {
+                "frequency": freq_value,
+                "start": match.start(),
+                "end": match.end()
+            }
 
     return None
