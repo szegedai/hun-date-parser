@@ -59,7 +59,34 @@ tf_frequencies = [
 ]
 
 
+# Test cases with exact index validation
+tf_index_test_cases = [
+    ("Találkozzunk hetente a parkban", "WEEKLY", 13, 20),
+    ("A meetingek naponta 9-kor kezdődnek", "DAILY", 12, 19),
+    ("Ez a feladat minden nap elvégzendő", "DAILY", 13, 23),
+    ("A nagyprojekt havonta kerül felülvizsgálatra", "MONTHLY", 14, 21)
+]
+
+
 @pytest.mark.parametrize("inp, exp", tf_frequencies)
 def test_frequency_parser(inp, exp):
     result = parse_frequency(s=inp)
-    assert result == exp
+    if exp is None:
+        assert result is None
+    else:
+        assert result is not None
+        assert result.get("frequency") == exp
+        assert "start" in result
+        assert "end" in result
+        assert result["start"] >= 0
+        assert result["end"] > result["start"]
+
+
+@pytest.mark.parametrize("text, freq, start, end", tf_index_test_cases)
+def test_frequency_indices(text, freq, start, end):
+    """Test specific cases with exact index validation"""
+    result = parse_frequency(s=text)
+    assert result is not None
+    assert result["frequency"] == freq
+    assert result["start"] == start
+    assert result["end"] == end
