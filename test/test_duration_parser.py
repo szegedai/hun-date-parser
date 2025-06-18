@@ -1,7 +1,7 @@
 import pytest
 from datetime import datetime
 
-from hun_date_parser.duration_parser.duration_parsers import duration_parser
+from hun_date_parser.duration_parser.duration_parsers import duration_parser, parse_duration
 from hun_date_parser.date_parser.date_parsers import Minute
 
 
@@ -11,7 +11,6 @@ tf_durations = [
     ("50 perces", [Minute(50, "duration_parser")]),
     ("120 perc", [Minute(120, "duration_parser")]),
     
-    # 15 min variants
     ("negyed óra", [Minute(15, "duration_parser")]),
     ("negyed órát", [Minute(15, "duration_parser")]),
     ("negyed órára", [Minute(15, "duration_parser")]),
@@ -19,21 +18,36 @@ tf_durations = [
     ("negyedórát", [Minute(15, "duration_parser")]),
     ("negyed óráig", [Minute(15, "duration_parser")]),
     
-    # 45 min variants
     (" háromnegyed óra", [Minute(45, "duration_parser")]),
     ("háromnegyed órát", [Minute(45, "duration_parser")]),
     ("háromnegyed órára", [Minute(45, "duration_parser")]),
     ("háromnegyedórát", [Minute(45, "duration_parser")]),
     ("háromnegyedórára", [Minute(45, "duration_parser")]),
     ("3 negyedóra", [Minute(45, "duration_parser")]),
-    
-    # 90 min variants
+    ("a háromnegyedóra hosszú időtartam", [Minute(45, "duration_parser")]),
+    ("a háromnegyed óra hosszú időtartam", [Minute(45, "duration_parser")]),
+    ("a háromnegyed órás időtartam", [Minute(45, "duration_parser")]),
+
     ("másfél óra", [Minute(90, "duration_parser")]),
+    ("a másfél óra hosszú időtartam", [Minute(90, "duration_parser")]),
     ("másfélóra", [Minute(90, "duration_parser")]),
+    ("másfélórás", [Minute(90, "duration_parser")]),
+    ("a másfélórás időtartam", [Minute(90, "duration_parser")]),
     ("másfél órára", [Minute(90, "duration_parser")]),
     ("másfél órát", [Minute(90, "duration_parser")]),
+    (" másfél órát ", [Minute(90, "duration_parser")]),
+    (" másfél órányi ", [Minute(90, "duration_parser")]),
+    (" a parkolás másfél órán át tart ", [Minute(90, "duration_parser")]),
+    (" a parkolás másfélórán át tart ", [Minute(90, "duration_parser")]),
+    (" a másfél órás parkolás ", [Minute(90, "duration_parser")]),
+    (" a másfél órás parkolás ", [Minute(90, "duration_parser")]),
     ("másfélórára", [Minute(90, "duration_parser")]),
     ("másfélórát", [Minute(90, "duration_parser")]),
+    ("a másfélórát b", [Minute(90, "duration_parser")]),
+    ("indítsd el másfélórára", [Minute(90, "duration_parser")]),
+    ("indítsd el másfél órára", [Minute(90, "duration_parser")]),
+    ("a másfélórás időtartam", [Minute(90, "duration_parser")]),
+
     
     ("25 perc", [Minute(25, "duration_parser")]),
     ("26 perc", [Minute(26, "duration_parser")]),
@@ -76,3 +90,13 @@ def test_named_month(inp, exp):
     duration_dct = duration_parser(s=inp)
 
     assert duration_dct["date_parts"] == exp
+
+
+@pytest.mark.parametrize("inp, exp", tf_durations)
+def test_parse_duration(inp, exp):
+    duration = parse_duration(inp)
+
+    if not exp:
+        assert duration is None
+    else:
+        assert duration == exp[0].value

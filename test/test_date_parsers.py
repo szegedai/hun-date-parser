@@ -249,6 +249,13 @@ tf_iso_date = [
     ('8000 forint', [], SearchScopes.PAST_SEARCH, False),
     ('0000', [], SearchScopes.NOT_RESTRICTED, False),
     ('0000', [], SearchScopes.NOT_RESTRICTED, True),
+    # Test cases for year matching bug - these should not be recognized as dates
+    ('20000', [], SearchScopes.NOT_RESTRICTED, True),
+    ('20250', [], SearchScopes.NOT_RESTRICTED, True),
+    ('20251', [], SearchScopes.NOT_RESTRICTED, True),
+    ('20000 forint', [], SearchScopes.NOT_RESTRICTED, True),
+    ('20250 forint', [], SearchScopes.NOT_RESTRICTED, True),
+    ('20251 forint', [], SearchScopes.NOT_RESTRICTED, True),
 ]
 
 tf_weekday = [
