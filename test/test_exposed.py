@@ -61,7 +61,6 @@ def test_text2date():
           ('8000 Forint', []),
           ("MZ/X kr.u. 3000-ben született", []),
           ("100000 nap múlva", [{'end_date': date(2294, 10, 12), 'start_date': date(2294, 10, 12)}]),
-          # Test cases for year matching bug - these should not be recognized as dates
           ('20000', []),
           ('20250', []),
           ('20251', []),
