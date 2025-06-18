@@ -60,7 +60,13 @@ def test_text2date():
           ('reggel nyolc óra', []),
           ('8000 Forint', []),
           ("MZ/X kr.u. 3000-ben született", []),
-          ("100000 nap múlva", [{'end_date': date(2294, 10, 12), 'start_date': date(2294, 10, 12)}])]
+          ("100000 nap múlva", [{'end_date': date(2294, 10, 12), 'start_date': date(2294, 10, 12)}]),
+          ('20000', []),
+          ('20250', []),
+          ('20251', []),
+          ('20000 forint', []),
+          ('20250 forint', []),
+          ('20251 forint', [])]
 
     for inp, out in tf:
         assert text2date(inp, now=now) == out
