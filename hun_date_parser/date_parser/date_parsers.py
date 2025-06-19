@@ -22,58 +22,83 @@ from hun_date_parser.utils import (remove_accent, word_to_num, Year, Month, Week
 
 
 def match_iso_date(s: str,
-                   realistic_year_restriction: bool = True) -> List[Dict[str, Any]]:
+                   realistic_year_restriction: bool = True, return_spans: bool = False) -> List[Dict[str, Any]]:
     """
     Match ISO date-like format.
     :param s: textual input
     :param realistic_year_restriction: whether to restrict year candidate to 1900-->2100 range
+    :param return_spans: whether to include span information
     :return: tuple of date parts
     """
 
     pattern = r'\b\d{4} (darab|forint|huf|eur|usd|ft|fo)\b'
-    s = re.sub(pattern, '', s.lower())
-
-    match = re.findall(R_ISO_DATE, s)
-    match_rev = re.findall(R_REV_ISO_DATE, s)
+    s_clean = re.sub(pattern, '', s.lower())
 
     res = []
-    if match_rev:
-        for group in match_rev:
-            group = [int(m.lstrip('0')) for m in group if m.lstrip('0')]
 
-            if realistic_year_restriction and not is_year_realistic(group[2]):
+    # Try reversed ISO format first (DD MM YYYY)
+    for match in re.finditer(R_REV_ISO_DATE, s_clean):
+        groups = match.groups()
+        group_values = [int(m.lstrip('0')) for m in groups if m and m.lstrip('0')]
+
+        if len(group_values) < 3:
+            continue
+
+        if realistic_year_restriction and not is_year_realistic(group_values[2]):
+            continue
+
+        span = None
+        if return_spans:
+            span = EntitySpan(start=match.start(), end=match.end(), text=match.group(0))
+
+        result = {
+            'match': group_values,
+            'date_parts': [Year(group_values[2], 'match_iso_date'),
+                           Month(group_values[1], 'match_iso_date'),
+                           Day(group_values[0], 'match_iso_date')]
+        }
+        if return_spans:
+            result['span'] = span
+
+        res.append(result)
+
+    # If no reversed matches, try standard ISO format (YYYY MM DD)
+    if not res:
+        for match in re.finditer(R_ISO_DATE, s_clean):
+            groups = match.groups()
+            group_values = [int(m.lstrip('0')) for m in groups if m and m.lstrip('0')]
+
+            if not group_values:
                 continue
 
-            res.append({'match': group,
-                        'date_parts': [Year(group[2], 'match_iso_date'),
-                                       Month(group[1], 'match_iso_date'),
-                                       Day(group[0], 'match_iso_date')]})
-    elif match:
-        for group in match:
-            group = [int(m.lstrip('0')) for m in group if m.lstrip('0')]
-
-            if not group:
+            if realistic_year_restriction and not is_year_realistic(group_values[0]):
                 continue
 
-            if realistic_year_restriction and not is_year_realistic(group[0]):
-                continue
+            span = None
+            if return_spans:
+                span = EntitySpan(start=match.start(), end=match.end(), text=match.group(0))
 
-            if len(group) == 1:
-                res.append({'match': group, 'date_parts': [Year(group[0], 'match_iso_date')]})
-            elif len(group) == 2:
-                res.append({'match': group,
-                            'date_parts': [Year(group[0], 'match_iso_date'), Month(group[1], 'match_iso_date')]})
-            elif len(group) == 3:
-                res.append({'match': group,
-                            'date_parts': [Year(group[0], 'match_iso_date'), Month(group[1], 'match_iso_date'),
-                                           Day(group[2], 'match_iso_date')]})
+            date_parts = []
+            if len(group_values) >= 1:
+                date_parts.append(Year(group_values[0], 'match_iso_date'))
+            if len(group_values) >= 2:
+                date_parts.append(Month(group_values[1], 'match_iso_date'))
+            if len(group_values) >= 3:
+                date_parts.append(Day(group_values[2], 'match_iso_date'))
+
+            result = {'match': group_values, 'date_parts': date_parts}
+            if return_spans:
+                result['span'] = span
+
+            res.append(result)
 
     return res
 
 
 @return_on_value_error([])
 def match_named_month(s: str, now: datetime,
-                      search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED) -> List[Dict[str, Any]]:
+                      search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED,
+                      return_spans: bool = False) -> List[Dict[str, Any]]:
     def has_month_already_pass(now, month):
         return month < now.month
 
@@ -81,15 +106,21 @@ def match_named_month(s: str, now: datetime,
     if re.findall(R_TOLIG_IMPLIED_END, s) or re.findall(R_NAMED_MONTH_SME, s):
         return []
 
-    groups = re.findall(R_NAMED_MONTH, s)
     months = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'szep', 'okt', 'nov', 'dec']
-
     res = []
-    groups = [(mod, m, d.lstrip('0')) if
-              d else (mod, m, '') for mod, m, d in groups]
 
-    for group in groups:
+    for match in re.finditer(R_NAMED_MONTH, s):
+        groups = match.groups()
+        mod, m, d = groups[0] or '', groups[1] or '', groups[2] or ''
+        group = (mod, m, d.lstrip('0') if d else '')
+
+        span = None
+        if return_spans:
+            span = EntitySpan(start=match.start(), end=match.end(), text=match.group(0))
+
         group_res = {'match': group, 'date_parts': []}
+        if return_spans:
+            group_res['span'] = span
 
         month_detected = None
         for i, month in enumerate(months):
@@ -151,64 +182,73 @@ def match_relative_day(s: str, now: datetime, return_spans: bool = False) -> Lis
         (R_YESTERDAY, 'yesterday'),
         (R_NYESTERDAY, 'day_before_yesterday')
     ]
-    
+
     res = []
-    
+
     for pattern, pattern_type in patterns:
         for match in re.finditer(pattern, s):
             group = match.group(0)
-            
+
             if match.groups():
                 group = [m for m in match.groups() if m][0]
-            
+
             span = None
             if return_spans:
                 span = EntitySpan(start=match.start(), end=match.end(), text=match.group(0))
-            
+
             if 'ma' in group or 'má' in group:
                 date_parts = [Year(now.year, 'relative_day'), Month(now.month, 'relative_day'),
-                             Day(now.day, 'relative_day')]
+                              Day(now.day, 'relative_day')]
             elif 'holnapu' in group:
                 tom2 = now + timedelta(days=2)
                 date_parts = [Year(tom2.year, 'relative_day'), Month(tom2.month, 'relative_day'),
-                             Day(tom2.day, 'relative_day')]
+                              Day(tom2.day, 'relative_day')]
             elif 'holnap' in group:
                 tom = now + timedelta(days=1)
                 date_parts = [Year(tom.year, 'relative_day'), Month(tom.month, 'relative_day'),
-                             Day(tom.day, 'relative_day')]
+                              Day(tom.day, 'relative_day')]
             elif 'tegnapel' in group:
                 yes2 = now - timedelta(days=2)
                 date_parts = [Year(yes2.year, 'relative_day'), Month(yes2.month, 'relative_day'),
-                             Day(yes2.day, 'relative_day')]
+                              Day(yes2.day, 'relative_day')]
             elif 'tegnap' in group:
                 yes = now - timedelta(days=1)
                 date_parts = [Year(yes.year, 'relative_day'), Month(yes.month, 'relative_day'),
-                             Day(yes.day, 'relative_day')]
+                              Day(yes.day, 'relative_day')]
             else:
                 continue
-            
+
             result = {'match': group, 'date_parts': date_parts}
             if return_spans:
                 result['span'] = span
-                
+
             res.append(result)
 
     return res
 
 
 def match_weekday(s: str, now: datetime,
-                  search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED) -> List[Dict[str, Any]]:
-    groups = re.findall(R_WEEKDAY, s)
-
+                  search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED,
+                  return_spans: bool = False) -> List[Dict[str, Any]]:
     res = []
-    for group in groups:
-        date_parts = {'match': group, 'date_parts': []}
-        week, day = group
+
+    for match in re.finditer(R_WEEKDAY, s):
+        groups = match.groups()
+        week, day = groups
+
+        span = None
+        if return_spans:
+            span = EntitySpan(start=match.start(), end=match.end(), text=match.group(0))
+
+        date_parts = {'match': groups, 'date_parts': []}
+        if return_spans:
+            date_parts['span'] = span
+
         n_weeks = 0
 
-        if 'jovo' in remove_accent(week):
+        if week and 'jovo' in remove_accent(week):
             n_weeks = 1
-        elif 'mult' in remove_accent(week) or 'elozo' in remove_accent(week):
+        elif week and ('mult' in remove_accent(week) or 'elozo' in remove_accent(week)):
             n_weeks = -1
 
         def to_next_week(dt):
@@ -225,19 +265,19 @@ def match_weekday(s: str, now: datetime,
             return ((now - timedelta(days=now.weekday())) + timedelta(days=w * 7)) + timedelta(days=d)
 
         day_num = -1
-        if 'hetfo' in remove_accent(day):
+        if day and 'hetfo' in remove_accent(day):
             day_num = 0
-        elif 'kedd' in remove_accent(day):
+        elif day and 'kedd' in remove_accent(day):
             day_num = 1
-        elif 'szerda' in remove_accent(day):
+        elif day and 'szerda' in remove_accent(day):
             day_num = 2
-        elif 'csut' in remove_accent(day):
+        elif day and 'csut' in remove_accent(day):
             day_num = 3
-        elif 'pent' in remove_accent(day):
+        elif day and 'pent' in remove_accent(day):
             day_num = 4
-        elif 'szom' in remove_accent(day):
+        elif day and 'szom' in remove_accent(day):
             day_num = 5
-        elif 'vas' in remove_accent(day):
+        elif day and 'vas' in remove_accent(day):
             day_num = 6
 
         if day_num != -1:
@@ -261,7 +301,7 @@ def match_weekday(s: str, now: datetime,
     return res
 
 
-def match_week(s: str, now: datetime) -> List[Dict[str, Any]]:
+def match_week(s: str, now: datetime, return_spans: bool = False) -> List[Dict[str, Any]]:
     groups = re.findall(R_WEEK, s)
 
     res = []
@@ -283,7 +323,7 @@ def match_week(s: str, now: datetime) -> List[Dict[str, Any]]:
     return res
 
 
-def match_n_periods_compared_to_now(s: str, now: datetime) -> List[Dict[str, Any]]:
+def match_n_periods_compared_to_now(s: str, now: datetime, return_spans: bool = False) -> List[Dict[str, Any]]:
     fn = 'n_date_periods_compared_to_now'
 
     regexes = [
@@ -334,7 +374,7 @@ def match_n_periods_compared_to_now(s: str, now: datetime) -> List[Dict[str, Any
     return res
 
 
-def match_named_year(s: str, now: datetime) -> List[Dict[str, Any]]:
+def match_named_year(s: str, now: datetime, return_spans: bool = False) -> List[Dict[str, Any]]:
     groups = re.findall(R_YEAR, s)
 
     res = []
@@ -375,7 +415,7 @@ def match_named_year(s: str, now: datetime) -> List[Dict[str, Any]]:
     return res
 
 
-def match_relative_month(s: str, now: datetime) -> List[Dict[str, Any]]:
+def match_relative_month(s: str, now: datetime, return_spans: bool = False) -> List[Dict[str, Any]]:
     groups = re.findall(R_RELATIVE_MONTH, s)
 
     res = []
@@ -404,7 +444,7 @@ def match_relative_month(s: str, now: datetime) -> List[Dict[str, Any]]:
     return res
 
 
-def match_in_past_n_periods(s: str, now: datetime) -> List[Dict[str, Any]]:
+def match_in_past_n_periods(s: str, now: datetime, return_spans: bool = False) -> List[Dict[str, Any]]:
     fn = 'in_past_n_periods'
 
     regexes = [
@@ -469,7 +509,7 @@ def match_in_past_n_periods(s: str, now: datetime) -> List[Dict[str, Any]]:
     return res
 
 
-def match_date_offset(s: str) -> List[Dict[str, Any]]:
+def match_date_offset(s: str, return_spans: bool = False) -> List[Dict[str, Any]]:
     fn = 'date_offset'
     date_parts: List[Dict[str, Any]] = [{'match': s, 'date_parts': []}]
 
@@ -496,7 +536,7 @@ def match_date_offset(s: str) -> List[Dict[str, Any]]:
         return []
 
 
-def match_day_of_month(s: str, now: datetime) -> List[Dict[str, Any]]:
+def match_day_of_month(s: str, now: datetime, return_spans: bool = False) -> List[Dict[str, Any]]:
     """
     Match standalone day of month expressions in Hungarian.
     This includes formats like "5-én", "elsején", "harmadikán", etc.
@@ -529,7 +569,7 @@ def match_day_of_month(s: str, now: datetime) -> List[Dict[str, Any]]:
 
 
 @return_on_value_error([])
-def match_named_month_interval(s: str) -> List[Dict[str, Any]]:
+def match_named_month_interval(s: str, return_spans: bool = False) -> List[Dict[str, Any]]:
     fn = "named_month_interval"
     groups = re.findall(R_TOLIG_IMPLIED_END, s)
 
@@ -568,7 +608,8 @@ def match_named_month_interval(s: str) -> List[Dict[str, Any]]:
 def match_named_month_start_mid_end(
         s: str,
         now: datetime,
-        search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED
+        search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED,
+        return_spans: bool = False
 ) -> List[Dict[str, Any]]:
     def has_month_already_pass(now, month):
         return month < now.month

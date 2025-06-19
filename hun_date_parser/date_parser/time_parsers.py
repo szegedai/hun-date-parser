@@ -4,41 +4,62 @@ from typing import Dict, List, Any, Tuple, Optional
 from datetime import datetime
 
 from hun_date_parser.date_parser.patterns import R_DIGI, R_HOUR_MIN, R_HOUR_MIN_REV, R_HWORDS_
-from hun_date_parser.utils import remove_accent, word_to_num, Year, Month, Day, Hour, Minute, Daypart
+from hun_date_parser.utils import remove_accent, word_to_num, Year, Month, Day, Hour, Minute, Daypart, EntitySpan
 from hun_date_parser.date_parser.date_parsers import match_weekday
 
 NAN = -1
 
 
-def match_digi_clock(s: str) -> List[Dict[str, Any]]:
+def match_digi_clock(s: str, return_spans: bool = False) -> List[Dict[str, Any]]:
     """
     Match digi clock format.
     :param s: textual input
+    :param return_spans: whether to include span information
     :return: tuple of date parts
     """
-    match = re.findall(R_DIGI, s)
-
     res = []
-    for group in match:
-        group = [int(m.lstrip('0')) for m in group if m.lstrip('0')]
 
-        if len(group) == 2:
-            h, m = group
-            res.append({'match': group, 'date_parts': [Hour(h, 'digi_clock'), Minute(m, 'digi_clock')]})
-        elif len(group) == 1:
-            res.append({'match': group, 'date_parts': [Hour(group[0], 'digi_clock')]})
+    for match in re.finditer(R_DIGI, s):
+        groups = match.groups()
+        group_values = [int(m.lstrip('0')) for m in groups if m.lstrip('0')]
+
+        span = None
+        if return_spans:
+            span = EntitySpan(start=match.start(), end=match.end(), text=match.group(0))
+
+        result = {'match': group_values, 'date_parts': []}
+        if return_spans:
+            result['span'] = span
+
+        if len(group_values) == 2:
+            h, m = group_values
+            result['date_parts'] = [Hour(h, 'digi_clock'), Minute(m, 'digi_clock')]
+        elif len(group_values) == 1:
+            result['date_parts'] = [Hour(group_values[0], 'digi_clock')]
+
+        if result['date_parts']:  # Only add if we have valid date parts
+            res.append(result)
 
     return res
 
 
-def match_hwords(s: str) -> List[Dict[str, Any]]:
-    group = re.findall(R_HWORDS_, s)
-    group = [m for m in group if ''.join(m)]
-
+def match_hwords(s: str, return_spans: bool = False) -> List[Dict[str, Any]]:
     res = []
-    for match in group:
-        match = int(match)
-        res.append({'match': match, 'date_parts': [Hour(match, 'hwords')]})
+
+    for match in re.finditer(R_HWORDS_, s):
+        match_text = match.group(0)
+        hour_str = match.group(1)  # Get the numeric part from the capturing group
+        if match_text and hour_str:
+            span = None
+            if return_spans:
+                span = EntitySpan(start=match.start(), end=match.end(), text=match_text)
+
+            hour_value = int(hour_str)
+            result = {'match': hour_value, 'date_parts': [Hour(hour_value, 'hwords')]}
+            if return_spans:
+                result['span'] = span
+
+            res.append(result)
 
     return res
 
@@ -104,9 +125,10 @@ def _raw_match_time_words(s: str) -> Optional[Tuple[Any, Any, Any, Any, Any]]:
     return group, daypart, hour_modifier, hour, minute
 
 
-def match_time_words(s: str) -> List[Dict[str, Any]]:
+def match_time_words(s: str, return_spans: bool = False) -> List[Dict[str, Any]]:
     """
     :param s: textual input
+    :param return_spans: whether to include character span information
     :return: tuple of date parts
     """
     parts = _raw_match_time_words(s)
@@ -217,9 +239,12 @@ def match_time_words(s: str) -> List[Dict[str, Any]]:
         else:
             date_parts.append(Hour(hour_num, 'time_words'))
 
-        res.append({'match': group, 'date_parts': date_parts})
+        result = {'match': group, 'date_parts': date_parts}
+        # TODO: Add span support for complex time word patterns
+        res.append(result)
 
     elif daypart:
+        # TODO: Add span support for daypart patterns
         if 'hajnal' in daypart:
             res.append({'match': group, 'date_parts': [Daypart(0, 'time_words')]})
         elif 'reggel' in daypart:
@@ -236,14 +261,22 @@ def match_time_words(s: str) -> List[Dict[str, Any]]:
     return res
 
 
-def match_now(s: str, now: datetime) -> List[Dict[str, Any]]:
+def match_now(s: str, now: datetime, return_spans: bool = False) -> List[Dict[str, Any]]:
     if match_weekday(s, now):
         return []
 
-    match = re.match(r'.*\bmost\b.*', s.lower())
+    match = re.search(r'\bmost\b', s.lower())
     if match:
+        span = None
+        if return_spans:
+            span = EntitySpan(start=match.start(), end=match.end(), text=match.group(0))
+
         date_parts = [Year(now.year, 'now'), Month(now.month, 'now'), Day(now.day, 'now'), Hour(now.hour, 'now'),
                       Minute(now.minute, 'now')]
-        return [{'match': 'most', 'date_parts': date_parts}]
+        result = {'match': 'most', 'date_parts': date_parts}
+        if return_spans:
+            result['span'] = span
+
+        return [result]
 
     return []

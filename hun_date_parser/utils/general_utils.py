@@ -265,34 +265,34 @@ def is_smaller_date_or_none(dt1: datetime, dt2: datetime):
 
 @dataclass
 class EntitySpan:
-    """Character positions of a matched entity in text."""
+    """Character positions of matched text."""
     start: int
-    end: int  
+    end: int
     text: str
-    
+
     def __post_init__(self):
         if self.start < 0:
-            raise ValueError(f"Span start cannot be negative: {self.start}")
+            raise ValueError(f"Start cannot be negative: {self.start}")
         if self.end < self.start:
-            raise ValueError(f"Span end ({self.end}) cannot be less than start ({self.start})")
+            raise ValueError(f"End ({self.end}) cannot be less than start ({self.start})")
         if len(self.text) != (self.end - self.start):
             raise ValueError(f"Text length ({len(self.text)}) doesn't match span length ({self.end - self.start})")
 
 
 def aggregate_spans(spans: List[EntitySpan]) -> EntitySpan:
-    """Combine multiple spans into one covering the full range."""
+    """Combine spans into one covering the full range."""
     if not spans:
         raise ValueError("Cannot aggregate empty span list")
-    
+
     min_start = min(span.start for span in spans)
     max_end = max(span.end for span in spans)
-    
+
     full_text = ""
     sorted_spans = sorted(spans, key=lambda s: s.start)
-    
+
     if len(sorted_spans) == 1:
         return sorted_spans[0]
-    
+
     for i, span in enumerate(sorted_spans):
         full_text += span.text
         if i < len(sorted_spans) - 1:
@@ -300,12 +300,12 @@ def aggregate_spans(spans: List[EntitySpan]) -> EntitySpan:
             gap_size = next_span.start - span.end
             if gap_size > 0:
                 full_text += " " * gap_size
-    
+
     return EntitySpan(start=min_start, end=max_end, text=full_text)
 
 
 def adjust_span_for_offset(span: EntitySpan, offset: int) -> EntitySpan:
-    """Adjust span positions by adding an offset."""
+    """Adjust span positions by offset."""
     return EntitySpan(
         start=span.start + offset,
         end=span.end + offset,

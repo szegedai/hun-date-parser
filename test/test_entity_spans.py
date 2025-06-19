@@ -3,6 +3,7 @@ from datetime import datetime
 
 from hun_date_parser.utils import EntitySpan
 from hun_date_parser.date_parser.date_parsers import match_relative_day
+from hun_date_parser import text2datetime, text2date, text2time
 
 
 class TestEntitySpanClass:
@@ -121,3 +122,95 @@ class TestSpanEdgeCases:
         assert span.start == 3
         assert span.end == 5
         assert span.text == "ma"
+
+
+class TestMainAPISpanIntegration:
+    
+    def test_text2datetime_with_spans(self):
+        now = datetime(2020, 10, 1)
+        result = text2datetime("ma", now, return_spans=True)
+        
+        assert len(result) == 1
+        assert 'span' in result[0]
+        
+        span = result[0]['span']
+        assert isinstance(span, EntitySpan)
+        assert span.start == 0
+        assert span.end == 2
+        assert span.text == "ma"
+        
+    def test_text2datetime_without_spans_backward_compatibility(self):
+        now = datetime(2020, 10, 1)
+        result = text2datetime("ma", now, return_spans=False)
+        
+        assert len(result) == 1
+        assert 'span' not in result[0]
+        assert 'start_date' in result[0]
+        assert 'end_date' in result[0]
+        
+    def test_text2date_with_spans(self):
+        now = datetime(2020, 10, 1)
+        result = text2date("ma", now, return_spans=True)
+        
+        assert len(result) == 1
+        assert 'span' in result[0]
+        
+        span = result[0]['span']
+        assert span.text == "ma"
+        
+    def test_text2time_with_spans(self):
+        now = datetime(2020, 10, 1)
+        result = text2time("ma reggel", now, return_spans=True)
+        
+        assert len(result) == 1
+        assert 'span' in result[0]
+        
+        span = result[0]['span']
+        assert "ma" in span.text
+        
+    def test_span_positioning_in_longer_sentence(self):
+        now = datetime(2020, 10, 1)
+        text = "Találkozzunk ma délben a parkban"
+        result = text2datetime(text, now, return_spans=True)
+        
+        assert len(result) == 1
+        span = result[0]['span']
+        assert span.start == 13
+        assert span.end == 15
+        assert span.text == "ma"
+        assert text[span.start:span.end] == span.text
+        
+    def test_multiple_temporal_expressions(self):
+        now = datetime(2020, 10, 1)
+        text = "ma reggel vagy holnap"
+        result = text2datetime(text, now, return_spans=True)
+        
+        assert len(result) == 2
+        
+        # Should have spans for each temporal expression
+        assert 'span' in result[0]
+        assert 'span' in result[1]
+        
+        # Check span texts contain the temporal expressions
+        span_texts = [r['span'].text for r in result]
+        assert any("ma" in text for text in span_texts)
+        assert any("holnap" in text for text in span_texts)
+        
+    def test_time_expressions_with_spans(self):
+        now = datetime(2020, 10, 1)
+        
+        # Test digital clock format
+        result1 = text2datetime("ma 8:30", now, return_spans=True)
+        assert len(result1) == 1
+        assert 'span' in result1[0]
+        span1 = result1[0]['span']
+        assert "8:30" in span1.text
+        
+        # Test "most" (now)
+        result2 = text2datetime("most", now, return_spans=True)
+        assert len(result2) == 1
+        assert 'span' in result2[0]
+        span2 = result2[0]['span']
+        assert span2.text == "most"
+        assert span2.start == 0
+        assert span2.end == 4

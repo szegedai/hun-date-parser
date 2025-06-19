@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, date, time
 from calendar import monthrange
 from itertools import chain
 
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Any
 from copy import copy
 
 from hun_date_parser.date_parser.structure_parsers import match_multi_match, match_interval, match_duration_match
@@ -18,8 +18,7 @@ from hun_date_parser.date_parser.time_parsers import match_digi_clock, match_tim
 from hun_date_parser.utils import (Year, Month, Week, Day, Daypart, Hour, Minute, StartDay, EndDay, get_type_if_exists,
                                    OverrideTopWithNow, SearchScopes, is_smaller_date_or_none,
                                    OverrideBottomWithNow, monday_of_calenderweek, DateTimePartConatiner,
-                                   return_on_value_error, filter_offset_objects, apply_offsets_and_return_components,
-                                   EntitySpan)
+                                   return_on_value_error, filter_offset_objects, apply_offsets_and_return_components)
 
 datelike = Union[datetime, date, time, None]
 
@@ -35,15 +34,15 @@ daypart_mapping = [
 
 def text2datetime(input_sentence: str, now: datetime = datetime.now(),
                   search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED,
-                  realistic_year_required: bool = True, return_spans: bool = False) -> List[Dict[str, Union[datelike, EntitySpan]]]:
+                  realistic_year_required: bool = True, return_spans: bool = False) -> List[Dict[str, Any]]:
     """
     Returns the list of datetime intervals found in the input sentence.
     :param input_sentence: Input sentence string.
     :param now: Current timestamp to calculate relative dates.
     :param search_scope: Defines whether the timeframe should be restricted to past or future.
     :param realistic_year_required: Defines whether to restrict year candidates to be between 1900 and 2100.
-    :param return_spans: Whether to include character span information in the results.
-    :return: list of datetime interval dictionaries (optionally including span info)
+    :param return_spans: Whether to include span information in the results.
+    :return: list of datetime interval dictionaries
     """
     datetime_extractor = DatetimeExtractor(now=now,
                                            output_container='datetime',
@@ -55,15 +54,15 @@ def text2datetime(input_sentence: str, now: datetime = datetime.now(),
 
 def text2date(input_sentence: str, now: datetime = datetime.now(),
               search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED,
-              realistic_year_required: bool = True, return_spans: bool = False) -> List[Dict[str, Union[datelike, EntitySpan]]]:
+              realistic_year_required: bool = True, return_spans: bool = False) -> List[Dict[str, Any]]:
     """
     Returns the list of date intervals found in the input sentence.
     :param input_sentence: Input sentence string.
     :param now: Current timestamp to calculate relative dates.
     :param search_scope: Defines whether the timeframe should be restricted to past or future.
     :param realistic_year_required: Defines whether to restrict year candidates to be between 1900 and 2100.
-    :param return_spans: Whether to include character span information in the results.
-    :return: list of date interval dictionaries (optionally including span info)
+    :param return_spans: Whether to include span information in the results.
+    :return: list of date interval dictionaries
     """
     datetime_extractor = DatetimeExtractor(now=now, output_container='date',
                                            search_scope=search_scope,
@@ -74,15 +73,15 @@ def text2date(input_sentence: str, now: datetime = datetime.now(),
 
 def text2time(input_sentence: str, now: datetime = datetime.now(),
               search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED,
-              realistic_year_required: bool = True, return_spans: bool = False) -> List[Dict[str, Union[datelike, EntitySpan]]]:
+              realistic_year_required: bool = True, return_spans: bool = False) -> List[Dict[str, Any]]:
     """
     Returns the list of time intervals found in the input sentence.
     :param input_sentence: Input sentence string.
     :param now: Current timestamp to calculate relative dates.
     :param search_scope: Defines whether the timeframe should be restricted to past or future.
     :param realistic_year_required: Defines whether to restrict year candidates to be between 1900 and 2100.
-    :param return_spans: Whether to include character span information in the results.
-    :return: list of time interval dictionaries (optionally including span info)
+    :param return_spans: Whether to include span information in the results.
+    :return: list of time interval dictionaries
     """
     datetime_extractor = DatetimeExtractor(now=now, output_container='time',
                                            search_scope=search_scope,
@@ -93,35 +92,48 @@ def text2time(input_sentence: str, now: datetime = datetime.now(),
 
 def match_rules(now: datetime, sentence: str,
                 search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED,
-                realistic_year_required: bool = True) -> List:
+                realistic_year_required: bool = True, return_spans: bool = False) -> Union[List, Dict[str, List]]:
     """
     Matches all rules against input text.
     :param now: Current timestamp to calculate relative dates.
     :param sentence: Input sentence.
     :param search_scope: Defines whether the timeframe should be restricted to past or future.
     :param realistic_year_required: Defines whether to restrict year candidates to be between 1900 and 2100.
+    :param return_spans: Whether to include span information.
     :return: Parsed date and time classes.
     """
-    matches = [*match_named_month(sentence, now, search_scope),
-               *match_iso_date(sentence, realistic_year_required),
-               *match_relative_day(sentence, now),
-               *match_weekday(sentence, now, search_scope),
-               *match_week(sentence, now),
-               *match_named_year(sentence, now),
-               *match_digi_clock(sentence),
-               *match_hwords(sentence),
-               *match_time_words(sentence),
-               *match_now(sentence, now),
-               *match_n_periods_compared_to_now(sentence, now),
-               *match_relative_month(sentence, now),
-               *match_in_past_n_periods(sentence, now),
-               *match_named_month_interval(sentence),
-               *match_named_month_start_mid_end(sentence, now),
-               *match_day_of_month(sentence, now)]
+    matches = [*match_named_month(sentence, now, search_scope, return_spans),
+               *match_iso_date(sentence, realistic_year_required, return_spans),
+               *match_relative_day(sentence, now, return_spans),
+               *match_weekday(sentence, now, search_scope, return_spans),
+               *match_week(sentence, now, return_spans),
+               *match_named_year(sentence, now, return_spans),
+               *match_digi_clock(sentence, return_spans),
+               *match_hwords(sentence, return_spans),
+               *match_time_words(sentence, return_spans),
+               *match_now(sentence, now, return_spans),
+               *match_n_periods_compared_to_now(sentence, now, return_spans),
+               *match_relative_month(sentence, now, return_spans),
+               *match_in_past_n_periods(sentence, now, return_spans),
+               *match_named_month_interval(sentence, return_spans),
+               *match_named_month_start_mid_end(sentence, now, search_scope, return_spans),
+               *match_day_of_month(sentence, now, return_spans)]
 
-    matches = list(chain(*[m['date_parts'] for m in matches]))
+    if return_spans:
+        # Collect spans from matches that have them
+        spans = []
+        for m in matches:
+            if 'span' in m:
+                spans.append(m['span'])
 
-    return matches
+        # Extract date_parts as before
+        date_parts = list(chain(*[m['date_parts'] for m in matches]))
+
+        return {'date_parts': date_parts, 'spans': spans}
+    else:
+        # Original behavior - just return date_parts
+        matches = list(chain(*[m['date_parts'] for m in matches]))
+        return matches
 
 
 def match_duration_rules(now: datetime, sentence: str,
@@ -184,7 +196,7 @@ class DatetimeExtractor:
         :param output_container: datetime object to populate with datetime parts
         :param search_scope: Defines whether the timeframe should be restricted to past or future.
         :param realistic_year_required: Defines whether to restrict year candidates to be between 1900 and 2100.
-        :param return_spans: Whether to include character span information in the results.
+        :param return_spans: Whether to include span information in the results.
         """
         self.now = now
         self.output_container = output_container
@@ -193,8 +205,13 @@ class DatetimeExtractor:
         self.return_spans = return_spans
 
     def _get_implicit_intervall(self, sentence_part: str):
-        matches = match_rules(self.now, sentence_part, self.search_scope, self.realistic_year_required)
-        return [{'start_date': matches, 'end_date': matches}]
+        matches = match_rules(self.now, sentence_part, self.search_scope, self.realistic_year_required,
+                              self.return_spans)
+        if self.return_spans and isinstance(matches, dict):
+            return [{'start_date': matches['date_parts'], 'end_date': matches['date_parts'],
+                     'spans': matches['spans']}]
+        else:
+            return [{'start_date': matches, 'end_date': matches}]
 
     @return_on_value_error(None)
     def assemble_datetime(self, now: datetime,
@@ -357,16 +374,16 @@ class DatetimeExtractor:
         else:
             return None
 
-    def parse_datetime(self, sentence: str) -> List[Dict[str, datelike]]:
+    def parse_datetime(self, sentence: str) -> List[Dict[str, Any]]:
         """
         Fail-safe wrapper around _parse_datetime. All possible exceptions will be caught and an empty list is returned.
         """
         try:
             return self._parse_datetime(sentence)
-        except:
+        except Exception:
             return []
 
-    def _parse_datetime(self, sentence: str) -> List[Dict[str, datelike]]:
+    def _parse_datetime(self, sentence: str) -> List[Dict[str, Any]]:
         """
         Extracts list of datetime intervals from input sentence.
         :param sentence: Input sentence string.
@@ -389,10 +406,32 @@ class DatetimeExtractor:
             #       start_date: parse_date(holnap)
             #       end_date: parse_date(jovo kedd)
             if interval and not duration_parts:
-                interval['start_date'] = 'OPEN' if interval['start_date'] == 'OPEN' else match_rules(self.now, interval[
-                    'start_date'], self.search_scope, self.realistic_year_required)
-                interval['end_date'] = 'OPEN' if interval['end_date'] == 'OPEN' else match_rules(self.now, interval[
-                    'end_date'], self.search_scope, self.realistic_year_required)
+                start_result = (match_rules(self.now, interval['start_date'], self.search_scope,
+                                            self.realistic_year_required, self.return_spans)
+                                if interval['start_date'] != 'OPEN' else 'OPEN')
+                end_result = (match_rules(self.now, interval['end_date'], self.search_scope,
+                                          self.realistic_year_required, self.return_spans)
+                              if interval['end_date'] != 'OPEN' else 'OPEN')
+
+                if self.return_spans:
+                    interval_spans = []
+                    if isinstance(start_result, dict) and 'spans' in start_result:
+                        interval_spans.extend(start_result['spans'])
+                        interval['start_date'] = start_result['date_parts']
+                    else:
+                        interval['start_date'] = start_result
+
+                    if isinstance(end_result, dict) and 'spans' in end_result:
+                        interval_spans.extend(end_result['spans'])
+                        interval['end_date'] = end_result['date_parts']
+                    else:
+                        interval['end_date'] = end_result
+
+                    if interval_spans:
+                        interval['spans'] = interval_spans
+                else:
+                    interval['start_date'] = start_result
+                    interval['end_date'] = end_result
                 parsed_dates.append(interval)
 
             # ... another way of explicitly expressing time intervals is with a start date and a duration
@@ -403,12 +442,20 @@ class DatetimeExtractor:
             elif duration_parts:
                 from_part, duration_part = duration_parts
 
-                interval['start_date'] = match_rules(self.now, from_part, self.search_scope,
-                                                     self.realistic_year_required)
-                interval['end_date'] = match_rules(self.now, from_part,
-                                                   self.search_scope,
-                                                   self.realistic_year_required) + match_duration_rules(
-                    self.now, duration_part, self.search_scope, self.realistic_year_required)
+                start_result = match_rules(self.now, from_part, self.search_scope,
+                                           self.realistic_year_required, self.return_spans)
+
+                if self.return_spans and isinstance(start_result, dict):
+                    interval['start_date'] = start_result['date_parts']
+                    interval['end_date'] = (start_result['date_parts'] +
+                                            match_duration_rules(self.now, duration_part,
+                                                                 self.search_scope, self.realistic_year_required))
+                    interval['spans'] = start_result['spans']
+                else:
+                    interval['start_date'] = start_result
+                    interval['end_date'] = (start_result +
+                                            match_duration_rules(self.now, duration_part,
+                                                                 self.search_scope, self.realistic_year_required))
                 parsed_dates.append(interval)
 
             # ... else try to determine a time interval implicitly.
@@ -421,9 +468,23 @@ class DatetimeExtractor:
 
         parsed_dates = [extend_start_end(intv) for intv in parsed_dates]
 
-        parsed_dates = [{'start_date': self.assemble_datetime(self.now, parsed_date['start_date'], bottom=True),
-                         'end_date': self.assemble_datetime(self.now, parsed_date['end_date'], bottom=False)}
-                        for parsed_date in parsed_dates]
+        if self.return_spans:
+            # Include spans in final output
+            result = []
+            for parsed_date in parsed_dates:
+                assembled = {
+                    'start_date': self.assemble_datetime(self.now, parsed_date['start_date'], bottom=True),
+                    'end_date': self.assemble_datetime(self.now, parsed_date['end_date'], bottom=False)
+                }
+                if 'spans' in parsed_date and parsed_date['spans']:
+                    from hun_date_parser.utils import aggregate_spans
+                    assembled['span'] = aggregate_spans(parsed_date['spans'])
+                result.append(assembled)
+            parsed_dates = result
+        else:
+            parsed_dates = [{'start_date': self.assemble_datetime(self.now, parsed_date['start_date'], bottom=True),
+                             'end_date': self.assemble_datetime(self.now, parsed_date['end_date'], bottom=False)}
+                            for parsed_date in parsed_dates]
 
         # remove results where
         # - both start and end dates are None
