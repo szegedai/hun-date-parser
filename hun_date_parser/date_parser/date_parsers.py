@@ -12,7 +12,7 @@ from .patterns import (R_ISO_DATE, R_REV_ISO_DATE, R_NAMED_MONTH, R_TODAY, R_TOM
                        R_N_WEEKS, R_N_DAYS, R_TOLIG_IMPLIED_END, R_NAMED_MONTH_SME, R_DAYNUM_SUFFIX, R_DAYNAME)
 from hun_date_parser.utils import (remove_accent, word_to_num, Year, Month, Week, Day, Hour, Minute,
                                    StartDay, EndDay, is_year_realistic,
-                                   OverrideTopWithNow, DayOffset, SearchScopes, return_on_value_error)
+                                   OverrideTopWithNow, DayOffset, SearchScopes, return_on_value_error, EntitySpan)
 
 
 # TODO: Update typing
@@ -143,40 +143,55 @@ def match_named_month(s: str, now: datetime,
     return res
 
 
-def match_relative_day(s: str, now: datetime) -> List[Dict[str, Any]]:
-    groups = [*re.findall(R_TODAY, s),
-              *re.findall(R_TOMORROW, s),
-              *re.findall(R_NTOMORROW, s),
-              *re.findall(R_YESTERDAY, s),
-              *re.findall(R_NYESTERDAY, s)]
-
+def match_relative_day(s: str, now: datetime, return_spans: bool = False) -> List[Dict[str, Any]]:
+    patterns = [
+        (R_TODAY, 'today'),
+        (R_TOMORROW, 'tomorrow'),
+        (R_NTOMORROW, 'day_after_tomorrow'),
+        (R_YESTERDAY, 'yesterday'),
+        (R_NYESTERDAY, 'day_before_yesterday')
+    ]
+    
     res = []
-    for group in groups:
-
-        if not isinstance(group, str):
-            group = [m for m in group if m][0]
-
-        if 'ma' in group or 'má' in group:
-            res.append({'match': group, 'date_parts': [Year(now.year, 'relative_day'), Month(now.month, 'relative_day'),
-                                                       Day(now.day, 'relative_day')]})
-        elif 'holnapu' in group:
-            tom2 = now + timedelta(days=2)
-            res.append({'match': group,
-                        'date_parts': [Year(tom2.year, 'relative_day'), Month(tom2.month, 'relative_day'),
-                                       Day(tom2.day, 'relative_day')]})
-        elif 'holnap' in group:
-            tom = now + timedelta(days=1)
-            res.append({'match': group, 'date_parts': [Year(tom.year, 'relative_day'), Month(tom.month, 'relative_day'),
-                                                       Day(tom.day, 'relative_day')]})
-        elif 'tegnapel' in group:
-            yes2 = now - timedelta(days=2)
-            res.append({'match': group,
-                        'date_parts': [Year(yes2.year, 'relative_day'), Month(yes2.month, 'relative_day'),
-                                       Day(yes2.day, 'relative_day')]})
-        elif 'tegnap' in group:
-            yes = now - timedelta(days=1)
-            res.append({'match': group, 'date_parts': [Year(yes.year, 'relative_day'), Month(yes.month, 'relative_day'),
-                                                       Day(yes.day, 'relative_day')]})
+    
+    for pattern, pattern_type in patterns:
+        for match in re.finditer(pattern, s):
+            group = match.group(0)
+            
+            if match.groups():
+                group = [m for m in match.groups() if m][0]
+            
+            span = None
+            if return_spans:
+                span = EntitySpan(start=match.start(), end=match.end(), text=match.group(0))
+            
+            if 'ma' in group or 'má' in group:
+                date_parts = [Year(now.year, 'relative_day'), Month(now.month, 'relative_day'),
+                             Day(now.day, 'relative_day')]
+            elif 'holnapu' in group:
+                tom2 = now + timedelta(days=2)
+                date_parts = [Year(tom2.year, 'relative_day'), Month(tom2.month, 'relative_day'),
+                             Day(tom2.day, 'relative_day')]
+            elif 'holnap' in group:
+                tom = now + timedelta(days=1)
+                date_parts = [Year(tom.year, 'relative_day'), Month(tom.month, 'relative_day'),
+                             Day(tom.day, 'relative_day')]
+            elif 'tegnapel' in group:
+                yes2 = now - timedelta(days=2)
+                date_parts = [Year(yes2.year, 'relative_day'), Month(yes2.month, 'relative_day'),
+                             Day(yes2.day, 'relative_day')]
+            elif 'tegnap' in group:
+                yes = now - timedelta(days=1)
+                date_parts = [Year(yes.year, 'relative_day'), Month(yes.month, 'relative_day'),
+                             Day(yes.day, 'relative_day')]
+            else:
+                continue
+            
+            result = {'match': group, 'date_parts': date_parts}
+            if return_spans:
+                result['span'] = span
+                
+            res.append(result)
 
     return res
 

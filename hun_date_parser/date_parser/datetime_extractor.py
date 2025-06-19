@@ -18,7 +18,8 @@ from hun_date_parser.date_parser.time_parsers import match_digi_clock, match_tim
 from hun_date_parser.utils import (Year, Month, Week, Day, Daypart, Hour, Minute, StartDay, EndDay, get_type_if_exists,
                                    OverrideTopWithNow, SearchScopes, is_smaller_date_or_none,
                                    OverrideBottomWithNow, monday_of_calenderweek, DateTimePartConatiner,
-                                   return_on_value_error, filter_offset_objects, apply_offsets_and_return_components)
+                                   return_on_value_error, filter_offset_objects, apply_offsets_and_return_components,
+                                   EntitySpan)
 
 datelike = Union[datetime, date, time, None]
 
@@ -34,53 +35,59 @@ daypart_mapping = [
 
 def text2datetime(input_sentence: str, now: datetime = datetime.now(),
                   search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED,
-                  realistic_year_required: bool = True) -> List[Dict[str, datelike]]:
+                  realistic_year_required: bool = True, return_spans: bool = False) -> List[Dict[str, Union[datelike, EntitySpan]]]:
     """
     Returns the list of datetime intervals found in the input sentence.
     :param input_sentence: Input sentence string.
     :param now: Current timestamp to calculate relative dates.
     :param search_scope: Defines whether the timeframe should be restricted to past or future.
     :param realistic_year_required: Defines whether to restrict year candidates to be between 1900 and 2100.
-    :return: list of datetime interval dictionaries
+    :param return_spans: Whether to include character span information in the results.
+    :return: list of datetime interval dictionaries (optionally including span info)
     """
     datetime_extractor = DatetimeExtractor(now=now,
                                            output_container='datetime',
                                            search_scope=search_scope,
-                                           realistic_year_required=realistic_year_required)
+                                           realistic_year_required=realistic_year_required,
+                                           return_spans=return_spans)
     return datetime_extractor.parse_datetime(sentence=input_sentence)
 
 
 def text2date(input_sentence: str, now: datetime = datetime.now(),
               search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED,
-              realistic_year_required: bool = True) -> List[Dict[str, datelike]]:
+              realistic_year_required: bool = True, return_spans: bool = False) -> List[Dict[str, Union[datelike, EntitySpan]]]:
     """
     Returns the list of date intervals found in the input sentence.
     :param input_sentence: Input sentence string.
     :param now: Current timestamp to calculate relative dates.
     :param search_scope: Defines whether the timeframe should be restricted to past or future.
     :param realistic_year_required: Defines whether to restrict year candidates to be between 1900 and 2100.
-    :return: list of date interval dictionaries
+    :param return_spans: Whether to include character span information in the results.
+    :return: list of date interval dictionaries (optionally including span info)
     """
     datetime_extractor = DatetimeExtractor(now=now, output_container='date',
                                            search_scope=search_scope,
-                                           realistic_year_required=realistic_year_required)
+                                           realistic_year_required=realistic_year_required,
+                                           return_spans=return_spans)
     return datetime_extractor.parse_datetime(sentence=input_sentence)
 
 
 def text2time(input_sentence: str, now: datetime = datetime.now(),
               search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED,
-              realistic_year_required: bool = True) -> List[Dict[str, datelike]]:
+              realistic_year_required: bool = True, return_spans: bool = False) -> List[Dict[str, Union[datelike, EntitySpan]]]:
     """
     Returns the list of time intervals found in the input sentence.
     :param input_sentence: Input sentence string.
     :param now: Current timestamp to calculate relative dates.
     :param search_scope: Defines whether the timeframe should be restricted to past or future.
     :param realistic_year_required: Defines whether to restrict year candidates to be between 1900 and 2100.
-    :return: list of time interval dictionaries
+    :param return_spans: Whether to include character span information in the results.
+    :return: list of time interval dictionaries (optionally including span info)
     """
     datetime_extractor = DatetimeExtractor(now=now, output_container='time',
                                            search_scope=search_scope,
-                                           realistic_year_required=realistic_year_required)
+                                           realistic_year_required=realistic_year_required,
+                                           return_spans=return_spans)
     return datetime_extractor.parse_datetime(sentence=input_sentence)
 
 
@@ -171,17 +178,19 @@ class DatetimeExtractor:
 
     def __init__(self, now: datetime = datetime.now(), output_container: str = 'datetime',
                  search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED,
-                 realistic_year_required: bool = True) -> None:
+                 realistic_year_required: bool = True, return_spans: bool = False) -> None:
         """
         :param now: Current timestamp to calculate relative dates.
         :param output_container: datetime object to populate with datetime parts
         :param search_scope: Defines whether the timeframe should be restricted to past or future.
         :param realistic_year_required: Defines whether to restrict year candidates to be between 1900 and 2100.
+        :param return_spans: Whether to include character span information in the results.
         """
         self.now = now
         self.output_container = output_container
         self.search_scope = search_scope
         self.realistic_year_required = realistic_year_required
+        self.return_spans = return_spans
 
     def _get_implicit_intervall(self, sentence_part: str):
         matches = match_rules(self.now, sentence_part, self.search_scope, self.realistic_year_required)
