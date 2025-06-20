@@ -204,12 +204,19 @@ class DatetimeExtractor:
         self.realistic_year_required = realistic_year_required
         self.return_spans = return_spans
 
-    def _get_implicit_intervall(self, sentence_part: str):
+    def _get_implicit_intervall(self, sentence_part: str, offset: int = 0):
         matches = match_rules(self.now, sentence_part, self.search_scope, self.realistic_year_required,
                               self.return_spans)
         if self.return_spans and isinstance(matches, dict):
+            # Adjust spans for offset if needed
+            adjusted_spans = []
+            if offset > 0:
+                from hun_date_parser.utils import adjust_span_for_offset
+                adjusted_spans = [adjust_span_for_offset(span, offset) for span in matches['spans']]
+            else:
+                adjusted_spans = matches['spans']
             return [{'start_date': matches['date_parts'], 'end_date': matches['date_parts'],
-                     'spans': matches['spans']}]
+                     'spans': adjusted_spans}]
         else:
             return [{'start_date': matches, 'end_date': matches}]
 
@@ -389,11 +396,39 @@ class DatetimeExtractor:
         :param sentence: Input sentence string.
         :return: list of datetime interval dictionaries
         """
+        original_sentence = sentence  # Store original for span text correction
         sentence = sentence.lower()
+
+        # Track offsets for split sentences
+        import re
+        from .patterns import R_MULTI
+        match = re.match(R_MULTI, sentence)
         sentence_parts = match_multi_match(sentence)
+        part_offsets = []
+
+        if match and len(sentence_parts) > 1:
+            # Calculate offsets for each part based on regex groups
+            groups = match.groups()
+            for i, group in enumerate(groups):
+                if group is not None:
+                    start_pos = match.start(i+1)
+                    # Strip whitespace and find actual content position
+                    stripped_group = group.strip()
+                    if stripped_group:
+                        content_start = group.find(stripped_group)
+                        actual_offset = start_pos + content_start
+                        part_offsets.append(actual_offset)
+
+            # Ensure we have enough offsets for all parts
+            while len(part_offsets) < len(sentence_parts):
+                part_offsets.append(0)
+        else:
+            part_offsets = [0] * len(sentence_parts)
+
         parsed_dates = []
 
-        for sentence_part in sentence_parts:
+        for i, sentence_part in enumerate(sentence_parts):
+            offset = part_offsets[i] if i < len(part_offsets) else 0
             # Try to determine whether an explicit date interval has been provided
             # Something like holnap**tol** jovo kedd**ig**
             interval = match_interval(sentence_part)
@@ -416,13 +451,23 @@ class DatetimeExtractor:
                 if self.return_spans:
                     interval_spans = []
                     if isinstance(start_result, dict) and 'spans' in start_result:
-                        interval_spans.extend(start_result['spans'])
+                        # Adjust spans for offset
+                        adjusted_spans = start_result['spans']
+                        if offset > 0:
+                            from hun_date_parser.utils import adjust_span_for_offset
+                            adjusted_spans = [adjust_span_for_offset(span, offset) for span in start_result['spans']]
+                        interval_spans.extend(adjusted_spans)
                         interval['start_date'] = start_result['date_parts']
                     else:
                         interval['start_date'] = start_result
 
                     if isinstance(end_result, dict) and 'spans' in end_result:
-                        interval_spans.extend(end_result['spans'])
+                        # Adjust spans for offset
+                        adjusted_spans = end_result['spans']
+                        if offset > 0:
+                            from hun_date_parser.utils import adjust_span_for_offset
+                            adjusted_spans = [adjust_span_for_offset(span, offset) for span in end_result['spans']]
+                        interval_spans.extend(adjusted_spans)
                         interval['end_date'] = end_result['date_parts']
                     else:
                         interval['end_date'] = end_result
@@ -450,7 +495,11 @@ class DatetimeExtractor:
                     interval['end_date'] = (start_result['date_parts'] +
                                             match_duration_rules(self.now, duration_part,
                                                                  self.search_scope, self.realistic_year_required))
-                    interval['spans'] = start_result['spans']
+                    # For duration expressions, create a span covering the entire expression
+                    from hun_date_parser.utils import EntitySpan
+                    full_duration_text = sentence_part
+                    duration_span = EntitySpan(start=offset, end=offset + len(sentence_part), text=full_duration_text)
+                    interval['spans'] = [duration_span]
                 else:
                     interval['start_date'] = start_result
                     interval['end_date'] = (start_result +
@@ -464,7 +513,7 @@ class DatetimeExtractor:
             #       start_date: parse_date(holnap, bottom=True) --> earliest datetime tomorrow
             #       end_date: parse_date(holnap, bottom=False)  --> latest datetime tomorrow
             else:
-                parsed_dates += self._get_implicit_intervall(sentence_part)
+                parsed_dates += self._get_implicit_intervall(sentence_part, offset)
 
         parsed_dates = [extend_start_end(intv) for intv in parsed_dates]
 
@@ -477,8 +526,18 @@ class DatetimeExtractor:
                     'end_date': self.assemble_datetime(self.now, parsed_date['end_date'], bottom=False)
                 }
                 if 'spans' in parsed_date and parsed_date['spans']:
-                    from hun_date_parser.utils import aggregate_spans
-                    assembled['span'] = aggregate_spans(parsed_date['spans'])
+                    from hun_date_parser.utils import EntitySpan
+                    spans = parsed_date['spans']
+                    if len(spans) == 1:
+                        span = spans[0]
+                        corrected_text = original_sentence[span.start:span.end]
+                        assembled['span'] = EntitySpan(start=span.start, end=span.end, text=corrected_text)
+                    else:
+                        # Always combine all spans to capture the full temporal expression
+                        min_start = min(span.start for span in spans)
+                        max_end = max(span.end for span in spans)
+                        full_text = original_sentence[min_start:max_end]
+                        assembled['span'] = EntitySpan(start=min_start, end=max_end, text=full_text)
                 result.append(assembled)
             parsed_dates = result
         else:

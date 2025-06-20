@@ -416,11 +416,18 @@ def match_named_year(s: str, now: datetime, return_spans: bool = False) -> List[
 
 
 def match_relative_month(s: str, now: datetime, return_spans: bool = False) -> List[Dict[str, Any]]:
-    groups = re.findall(R_RELATIVE_MONTH, s)
-
     res = []
-    for group in groups:
+
+    for match in re.finditer(R_RELATIVE_MONTH, s):
+        group = match.group(0)
+
+        span = None
+        if return_spans:
+            span = EntitySpan(start=match.start(), end=match.end(), text=group)
+
         date_parts = {'match': group, 'date_parts': []}
+        if return_spans:
+            date_parts['span'] = span
 
         if ('mult' in remove_accent(group)
                 or 'elozo' in remove_accent(group)
@@ -542,28 +549,46 @@ def match_day_of_month(s: str, now: datetime, return_spans: bool = False) -> Lis
     This includes formats like "5-én", "elsején", "harmadikán", etc.
     :param s: The input string
     :param now: Current datetime for context
+    :param return_spans: whether to include span information
     :return: List of matching date parts
     """
     fn = 'day_of_month'
     res = []
 
     # Match numeric day with suffix: 1-én, 2-a, 3-át, 1-jén, 1-jei, 2-i, etc.
-    numeric_days = re.findall(R_DAYNUM_SUFFIX, s)
-    for match in numeric_days:
-        day_str, suffix = match
+    for match in re.finditer(R_DAYNUM_SUFFIX, s):
+        groups = match.groups()
+        day_str, suffix = groups
+
         try:
             day_num = int(day_str)
             if 1 <= day_num <= 31:  # Valid day range
-                res.append({'match': day_str + '-' + suffix, 'date_parts': [Day(day_num, fn)]})
+                span = None
+                if return_spans:
+                    span = EntitySpan(start=match.start(), end=match.end(), text=match.group(0))
+
+                result = {'match': day_str + '-' + suffix, 'date_parts': [Day(day_num, fn)]}
+                if return_spans:
+                    result['span'] = span
+
+                res.append(result)
         except ValueError:
             pass
 
     # Match day names: elseje, másodika, etc.
-    day_names = re.findall(R_DAYNAME, s)
-    for day_name in day_names:
+    for match in re.finditer(R_DAYNAME, s):
+        day_name = match.group(0)
         day_num = word_to_num(day_name)
         if day_num != -1 and 1 <= day_num <= 31:
-            res.append({'match': day_name, 'date_parts': [Day(day_num, fn)]})
+            span = None
+            if return_spans:
+                span = EntitySpan(start=match.start(), end=match.end(), text=day_name)
+
+            result = {'match': day_name, 'date_parts': [Day(day_num, fn)]}
+            if return_spans:
+                result['span'] = span
+
+            res.append(result)
 
     return res
 
@@ -618,15 +643,21 @@ def match_named_month_start_mid_end(
         _, last_day = calendar.monthrange(y, m)
         return last_day
 
-    groups = re.findall(R_NAMED_MONTH_SME, s)
     months = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'szep', 'okt', 'nov', 'dec']
 
     res = []
-    groups = [(mod, m, d.lstrip('0')) if
-              d else (mod, m, '') for mod, m, d in groups]
 
-    for group in groups:
+    for match in re.finditer(R_NAMED_MONTH_SME, s):
+        groups = match.groups()
+        group = (groups[0] or '', groups[1] or '', (groups[2] or '').lstrip('0') if groups[2] else '')
+        
+        span = None
+        if return_spans:
+            span = EntitySpan(start=match.start(), end=match.end(), text=match.group(0))
+
         group_res = {'match': group, 'date_parts': []}
+        if return_spans:
+            group_res['span'] = span
 
         month_detected = None
         for i, month in enumerate(months):
