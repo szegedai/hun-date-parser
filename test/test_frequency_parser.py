@@ -35,6 +35,13 @@ tf_frequencies = [
     ("napi", "DAILY"),
     ("háromhavonta", "QUARTERLY"),
     
+    ("napit", "DAILY"),
+    ("hetit", "WEEKLY"),
+    ("kéthetit", "FORTNIGHTLY"),
+    ("havit", "MONTHLY"),
+    ("évi", "YEARLY"),
+    ("évit", "YEARLY"),
+    
     ("az értekezletet naponta tartjuk", "DAILY"),
     ("az értekezletet napi rendszerességgel tartjuk", "DAILY"),
     ("az értekezletet minden nap megtartjuk", "DAILY"),
