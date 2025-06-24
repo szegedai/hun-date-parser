@@ -158,13 +158,11 @@ def duration_parser(s: str, return_preferred_unit: bool = False) -> DateParts:
                 res_date_parts = [Minute(res_mins, "duration_parser")]
                 preferred_unit = DurationUnit.MINUTES
 
-    result = {
+    result: DateParts = {
         "match": s,
-        "date_parts": res_date_parts
+        "date_parts": res_date_parts,
+        "preferred_unit": preferred_unit if return_preferred_unit else None
     }
-    
-    if return_preferred_unit:
-        result["preferred_unit"] = preferred_unit
     
     return result
 
