@@ -1,9 +1,9 @@
 from typing import TypedDict, Optional, Sequence, Union, List
 import re
-from hun_date_parser.utils import (DateTimePartConatiner, remove_accent, word_to_num, 
-                                      Minute, Hour, Day, Week, Month, Year)
-from hun_date_parser.date_parser.patterns import (R_HOUR_MIN_D, R_HOUR_HOUR_D, 
-                                                       R_HOUR_D, R_SPECIAL_HOUR_D)
+from hun_date_parser.utils import (DateTimePartConatiner, remove_accent, word_to_num,
+                                   Minute, Hour, Day, Week, Month, Year)
+from hun_date_parser.date_parser.patterns import (R_HOUR_MIN_D, R_HOUR_HOUR_D,
+                                                  R_HOUR_D, R_SPECIAL_HOUR_D)
 from enum import Enum
 
 
@@ -167,7 +167,7 @@ def duration_parser(s: str, return_preferred_unit: bool = False) -> DateParts:
                         if match:
                             special_hour = match.groups()[0]
                             res_mins = convert_quarter_hour(special_hour)
-        
+
         if res_mins > 0:
             if return_preferred_unit and res_mins >= 60 and res_mins % 60 == 0:
                 # Prefer hours for whole hour durations
@@ -182,7 +182,7 @@ def duration_parser(s: str, return_preferred_unit: bool = False) -> DateParts:
         "date_parts": res_date_parts,
         "preferred_unit": preferred_unit if return_preferred_unit else None
     }
-    
+
     return result
 
 
