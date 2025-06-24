@@ -156,7 +156,7 @@ from hun_date_parser import parse_duration
 # Standard behavior (returns minutes)
 print(parse_duration('2 évre'))  # Output: 1051200
 
-# With preferred units (returns a detailed dictionary)
+# With preferred units
 result = parse_duration('2 évre', return_preferred_unit=True)
 print(result)
 # Output: {
