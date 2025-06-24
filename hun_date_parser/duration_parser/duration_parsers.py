@@ -1,4 +1,4 @@
-from typing import TypedDict, Optional, Sequence, Union
+from typing import TypedDict, Optional, Sequence, Union, List
 import re
 from hun_date_parser.utils import DateTimePartConatiner, remove_accent, word_to_num, Minute, Hour, Day, Week, Month, Year
 from hun_date_parser.date_parser.patterns import R_HOUR_MIN_D, R_HOUR_HOUR_D, R_HOUR_D, R_SPECIAL_HOUR_D
@@ -56,8 +56,8 @@ def duration_parser(s: str, return_preferred_unit: bool = False) -> DateParts:
     s_clean = s.strip().lower()
     s_no_accent = remove_accent(s_clean)
     
-    preferred_unit = None
-    res_date_parts = []
+    preferred_unit: Optional[DurationUnit] = None
+    res_date_parts: List[DateTimePartConatiner] = []
     
     # Year patterns
     if re.search(r'\b(\d+|egy|kett[oöő]|két|h[aá]rom|n[eé]gy|[öo]t|hat|h[eé]t|nyolc|kilenc|t[ií]z|teljes)?\s*[eé]v(ese?[eé]?t?|re)\b', s_no_accent):
@@ -189,7 +189,7 @@ def parse_duration(s: str, return_preferred_unit: bool = False) -> Union[Optiona
         return {
             "value": date_part.value,
             "unit": type(date_part).__name__.lower(),
-            "preferred_unit": preferred_unit.value,
+            "preferred_unit": preferred_unit.value if preferred_unit else DurationUnit.MINUTES.value,
             "minutes": _convert_to_minutes(date_part)
         }
     else:
@@ -201,6 +201,9 @@ def _convert_to_minutes(date_part: DateTimePartConatiner) -> int:
     """
     Helper function to convert any date part to minutes.
     """
+    if date_part.value is None:
+        return 0
+        
     if isinstance(date_part, Minute):
         return date_part.value
     elif isinstance(date_part, Hour):
@@ -210,8 +213,8 @@ def _convert_to_minutes(date_part: DateTimePartConatiner) -> int:
     elif isinstance(date_part, Week):
         return date_part.value * 7 * 24 * 60
     elif isinstance(date_part, Month):
-        return date_part.value * 30 * 24 * 60  # approx
+        return date_part.value * 30 * 24 * 60  # Approximate
     elif isinstance(date_part, Year):
-        return date_part.value * 365 * 24 * 60  # approx
+        return date_part.value * 365 * 24 * 60  # Approximate
     else:
         return 0
