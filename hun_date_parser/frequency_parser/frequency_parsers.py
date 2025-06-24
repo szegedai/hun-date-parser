@@ -41,7 +41,7 @@ def parse_frequency(s: str) -> Optional[dict]:
         r'\bminden fel(ev|eve)ben\b': Frequency.EVERY_HALF_YEAR,
         r'\b(ev|eve)nte\b': Frequency.YEARLY,
         r'\bminden (ev|eve)ben\b': Frequency.YEARLY,
-        r'\b(ev|eve)(i|it)\b': Frequency.YEARLY,
+        r'\b(ev|eve)(i|it|s)\b': Frequency.YEARLY,
     }
 
     for pattern, freq_value in frequency_map.items():
