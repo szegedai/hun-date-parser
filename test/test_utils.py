@@ -36,6 +36,8 @@ tf_word_to_num = [
     ('másodikán', 2),
     ('huszonharmadikán', 23),
     ('harmincegyedikén', 31),
+    ('kéthetes', 2),
+    ('kethetes', 2),
 ]
 
 
