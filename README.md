@@ -126,20 +126,52 @@ The duration parser can extract the duration in minutes from various expressions
 
 The parser is capable of understanding a variety of duration expressions. Here are the primary formats it recognizes:
 
-- Hour and Minute Combination:
+- **Hour and Minute Combination**:
   - Examples: `1 óra 45 perc`, `egy óra 30 perc`, `2 óra 15 perc`
-- Hour Only:
+- **Hour Only**:
   - Examples: `1 óra`, `egy óra`, `2 órát`, `3,5 óra`
-- Quarter Hour Phrases:
+- **Quarter Hour Phrases**:
   - Examples: `háromnegyed óra`, `egy és negyed óra`, `kettő és fél óra`
+- **Various day, week, month and year expressions**:
+  - Examples: `24 órás`, `1 hetes`, `kéthetes`, `10 napos`, `30 napos`, `éves`, `1 órára`, `24 órára`, `1 hétre`, `két hétre`, `30 napra`, `évre`
 
+#### Basic Usage
 
 ```python
 from hun_date_parser import parse_duration
 
 print(parse_duration('45 perc'))  # Output: 45
-
 print(parse_duration('1 és negyed óra'))  # Output: 75
+print(parse_duration('24 órás'))  # Output: 1440
+print(parse_duration('1 hétre'))  # Output: 10080
+```
+
+#### Advanced Usage with Preferred Units
+
+The duration parser also supports returning durations in their most natural unit rather than always converting to minutes:
+
+```python
+from hun_date_parser import parse_duration
+
+# Standard behavior (returns minutes)
+print(parse_duration('2 évre'))  # Output: 1051200
+
+# With preferred units (returns a detailed dictionary)
+result = parse_duration('2 évre', return_preferred_unit=True)
+print(result)
+# Output: {
+#   'value': 2,
+#   'unit': 'year',
+#   'preferred_unit': 'years',
+#   'minutes': 1051200
+# }
+
+# More examples:
+print(parse_duration('24 órás', return_preferred_unit=True))
+# Output: {'value': 24, 'unit': 'hour', 'preferred_unit': 'hours', 'minutes': 1440}
+
+print(parse_duration('30 napra', return_preferred_unit=True))
+# Output: {'value': 30, 'unit': 'day', 'preferred_unit': 'days', 'minutes': 43200}
 ```
 
 ### Frequency Parsing
