@@ -84,9 +84,8 @@ def duration_parser(s: str, return_preferred_unit: bool = False) -> DateParts:
             res_date_parts = [Minute(num_years * 365 * 24 * 60, "duration_parser")]
 
     # Week patterns
-    week_pattern = (r'\b(\d+|egy|kett[oöő]|k[eé]t|k[eé]thetes|h[aá]rom|n[eé]gy|[öo]t|hat|h[eé]t|'
-                    r'nyolc|kilenc|t[ií]z)\s*h[eé]t(ese?[eé]?t?|re)\b')
-    elif re.search(week_pattern, s_no_accent):
+    elif re.search(r'\b(\d+|egy|kett[oöő]|k[eé]t|k[eé]thetes|h[aá]rom|n[eé]gy|[öo]t|hat|h[eé]t|'
+                   r'nyolc|kilenc|t[ií]z)\s*h[eé]t(ese?[eé]?t?|re)\b', s_no_accent):
         week_match_pattern = (r'(\d+|egy|kett[oöő]|k[eé]t|k[eé]thetes|h[aá]rom|n[eé]gy|[öo]t|hat|'
                               r'h[eé]t|nyolc|kilenc|t[ií]z)\s*h[eé]t(ese?[eé]?t?|re)')
         num_match = re.search(week_match_pattern, s_no_accent)
@@ -103,9 +102,8 @@ def duration_parser(s: str, return_preferred_unit: bool = False) -> DateParts:
             res_date_parts = [Minute(num_weeks * 7 * 24 * 60, "duration_parser")]
 
     # Day patterns
-    day_pattern = (r'\b(\d+|egy|kett[oöő]|két|h[aá]rom|n[eé]gy|[öo]t|hat|h[eé]t|nyolc|kilenc|'
-                   r't[ií]z|harminc|\d{2,3})\s*nap(osa?[aá]?t?|ra)\b')
-    elif re.search(day_pattern, s_no_accent):
+    elif re.search(r'\b(\d+|egy|kett[oöő]|két|h[aá]rom|n[eé]gy|[öo]t|hat|h[eé]t|nyolc|kilenc|'
+                   r't[ií]z|harminc|\d{2,3})\s*nap(osa?[aá]?t?|ra)\b', s_no_accent):
         day_match_pattern = (r'(\d+|egy|kett[oöő]|két|h[aá]rom|n[eé]gy|[öo]t|hat|h[eé]t|nyolc|'
                              r'kilenc|t[ií]z|harminc|\d{2,3})\s*nap(osa?[aá]?t?|ra)')
         num_match = re.search(day_match_pattern, s_no_accent)
@@ -119,9 +117,8 @@ def duration_parser(s: str, return_preferred_unit: bool = False) -> DateParts:
                 res_date_parts = [Minute(num_days * 24 * 60, "duration_parser")]
 
     # Hour patterns
-    hour_pattern = (r'\b(\d+|egy|kett[oöő]|két|h[aá]rom|n[eé]gy|[öo]t|hat|h[eé]t|nyolc|kilenc|'
-                    r't[ií]z|\d{2})\s*[oó]r[aá](sa?[aá]?t?|ra)\b')
-    elif re.search(hour_pattern, s_no_accent):
+    elif re.search(r'\b(\d+|egy|kett[oöő]|két|h[aá]rom|n[eé]gy|[öo]t|hat|h[eé]t|nyolc|kilenc|'
+                   r't[ií]z|\d{2})\s*[oó]r[aá](sa?[aá]?t?|ra)\b', s_no_accent):
         hour_match_pattern = (r'(\d+|egy|kett[oöő]|két|h[aá]rom|n[eé]gy|[öo]t|hat|h[eé]t|nyolc|'
                               r'kilenc|t[ií]z|\d{2})\s*[oó]r[aá](sa?[aá]?t?|ra)')
         num_match = re.search(hour_match_pattern, s_no_accent)
