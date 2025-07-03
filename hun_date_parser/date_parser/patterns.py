@@ -46,7 +46,7 @@ R_IN_PAST_PERIOD_WEEKS = r'(elm[úu]lt|megel[oőö]z[oőö]|el[oőö]z[oőö])\b
 R_IN_PAST_PERIOD_MONTHS = r'(elm[úu]lt|megel[oőö]z[oőö]|el[oőö]z[oőö])\b([ \w]*)\b(h[oó]napban|havi|h[oó]nap)'
 R_IN_PAST_PERIOD_YEARS = r'(elm[úu]lt|megel[oőö]z[oőö]|el[oőö]z[oőö])\b([ \w]*)\b([eé]v|[eé]vben|[eé]vi)'
 
-R_YEAR = r'(tavalyel[oöő]tt|id[eé]n|idei|ebben az [eé]vben|j[oöő]v[oöő]re|tavaly|.*[eé]v m[uú]lva|.*[eé]vvel ezel[oő]tt|.*[eé]vvel kor[aá]bban)'
+R_YEAR = r'(tavalyel[oöő]tt|el[oöő]z[oöő] [eé]v[a-z]*|idei [eé]v[a-z]*|id[eé]n|idei|ebben az [eé]vben|ett[oöő]l az [eé]v|erre az [eé]vre|j[oöő]v[oöő] [eé]v[a-z]*|j[oöő]v[oöő]re|tavaly|.*[eé]v m[uú]lva|.*[eé]vvel ezel[oő]tt|.*[eé]vvel kor[aá]bban)'
 
 # hour level
 R_AT = r'([:\w ]*-?kor)'
