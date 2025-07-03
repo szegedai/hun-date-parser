@@ -285,7 +285,16 @@ tf_named_year = [('tavaly', [[Year(2019, 'named_year')]]),
                  ('tavalyelőtt történt', [[Year(2018, 'named_year')]]),
                  ('40 év múlva', [[Year(2060, 'named_year')]]),
                  ('kb három évvel ezelőtt', [[Year(2017, 'named_year')]]),
-                 ('találkozzunk jövő héten szombaton', [])]
+                 ('találkozzunk jövő héten szombaton', []),
+                 ('jövő évben találkozunk', [[Year(2021, 'named_year')]]),
+                 ('jövő évre', [[Year(2021, 'named_year')]]),
+                 ('a jövő évtől kezdődik', [[Year(2021, 'named_year')]]),
+                 ('az idei évben elkészül', [[Year(2020, 'named_year')]]),
+                 ('az előző évben történt', [[Year(2019, 'named_year')]]),
+                 ('erre az évre', [[Year(2020, 'named_year')]]),
+                 ('ebben az évben', [[Year(2020, 'named_year')]]),
+                 ('ettol az evtol', [[Year(2020, 'named_year')]]),
+                 ('a megelőző évről beszélünk', [[Year(2019, 'named_year')]])]
 
 tf_relative_month = [
     ('az utolsó hónapom.', [[Year(2023, 'relative_month'), Month(4, 'relative_month')]]),
