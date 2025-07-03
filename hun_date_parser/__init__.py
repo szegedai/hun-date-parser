@@ -6,4 +6,4 @@ from hun_date_parser.frequency_parser.frequency_parsers import parse_frequency
 __all__ = ["DatetimeTextualizer", "DatetimeExtractor", "datetime2text", "text2datetime", "text2date", "text2time",
            "parse_duration", "parse_frequency"]
 
-__version__ = "0.2.14"
+__version__ = "0.2.15"
