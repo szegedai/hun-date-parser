@@ -32,6 +32,24 @@ daypart_mapping = [
 ]
 
 
+def text2datetime_with_spans(input_sentence: str, now: datetime = datetime.now(),
+                            search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED,
+                            realistic_year_required: bool = True) -> List[Dict]:
+    """
+    Returns datetime intervals with span information found in the input sentence.
+    :param input_sentence: Input sentence string.
+    :param now: Current timestamp to calculate relative dates.
+    :param search_scope: Defines whether the timeframe should be restricted to past or future.
+    :param realistic_year_required: Defines whether to restrict year candidates to be between 1900 and 2100.
+    :return: list of dictionaries with datetime intervals and span info
+    """
+    matches = match_rules_with_spans(now, input_sentence, search_scope, realistic_year_required)
+    return [{'match_text': m.get('match_text', ''), 
+             'match_start': m.get('match_start', 0), 
+             'match_end': m.get('match_end', 0),
+             'date_parts': m['date_parts']} for m in matches if m.get('date_parts')]
+
+
 def text2datetime(input_sentence: str, now: datetime = datetime.now(),
                   search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED,
                   realistic_year_required: bool = True) -> List[Dict[str, datelike]]:
@@ -48,6 +66,24 @@ def text2datetime(input_sentence: str, now: datetime = datetime.now(),
                                            search_scope=search_scope,
                                            realistic_year_required=realistic_year_required)
     return datetime_extractor.parse_datetime(sentence=input_sentence)
+
+
+def text2date_with_spans(input_sentence: str, now: datetime = datetime.now(),
+                        search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED,
+                        realistic_year_required: bool = True) -> List[Dict]:
+    """
+    Returns date intervals with span information found in the input sentence.
+    :param input_sentence: Input sentence string.
+    :param now: Current timestamp to calculate relative dates.
+    :param search_scope: Defines whether the timeframe should be restricted to past or future.
+    :param realistic_year_required: Defines whether to restrict year candidates to be between 1900 and 2100.
+    :return: list of dictionaries with date intervals and span info
+    """
+    matches = match_rules_with_spans(now, input_sentence, search_scope, realistic_year_required)
+    return [{'match_text': m.get('match_text', ''), 
+             'match_start': m.get('match_start', 0), 
+             'match_end': m.get('match_end', 0),
+             'date_parts': m['date_parts']} for m in matches if m.get('date_parts')]
 
 
 def text2date(input_sentence: str, now: datetime = datetime.now(),
@@ -84,6 +120,35 @@ def text2time(input_sentence: str, now: datetime = datetime.now(),
     return datetime_extractor.parse_datetime(sentence=input_sentence)
 
 
+def match_rules_with_spans(now: datetime, sentence: str,
+                          search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED,
+                          realistic_year_required: bool = True) -> List:
+    """
+    Matches all rules against input text and returns both date parts and span information.
+    :param now: Current timestamp to calculate relative dates.
+    :param sentence: Input sentence.
+    :param search_scope: Defines whether the timeframe should be restricted to past or future.
+    :param realistic_year_required: Defines whether to restrict year candidates to be between 1900 and 2100.
+    :return: List of match dictionaries with date_parts and span info.
+    """
+    return [*match_named_month(sentence, now, search_scope),
+            *match_iso_date(sentence, realistic_year_required),
+            *match_relative_day(sentence, now),
+            *match_weekday(sentence, now, search_scope),
+            *match_week(sentence, now),
+            *match_named_year(sentence, now),
+            *match_digi_clock(sentence),
+            *match_hwords(sentence),
+            *match_time_words(sentence),
+            *match_now(sentence, now),
+            *match_n_periods_compared_to_now(sentence, now),
+            *match_relative_month(sentence, now),
+            *match_in_past_n_periods(sentence, now),
+            *match_named_month_interval(sentence),
+            *match_named_month_start_mid_end(sentence, now),
+            *match_day_of_month(sentence, now)]
+
+
 def match_rules(now: datetime, sentence: str,
                 search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED,
                 realistic_year_required: bool = True) -> List:
@@ -95,25 +160,8 @@ def match_rules(now: datetime, sentence: str,
     :param realistic_year_required: Defines whether to restrict year candidates to be between 1900 and 2100.
     :return: Parsed date and time classes.
     """
-    matches = [*match_named_month(sentence, now, search_scope),
-               *match_iso_date(sentence, realistic_year_required),
-               *match_relative_day(sentence, now),
-               *match_weekday(sentence, now, search_scope),
-               *match_week(sentence, now),
-               *match_named_year(sentence, now),
-               *match_digi_clock(sentence),
-               *match_hwords(sentence),
-               *match_time_words(sentence),
-               *match_now(sentence, now),
-               *match_n_periods_compared_to_now(sentence, now),
-               *match_relative_month(sentence, now),
-               *match_in_past_n_periods(sentence, now),
-               *match_named_month_interval(sentence),
-               *match_named_month_start_mid_end(sentence, now),
-               *match_day_of_month(sentence, now)]
-
+    matches = match_rules_with_spans(now, sentence, search_scope, realistic_year_required)
     matches = list(chain(*[m['date_parts'] for m in matches]))
-
     return matches
 
 
