@@ -21,7 +21,7 @@ Install and try the package with `pip install hun-date-parser`
 ## :fire: Usage
 
 ```python
-from hun_date_parser import text2datetime
+from hun_date_parser import text2datetime, text2datetime_with_spans
 from datetime import datetime
 
 text2datetime('találkozzunk jövő kedd délután!', now=datetime(2020, 12, 27))
@@ -46,6 +46,25 @@ text2datetime('2021 januárig', now=datetime(2020, 12, 27))
 ```
 
 If not specified otherwise, relative dates (eg.: tomorrow, next week, etc.) are calculated relative to the current datetime, at the time when the function is called. The `now` parameter can be used for parsing relative datetimes relative to any timestamp other than the current time.
+
+### Span Information
+
+The library also provides span-aware parsing functions that return the exact text positions of matched temporal expressions:
+
+```python
+from hun_date_parser import text2datetime_with_spans
+from datetime import datetime
+
+text2datetime_with_spans('találkozzunk jövő kedd délután!', now=datetime(2020, 12, 27))
+# [{'match_text': 'jövő kedd délután', 'match_start': 13, 'match_end': 30, 
+#   'start_date': datetime.datetime(2020, 12, 29, 12, 0), 
+#   'end_date': datetime.datetime(2020, 12, 29, 18, 59, 59)}]
+
+text2datetime_with_spans('X január 5-én reggel', now=datetime(2020, 12, 18))
+# [{'match_text': 'január 5-én reggel', 'match_start': 2, 'match_end': 20,
+#   'start_date': datetime.datetime(2020, 1, 5, 6, 0), 
+#   'end_date': datetime.datetime(2020, 1, 5, 10, 59, 59)}]
+```
 
 ### Supported formats
 

@@ -10,35 +10,98 @@ from hun_date_parser.date_parser.date_parsers import match_weekday
 NAN = -1
 
 
+def _trim_to_temporal_content(text: str, match_start: int, match_end: int, match_text: str) -> Tuple[int, int, str]:
+    """Trim match to start and end at relevant temporal words."""
+    if not match_text or match_start == match_end:
+        return match_start, match_end, match_text
+    
+    # Temporal word patterns (accent-free, longer words first)
+    temporal_patterns = [
+        r'\bharomnegyed\b', r'\bdelelo[to]*\b', r'\bdelutan\b', r'\bhajnal[i]?\b', 
+        r'\breggel\b', r'\beste\b', r'\bejjel\b',
+        r'\bnegyed\b', r'\bfel\b', r'\bora\b', r'\bkor\b', r'\belott\b', r'\butan\b',
+        r'\bperc\b', r'\bma\b', r'\bholnap\b', r'\btegnap\b',
+        r'\bhetfo\b', r'\bkedd\b', r'\bszerda\b', r'\bcsutortok\b', r'\bpentek\b', r'\bszombat\b', r'\bvasarnap\b',
+        r'\bjanuar\b', r'\bfebruar\b', r'\bmarcius\b', r'\baprilis\b', r'\bmajus\b', r'\bjunius\b',
+        r'\bjulius\b', r'\baugusztus\b', r'\bszeptember\b', r'\boktober\b', r'\bnovember\b', r'\bdecember\b',
+        r'\b\d+\b'  # Any digit sequence
+    ]
+    
+    first_temporal_start = None
+    last_temporal_end = None
+    
+    match_text_lower = remove_accent(match_text.lower())
+    
+    for pattern in temporal_patterns:
+        for match in re.finditer(pattern, match_text_lower):
+            start_pos = match.start()
+            end_pos = match.end()
+            
+            if first_temporal_start is None or start_pos < first_temporal_start:
+                first_temporal_start = start_pos
+            
+            if last_temporal_end is None or end_pos > last_temporal_end:
+                last_temporal_end = end_pos
+    
+    if first_temporal_start is None:
+        return match_start, match_end, match_text
+    
+    new_start = match_start + first_temporal_start
+    new_end = match_start + last_temporal_end
+    new_match_text = text[new_start:new_end]
+    
+    return new_start, new_end, new_match_text
+
+
 def match_digi_clock(s: str) -> List[Dict[str, Any]]:
     """
     Match digi clock format.
     :param s: textual input
     :return: tuple of date parts
     """
-    match = re.findall(R_DIGI, s)
+    matches = re.finditer(R_DIGI, s)
 
     res = []
-    for group in match:
-        group = [int(m.lstrip('0')) for m in group if m.lstrip('0')]
+    for match_obj in matches:
+        group = match_obj.groups()
+        group_nums = [int(m.lstrip('0')) for m in group if m and m.lstrip('0')]
 
-        if len(group) == 2:
-            h, m = group
-            res.append({'match': group, 'date_parts': [Hour(h, 'digi_clock'), Minute(m, 'digi_clock')]})
-        elif len(group) == 1:
-            res.append({'match': group, 'date_parts': [Hour(group[0], 'digi_clock')]})
+        if len(group_nums) == 2:
+            h, m = group_nums
+            res.append({
+                'match': group_nums,
+                'match_text': match_obj.group(0),
+                'match_start': match_obj.start(),
+                'match_end': match_obj.end(),
+                'date_parts': [Hour(h, 'digi_clock'), Minute(m, 'digi_clock')]
+            })
+        elif len(group_nums) == 1:
+            res.append({
+                'match': group_nums,
+                'match_text': match_obj.group(0),
+                'match_start': match_obj.start(),
+                'match_end': match_obj.end(),
+                'date_parts': [Hour(group_nums[0], 'digi_clock')]
+            })
 
     return res
 
 
 def match_hwords(s: str) -> List[Dict[str, Any]]:
-    group = re.findall(R_HWORDS_, s)
-    group = [m for m in group if ''.join(m)]
+    matches = re.finditer(R_HWORDS_, s)
 
     res = []
-    for match in group:
-        match = int(match)
-        res.append({'match': match, 'date_parts': [Hour(match, 'hwords')]})
+    for match_obj in matches:
+        groups = match_obj.groups()
+        if groups[0]:  # Only process if the captured hour group exists
+            hour_num = int(groups[0])
+            res.append({
+                'match': hour_num,
+                'match_text': match_obj.group(0),
+                'match_start': match_obj.start(),
+                'match_end': match_obj.end(),
+                'date_parts': [Hour(hour_num, 'hwords')]
+            })
 
     return res
 
@@ -70,38 +133,51 @@ def is_indeed_hour(s: str):
     return False
 
 
-def _raw_match_time_words(s: str) -> Optional[Tuple[Any, Any, Any, Any, Any]]:
+def _raw_match_time_words(s: str) -> Optional[Tuple[Any, Any, Any, Any, Any, Any]]:
     """
     Extracts date and time particles from text
     :param s: input text
-    :return:
+    :return: (match_obj, daypart, hour_modifier, hour, minute, match_type) or None
     """
-    group = re.findall(R_HOUR_MIN, s)
-    group = [m for m in group if ''.join(m)]
-
-    group_rev = re.findall(R_HOUR_MIN_REV, s)
-    group_rev = [m for m in group_rev if ''.join(m)]
+    match_obj = None
+    match_type = None
+    
+    # Try regular pattern first
+    matches = list(re.finditer(R_HOUR_MIN, s))
+    group = [m.groups() for m in matches if ''.join([g for g in m.groups() if g])]
+    
+    # Try reverse pattern
+    matches_rev = list(re.finditer(R_HOUR_MIN_REV, s))
+    group_rev = [m.groups() for m in matches_rev if ''.join([g for g in m.groups() if g])]
 
     if not (group or group_rev):
         return None
     elif group and not group_rev:
         daypart, hour_modifier, hour, minute = group[0]
+        match_obj = matches[0]
+        match_type = 'regular'
     elif not group and group_rev:
         minute, daypart, hour_modifier, hour, is_before = group_rev[0]
         minute += (' ' + is_before)
-    elif group_rev[0].count('') < group[0].count(''):
+        match_obj = matches_rev[0]
+        match_type = 'reverse'
+    elif group_rev[0].count(None) < group[0].count(None):
         minute, daypart, hour_modifier, hour, is_before = group_rev[0]
         minute += (' ' + is_before)
+        match_obj = matches_rev[0]
+        match_type = 'reverse'
     else:
         daypart, hour_modifier, hour, minute = group[0]
+        match_obj = matches[0]
+        match_type = 'regular'
 
     # when a single number is matched, the pattern currently interprets it as an hour value
     # i.e.: "1" --> 1 hour or "egy" --> 1 hour
     # this check is designed to address this issue (R_HOUR_MIN pattern needs to be rewritten for a proper solution)
     if not (daypart or minute or hour_modifier) and hour and not is_indeed_hour(s):
-        return [('', '', '', '')], '', '', '', ''
+        return [('', '', '', '')], '', '', '', '', None
 
-    return group, daypart, hour_modifier, hour, minute
+    return match_obj, daypart, hour_modifier, hour, minute, match_type
 
 
 def match_time_words(s: str) -> List[Dict[str, Any]]:
@@ -113,25 +189,30 @@ def match_time_words(s: str) -> List[Dict[str, Any]]:
     if not parts:
         return []
     else:
-        group, daypart, hour_modifier, hour, minute = parts
+        match_obj, daypart, hour_modifier, hour, minute, match_type = parts
+        
+    # Handle the special case where no valid hour is found
+    if match_type is None:
+        return []
 
     # Only numbers can match dates as well, this is an attempt to remove false matches
-    hour_index = s.index(f'{hour}')
-    before_hour = s[:hour_index].split()
-    if before_hour:
-        months = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'szep', 'okt', 'nov', 'dec']
-        for month in months:
-            if month in remove_accent(before_hour[-1]):
-                return []
-
-    # Fix false time match for input 'jövő hét'
-    if remove_accent(hour) == 'het':
-        hour_indeces = [m.start() for m in re.finditer('het(?!fo)', remove_accent(s))]
-        if hour_indeces:
-            before_hour = s[:hour_indeces[-1]].split()
-            if before_hour:
-                if 'jovo' in remove_accent(before_hour[-1]):
+    if hour:
+        hour_index = s.index(f'{hour}')
+        before_hour = s[:hour_index].split()
+        if before_hour:
+            months = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'szep', 'okt', 'nov', 'dec']
+            for month in months:
+                if month in remove_accent(before_hour[-1]):
                     return []
+
+        # Fix false time match for input 'jövő hét'
+        if remove_accent(hour) == 'het':
+            hour_indeces = [m.start() for m in re.finditer('het(?!fo)', remove_accent(s))]
+            if hour_indeces:
+                before_hour = s[:hour_indeces[-1]].split()
+                if before_hour:
+                    if 'jovo' in remove_accent(before_hour[-1]):
+                        return []
 
     res = []
     am = True
@@ -158,7 +239,7 @@ def match_time_words(s: str) -> List[Dict[str, Any]]:
             return []
 
         hour_num = word_to_num(hour)
-        minute_num = word_to_num(minute)
+        minute_num = word_to_num(minute) if minute else NAN
 
         if not daypart:
             # default to business hour if daypart is not specified
@@ -186,14 +267,14 @@ def match_time_words(s: str) -> List[Dict[str, Any]]:
             # this is made redundant by the change in the patterns
             non_minutes = ['ev', 'ora']
             for nm in non_minutes:
-                if f' {nm}' in remove_accent(minute) or remove_accent(minute).startswith(nm):
+                if minute and (f' {nm}' in remove_accent(minute) or remove_accent(minute).startswith(nm)):
                     return []
 
-            if 'elott' in remove_accent(minute) and not hour_modifier:
+            if minute and 'elott' in remove_accent(minute) and not hour_modifier:
                 hour_num -= (minute_num // 60) + 1
                 hour_num = hour_num if hour_num >= 0 else 23
                 date_parts.extend([Hour(hour_num, 'time_words'), Minute(60 - (minute_num % 60), 'time_words')])
-            elif 'elott' in remove_accent(minute) and hour_modifier:
+            elif minute and 'elott' in remove_accent(minute) and hour_modifier:
                 n_minutes_before = word_to_num(minute)
                 if n_minutes_before != NAN:
                     minute_num -= n_minutes_before
@@ -203,7 +284,7 @@ def match_time_words(s: str) -> List[Dict[str, Any]]:
                     minute_num = minute_num % 60
                 date_parts.extend([Hour(hour_num, 'time_words'), Minute(minute_num, 'time_words')])
             elif hour_modifier:
-                n_minutes_after = word_to_num(minute)
+                n_minutes_after = word_to_num(minute) if minute else NAN
                 if n_minutes_after != NAN:
                     minute_num += n_minutes_after
                 if minute_num > 59:
@@ -217,21 +298,53 @@ def match_time_words(s: str) -> List[Dict[str, Any]]:
         else:
             date_parts.append(Hour(hour_num, 'time_words'))
 
-        res.append({'match': group, 'date_parts': date_parts})
+        original_start = match_obj.start() if match_obj else 0
+        original_end = match_obj.end() if match_obj else 0
+        original_text = match_obj.group(0) if match_obj else ''
+        
+        trimmed_start, trimmed_end, trimmed_text = _trim_to_temporal_content(
+            s, original_start, original_end, original_text
+        )
+        
+        res.append({
+            'match': match_obj.groups() if match_obj else [],
+            'match_text': trimmed_text,
+            'match_start': trimmed_start,
+            'match_end': trimmed_end,
+            'date_parts': date_parts
+        })
 
     elif daypart:
+        original_start = match_obj.start() if match_obj else 0
+        original_end = match_obj.end() if match_obj else 0
+        original_text = match_obj.group(0) if match_obj else ''
+        
+        trimmed_start, trimmed_end, trimmed_text = _trim_to_temporal_content(
+            s, original_start, original_end, original_text
+        )
+        
+        daypart_match = {
+            'match': match_obj.groups() if match_obj else [],
+            'match_text': trimmed_text,
+            'match_start': trimmed_start,
+            'match_end': trimmed_end,
+            'date_parts': []
+        }
+        
         if 'hajnal' in daypart:
-            res.append({'match': group, 'date_parts': [Daypart(0, 'time_words')]})
+            daypart_match['date_parts'] = [Daypart(0, 'time_words')]
         elif 'reggel' in daypart:
-            res.append({'match': group, 'date_parts': [Daypart(1, 'time_words')]})
+            daypart_match['date_parts'] = [Daypart(1, 'time_words')]
         elif 'delelott' in remove_accent(daypart):
-            res.append({'match': group, 'date_parts': [Daypart(2, 'time_words')]})
+            daypart_match['date_parts'] = [Daypart(2, 'time_words')]
         elif 'delutan' in remove_accent(daypart):
-            res.append({'match': group, 'date_parts': [Daypart(3, 'time_words')]})
+            daypart_match['date_parts'] = [Daypart(3, 'time_words')]
         elif 'este' in daypart:
-            res.append({'match': group, 'date_parts': [Daypart(4, 'time_words')]})
+            daypart_match['date_parts'] = [Daypart(4, 'time_words')]
         elif 'ejjel' in remove_accent(daypart):
-            res.append({'match': group, 'date_parts': [Daypart(5, 'time_words')]})
+            daypart_match['date_parts'] = [Daypart(5, 'time_words')]
+            
+        res.append(daypart_match)
 
     return res
 
@@ -240,10 +353,16 @@ def match_now(s: str, now: datetime) -> List[Dict[str, Any]]:
     if match_weekday(s, now):
         return []
 
-    match = re.match(r'.*\bmost\b.*', s.lower())
-    if match:
+    match_obj = re.search(r'\bmost\b', s.lower())
+    if match_obj:
         date_parts = [Year(now.year, 'now'), Month(now.month, 'now'), Day(now.day, 'now'), Hour(now.hour, 'now'),
                       Minute(now.minute, 'now')]
-        return [{'match': 'most', 'date_parts': date_parts}]
+        return [{
+            'match': 'most',
+            'match_text': match_obj.group(0),
+            'match_start': match_obj.start(),
+            'match_end': match_obj.end(),
+            'date_parts': date_parts
+        }]
 
     return []

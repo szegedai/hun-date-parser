@@ -74,7 +74,7 @@ def extract_datetime_within_interval(interval_start: datetime,
     possible_am_pm_missmatch = False
     parts = _raw_match_time_words(query_text)
     if parts:
-        group, daypart, hour_modifier, hour, minute = parts
+        match_obj, daypart, hour_modifier, hour, minute, match_type = parts
         if not daypart and hour:
             possible_am_pm_missmatch = True
 

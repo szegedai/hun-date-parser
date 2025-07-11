@@ -43,11 +43,100 @@ def text2datetime_with_spans(input_sentence: str, now: datetime = datetime.now()
     :param realistic_year_required: Defines whether to restrict year candidates to be between 1900 and 2100.
     :return: list of dictionaries with datetime intervals and span info
     """
-    matches = match_rules_with_spans(now, input_sentence, search_scope, realistic_year_required)
-    return [{'match_text': m.get('match_text', ''), 
-             'match_start': m.get('match_start', 0), 
-             'match_end': m.get('match_end', 0),
-             'date_parts': m['date_parts']} for m in matches if m.get('date_parts')]
+    from hun_date_parser.date_parser.structure_parsers import match_multi_match
+    
+    datetime_extractor = DatetimeExtractor(now=now, output_container='datetime',
+                                         search_scope=search_scope,
+                                         realistic_year_required=realistic_year_required)
+    
+    sentence_parts = match_multi_match(input_sentence.lower())
+    
+    if len(sentence_parts) > 1:
+        all_results = []
+        cumulative_offset = 0
+        
+        for part in sentence_parts:
+            part_start = input_sentence.lower().find(part, cumulative_offset)
+            if part_start == -1:
+                continue
+                
+            matches = match_rules_with_spans(now, part, search_scope, realistic_year_required)
+            filtered_matches = [{'match_text': m.get('match_text', ''), 
+                                'match_start': m.get('match_start', 0) + part_start, 
+                                'match_end': m.get('match_end', 0) + part_start,
+                                'date_parts': m['date_parts']} for m in matches if m.get('date_parts')]
+            
+            if len(filtered_matches) > 1:
+                min_start = min(m['match_start'] for m in filtered_matches)
+                max_end = max(m['match_end'] for m in filtered_matches)
+                merged_text = input_sentence[min_start:max_end]
+                all_date_parts = []
+                for m in filtered_matches:
+                    all_date_parts.extend(m['date_parts'])
+                
+                result_match = {
+                    'match_text': merged_text,
+                    'match_start': min_start,
+                    'match_end': max_end,
+                    'date_parts': all_date_parts
+                }
+            else:
+                result_match = filtered_matches[0] if filtered_matches else None
+            
+            if result_match:
+                start_date = datetime_extractor.assemble_datetime(now, result_match['date_parts'], bottom=True)
+                end_date = datetime_extractor.assemble_datetime(now, result_match['date_parts'], bottom=False)
+                
+                final_result = {
+                    'match_text': result_match['match_text'],
+                    'match_start': result_match['match_start'],
+                    'match_end': result_match['match_end'],
+                    'start_date': start_date,
+                    'end_date': end_date
+                }
+                all_results.append(final_result)
+                
+            cumulative_offset = part_start + len(part)
+            
+        return all_results
+    else:
+        matches = match_rules_with_spans(now, input_sentence, search_scope, realistic_year_required)
+        filtered_matches = [{'match_text': m.get('match_text', ''), 
+                            'match_start': m.get('match_start', 0), 
+                            'match_end': m.get('match_end', 0),
+                            'date_parts': m['date_parts']} for m in matches if m.get('date_parts')]
+        
+        if len(filtered_matches) > 1:
+            min_start = min(m['match_start'] for m in filtered_matches)
+            max_end = max(m['match_end'] for m in filtered_matches)
+            merged_text = input_sentence[min_start:max_end]
+            all_date_parts = []
+            for m in filtered_matches:
+                all_date_parts.extend(m['date_parts'])
+            
+            result_match = {
+                'match_text': merged_text,
+                'match_start': min_start,
+                'match_end': max_end,
+                'date_parts': all_date_parts
+            }
+        else:
+            result_match = filtered_matches[0] if filtered_matches else None
+        
+        if result_match:
+            start_date = datetime_extractor.assemble_datetime(now, result_match['date_parts'], bottom=True)
+            end_date = datetime_extractor.assemble_datetime(now, result_match['date_parts'], bottom=False)
+            
+            final_result = {
+                'match_text': result_match['match_text'],
+                'match_start': result_match['match_start'],
+                'match_end': result_match['match_end'],
+                'start_date': start_date,
+                'end_date': end_date
+            }
+            return [final_result]
+        
+        return []
 
 
 def text2datetime(input_sentence: str, now: datetime = datetime.now(),
@@ -82,8 +171,7 @@ def text2date_with_spans(input_sentence: str, now: datetime = datetime.now(),
     matches = match_rules_with_spans(now, input_sentence, search_scope, realistic_year_required)
     return [{'match_text': m.get('match_text', ''), 
              'match_start': m.get('match_start', 0), 
-             'match_end': m.get('match_end', 0),
-             'date_parts': m['date_parts']} for m in matches if m.get('date_parts')]
+             'match_end': m.get('match_end', 0)} for m in matches if m.get('date_parts')]
 
 
 def text2date(input_sentence: str, now: datetime = datetime.now(),
