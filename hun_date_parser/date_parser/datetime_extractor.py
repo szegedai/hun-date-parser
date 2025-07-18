@@ -64,7 +64,7 @@ def text2datetime_with_spans(input_sentence: str, now: datetime = datetime.now()
             filtered_matches = [{'match_text': m.get('match_text', ''), 
                                 'match_start': m.get('match_start', 0) + part_start, 
                                 'match_end': m.get('match_end', 0) + part_start,
-                                'date_parts': m['date_parts']} for m in matches if m.get('date_parts')]
+                                'date_parts': m['date_parts']} for m in matches if m.get('date_parts') and m.get('match_start', 0) != m.get('match_end', 0)]
             
             if len(filtered_matches) > 1:
                 min_start = min(m['match_start'] for m in filtered_matches)
@@ -104,7 +104,7 @@ def text2datetime_with_spans(input_sentence: str, now: datetime = datetime.now()
         filtered_matches = [{'match_text': m.get('match_text', ''), 
                             'match_start': m.get('match_start', 0), 
                             'match_end': m.get('match_end', 0),
-                            'date_parts': m['date_parts']} for m in matches if m.get('date_parts')]
+                            'date_parts': m['date_parts']} for m in matches if m.get('date_parts') and m.get('match_start', 0) != m.get('match_end', 0)]
         
         if len(filtered_matches) > 1:
             min_start = min(m['match_start'] for m in filtered_matches)

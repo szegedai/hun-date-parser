@@ -158,12 +158,12 @@ def _raw_match_time_words(s: str) -> Optional[Tuple[Any, Any, Any, Any, Any, Any
         match_type = 'regular'
     elif not group and group_rev:
         minute, daypart, hour_modifier, hour, is_before = group_rev[0]
-        minute += (' ' + is_before)
+        minute = (minute or '') + (' ' + (is_before or ''))
         match_obj = matches_rev[0]
         match_type = 'reverse'
     elif group_rev[0].count(None) < group[0].count(None):
         minute, daypart, hour_modifier, hour, is_before = group_rev[0]
-        minute += (' ' + is_before)
+        minute = (minute or '') + (' ' + (is_before or ''))
         match_obj = matches_rev[0]
         match_type = 'reverse'
     else:

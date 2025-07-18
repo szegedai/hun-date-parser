@@ -45,8 +45,14 @@ test_cases_with_spans = [
     ('2021 január 5', [
         {'match_text': '2021 január 5', 'match_start': 0, 'match_end': 13, 'datetime_range': [datetime(2021, 1, 5, 0, 0, 0), datetime(2021, 1, 5, 23, 59, 59)]}
     ]),
+    ('ekkor: 2021-01-05', [
+        {'match_text': '2021-01-05', 'match_start': 7, 'match_end': 17, 'datetime_range': [datetime(2021, 1, 5, 0, 0, 0), datetime(2021, 1, 5, 23, 59, 59)]}
+    ]),
     ('idén márciusban', [
         {'match_text': 'idén március', 'match_start': 0, 'match_end': 12, 'datetime_range': [datetime(2020, 3, 1, 0, 0, 0), datetime(2020, 3, 31, 23, 59, 59)]}
+    ]),
+    ('ekkor: 2020 márciusban', [
+        {'match_text': '2020 március', 'match_start': 7, 'match_end': 19, 'datetime_range': [datetime(2020, 3, 1, 0, 0, 0), datetime(2020, 3, 31, 23, 59, 59)]}
     ]),
     ('xy tegnap vagy holnap', [
         {'match_text': 'tegnap', 'match_start': 3, 'match_end': 9, 'datetime_range': [datetime(2020, 12, 17, 0, 0, 0), datetime(2020, 12, 17, 23, 59, 59)]},
@@ -95,6 +101,79 @@ test_cases_with_spans = [
     ('x ma este 7-kor', [
         {'match_text': 'ma este 7-kor', 'match_start': 2, 'match_end': 15, 'datetime_range': [datetime(2020, 12, 18, 19, 0, 0), datetime(2020, 12, 18, 19, 59, 59)]}
     ]),
+    ('időpont foglalása holnapra vagy legyen inkább holnapután', [
+        {'match_text': 'holnap', 'match_start': 18, 'match_end': 24, 'datetime_range': [datetime(2020, 12, 19, 0, 0, 0), datetime(2020, 12, 19, 23, 59, 59)]},
+        {'match_text': 'holnapután', 'match_start': 46, 'match_end': 56, 'datetime_range': [datetime(2020, 12, 20, 0, 0, 0), datetime(2020, 12, 20, 23, 59, 59)]}
+    ]),
+    ('találkozunk kedden este 8-kor vagy szerdán délelőtt', [
+        {'match_text': 'kedden este 8-kor', 'match_start': 12, 'match_end': 29, 'datetime_range': [datetime(2020, 12, 15, 20, 0, 0), datetime(2020, 12, 15, 20, 59, 59)]},
+        {'match_text': 'szerdán délelőtt', 'match_start': 35, 'match_end': 51, 'datetime_range': [datetime(2020, 12, 16, 8, 0, 0), datetime(2020, 12, 16, 11, 59, 59)]}
+    ]),
+    ('BBB hétfőn reggel 9-kor kezdjük', [
+        {'match_text': 'hétfőn reggel 9-kor', 'match_start': 4, 'match_end': 23, 'datetime_range': [datetime(2020, 12, 14, 9, 0, 0), datetime(2020, 12, 14, 9, 59, 59)]}
+    ]),
+    ('Z március 5-én Y', [
+        {'match_text': 'március 5-én', 'match_start': 2, 'match_end': 14, 'datetime_range': [datetime(2020, 3, 5, 0, 0, 0), datetime(2020, 3, 5, 23, 59, 59)]}
+    ]),
+    ('X múlt csütörtökön délután 3-kor X', [
+        {'match_text': 'múlt csütörtökön délután 3-kor', 'match_start': 2, 'match_end': 32, 'datetime_range': [datetime(2020, 12, 10, 15, 0, 0), datetime(2020, 12, 10, 15, 59, 59)]}
+    ]),
+    ('az értekezlet 14:30-kor kezdődik', [
+        {'match_text': '14:30', 'match_start': 14, 'match_end': 19, 'datetime_range': [datetime(2020, 12, 18, 14, 30, 0), datetime(2020, 12, 18, 14, 30, 59)]}
+    ]),
+    ('beszélgetés most folyik', [
+        {'match_text': 'most', 'match_start': 12, 'match_end': 16, 'datetime_range': [datetime(2020, 12, 18, 0, 0, 0), datetime(2020, 12, 18, 0, 0, 59)]}
+    ]),
+    ('projekt befejezése 5 nap múlva lesz', [
+        {'match_text': '5 nap múlva', 'match_start': 19, 'match_end': 30, 'datetime_range': [datetime(2020, 12, 23, 0, 0, 0), datetime(2020, 12, 23, 23, 59, 59)]}
+    ]),
+    ('ünnepség március elején tartjuk', [
+        {'match_text': 'március elej', 'match_start': 9, 'match_end': 21, 'datetime_range': [datetime(2020, 3, 1, 0, 0, 0), datetime(2020, 3, 10, 23, 59, 59)]}
+    ]),
+    ('karácsonyi vásár december végén nyílik', [
+        {'match_text': 'december vég', 'match_start': 17, 'match_end': 29, 'datetime_range': [datetime(2020, 12, 20, 0, 0, 0), datetime(2020, 12, 31, 23, 59, 59)]}
+    ]),
+    ('programunk 2 hét múlva indul el', [
+        {'match_text': '2 hét múlva', 'match_start': 11, 'match_end': 22, 'datetime_range': [datetime(2021, 1, 1, 0, 0, 0), datetime(2021, 1, 1, 23, 59, 59)]}
+    ]),
+    ('konferencia rendezése 16h-kor zárul', [
+        {'match_text': '16h', 'match_start': 22, 'match_end': 25, 'datetime_range': [datetime(2020, 12, 18, 16, 0, 0), datetime(2020, 12, 18, 16, 59, 59)]}
+    ]),
+    # Additional test cases with random characters before/after target spans
+    ('xyz hétfőn találkozunk abc', [
+        {'match_text': 'hétfő', 'match_start': 4, 'match_end': 9, 'datetime_range': [datetime(2020, 12, 14, 0, 0, 0), datetime(2020, 12, 14, 23, 59, 59)]}
+    ]),
+    ('qwe kedden dolgozom rty', [
+        {'match_text': 'kedd', 'match_start': 4, 'match_end': 8, 'datetime_range': [datetime(2020, 12, 15, 0, 0, 0), datetime(2020, 12, 15, 23, 59, 59)]}
+    ]),
+    ('abc múlt vasárnap voltunk ott xyz', [
+        {'match_text': 'múlt vasárnap', 'match_start': 4, 'match_end': 17, 'datetime_range': [datetime(2020, 12, 13, 0, 0, 0), datetime(2020, 12, 13, 23, 59, 59)]}
+    ]),
+    ('def jövő kedden indulunk ghi', [
+        {'match_text': 'jövő kedd', 'match_start': 4, 'match_end': 13, 'datetime_range': [datetime(2020, 12, 22, 0, 0, 0), datetime(2020, 12, 22, 23, 59, 59)]}
+    ]),
+    ('pqr harmadikán megyünk uvw', [
+        {'match_text': 'harmadikán', 'match_start': 4, 'match_end': 14, 'datetime_range': [datetime(2020, 12, 3, 0, 0, 0), datetime(2020, 12, 3, 23, 59, 59)]}
+    ]),
+    ('zyx 15-én van a meeting stu', [
+        {'match_text': '15-én', 'match_start': 4, 'match_end': 9, 'datetime_range': [datetime(2020, 12, 15, 0, 0, 0), datetime(2020, 12, 15, 23, 59, 59)]}
+    ]),
+    ('mno 2021-ben történt vwx', [
+        {'match_text': '2021', 'match_start': 4, 'match_end': 8, 'datetime_range': [datetime(2021, 1, 1, 0, 0, 0), datetime(2021, 12, 31, 23, 59, 59)]}
+    ]),
+    ('abc tavaly decemberben def', [
+        {'match_text': 'tavaly december', 'match_start': 4, 'match_end': 19, 'datetime_range': [datetime(2019, 12, 1, 0, 0, 0), datetime(2019, 12, 31, 23, 59, 59)]}
+    ]),
+    ('klm jövő évben találkozunk opq', [
+        {'match_text': 'jövő évben', 'match_start': 4, 'match_end': 14, 'datetime_range': [datetime(2021, 1, 1, 0, 0, 0), datetime(2021, 12, 31, 23, 59, 59)]}
+    ]),
+    ('rst 3 hét múlva utazunk xyz', [
+        {'match_text': '3 hét múlva', 'match_start': 4, 'match_end': 15, 'datetime_range': [datetime(2021, 1, 8, 0, 0, 0), datetime(2021, 1, 8, 23, 59, 59)]}
+    ]),
+    ('vbn február közepén mnb', [
+        {'match_text': 'február közep', 'match_start': 4, 'match_end': 17, 'datetime_range': [datetime(2020, 2, 10, 0, 0, 0), datetime(2020, 2, 20, 23, 59, 59)]}
+    ]),
+
 ]
 
 

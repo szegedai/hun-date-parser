@@ -743,6 +743,16 @@ def match_named_month_start_mid_end(
             last_day = get_last_day(year_detected, month_detected)
             group_res['date_parts'].append(EndDay(last_day, 'named_month_sme'))
 
+        # Trim whitespace from match text and adjust span positions
+        full_text = group_res['match_text']
+        trimmed_text = full_text.strip()
+        if trimmed_text != full_text:
+            trimmed_start = group_res['match_start'] + len(full_text) - len(full_text.lstrip())
+            trimmed_end = group_res['match_end'] - len(full_text) + len(full_text.rstrip())
+            group_res['match_text'] = trimmed_text
+            group_res['match_start'] = trimmed_start
+            group_res['match_end'] = trimmed_end
+
         res.append(group_res)
 
     return res
