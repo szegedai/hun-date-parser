@@ -81,7 +81,7 @@ def text2datetime_with_spans(input_sentence: str, now: datetime = datetime.now()
                     'date_parts': all_date_parts
                 }
             else:
-                result_match = filtered_matches[0] if filtered_matches else None
+                result_match = filtered_matches[0] if filtered_matches else {}
             
             if result_match:
                 start_date = datetime_extractor.assemble_datetime(now, result_match['date_parts'], bottom=True)
@@ -121,7 +121,7 @@ def text2datetime_with_spans(input_sentence: str, now: datetime = datetime.now()
                 'date_parts': all_date_parts
             }
         else:
-            result_match = filtered_matches[0] if filtered_matches else None
+            result_match = filtered_matches[0] if filtered_matches else {}
         
         if result_match:
             start_date = datetime_extractor.assemble_datetime(now, result_match['date_parts'], bottom=True)
