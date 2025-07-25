@@ -1,6 +1,6 @@
 import re
 import calendar
-from typing import Dict, List, Any
+from typing import Dict, List, Any, Union
 from datetime import datetime, timedelta, date
 from dateutil.relativedelta import relativedelta
 
@@ -66,7 +66,7 @@ def match_iso_date(s: str,
             if realistic_year_restriction and not is_year_realistic(group_nums[0]):
                 continue
 
-            date_parts = []
+            date_parts: List[Union[Year, Month, Day]] = []
             if len(group_nums) >= 1:
                 date_parts.append(Year(group_nums[0], 'match_iso_date'))
             if len(group_nums) >= 2:
@@ -102,7 +102,7 @@ def match_named_month(s: str, now: datetime,
         group = match_obj.groups()
         group = (group[0], group[1], group[2].lstrip('0')) if group[2] else (group[0], group[1], '')
         
-        group_res = {'match': group, 
+        group_res: Dict[str, Any] = {'match': group, 
                      'match_text': match_obj.group(0),
                      'match_start': match_obj.start(),
                      'match_end': match_obj.end(),
@@ -214,7 +214,7 @@ def match_weekday(s: str, now: datetime,
         group = match_obj.groups()
         week, day = group
         
-        date_parts = {
+        date_parts: Dict[str, Any] = {
             'match': group,
             'match_text': match_obj.group(0),
             'match_start': match_obj.start(),
@@ -261,18 +261,18 @@ def match_weekday(s: str, now: datetime,
         if day_num != -1:
             if search_scope == SearchScopes.PAST_SEARCH:
                 if n_weeks == 0:
-                    day = to_last_week(get_day_of_week(n_weeks, day_num))
+                    target_day = to_last_week(get_day_of_week(n_weeks, day_num))
                 else:
-                    day = get_day_of_week(n_weeks, day_num)
+                    target_day = get_day_of_week(n_weeks, day_num)
             elif search_scope == SearchScopes.FUTURE_DAY:
                 if n_weeks == 0:
-                    day = to_next_week(get_day_of_week(n_weeks, day_num))
+                    target_day = to_next_week(get_day_of_week(n_weeks, day_num))
                 else:
-                    day = get_day_of_week(n_weeks, day_num)
+                    target_day = get_day_of_week(n_weeks, day_num)
             else:
-                day = get_day_of_week(n_weeks, day_num)
+                target_day = get_day_of_week(n_weeks, day_num)
 
-            date_parts['date_parts'] = [Year(day.year, 'weekday'), Month(day.month, 'weekday'), Day(day.day, 'weekday')]
+            date_parts['date_parts'] = [Year(target_day.year, 'weekday'), Month(target_day.month, 'weekday'), Day(target_day.day, 'weekday')]
 
         res.append(date_parts)
 
@@ -286,7 +286,7 @@ def match_week(s: str, now: datetime) -> List[Dict[str, Any]]:
     for match_obj in matches:
         group = match_obj.group(0)
         
-        date_parts = {
+        date_parts: Dict[str, Any] = {
             'match': group,
             'match_text': match_obj.group(0),
             'match_start': match_obj.start(),
@@ -330,7 +330,7 @@ def match_n_periods_compared_to_now(s: str, now: datetime) -> List[Dict[str, Any
         for match_obj in matches:
             group = match_obj.groups()
             
-            date_parts = {
+            date_parts: Dict[str, Any] = {
                 'match': group,
                 'match_text': match_obj.group(0),
                 'match_start': match_obj.start(),
@@ -338,9 +338,9 @@ def match_n_periods_compared_to_now(s: str, now: datetime) -> List[Dict[str, Any
                 'date_parts': []
             }
 
-            n = group[1]
-            if n:
-                n = word_to_num(n)
+            n_str = group[1]
+            if n_str:
+                n = word_to_num(n_str)
 
                 if n == -1:
                     continue
@@ -375,7 +375,7 @@ def match_named_year(s: str, now: datetime) -> List[Dict[str, Any]]:
     for match_obj in matches:
         group = match_obj.group(0)
         
-        date_parts = {
+        date_parts: Dict[str, Any] = {
             'match': group,
             'match_text': match_obj.group(0),
             'match_start': match_obj.start(),
@@ -427,7 +427,7 @@ def match_relative_month(s: str, now: datetime) -> List[Dict[str, Any]]:
     for match_obj in matches:
         group = match_obj.group(0)
         
-        date_parts = {
+        date_parts: Dict[str, Any] = {
             'match': group,
             'match_text': match_obj.group(0),
             'match_start': match_obj.start(),
@@ -476,7 +476,7 @@ def match_in_past_n_periods(s: str, now: datetime) -> List[Dict[str, Any]]:
         for match_obj in matches:
             group = match_obj.groups()
             
-            date_parts = {
+            date_parts: Dict[str, Any] = {
                 'match': group,
                 'match_text': match_obj.group(0),
                 'match_start': match_obj.start(),
@@ -484,9 +484,9 @@ def match_in_past_n_periods(s: str, now: datetime) -> List[Dict[str, Any]]:
                 'date_parts': []
             }
 
-            n = group[1]
-            if n:
-                n = word_to_num(n) if n != " " else 1
+            n_str = group[1]
+            if n_str:
+                n = word_to_num(n_str) if n_str != " " else 1
 
                 if n == -1:
                     continue
@@ -626,7 +626,7 @@ def match_named_month_interval(s: str) -> List[Dict[str, Any]]:
     for match_obj in matches:
         group = match_obj.groups()
         
-        group_res = {
+        group_res: Dict[str, Any] = {
             'match': group,
             'match_text': match_obj.group(0),
             'match_start': match_obj.start(),
@@ -679,7 +679,7 @@ def match_named_month_start_mid_end(
         group = match_obj.groups()
         group = (group[0], group[1], group[2].lstrip('0')) if group[2] else (group[0], group[1], '')
         
-        group_res = {
+        group_res: Dict[str, Any] = {
             'match': group,
             'match_text': match_obj.group(0),
             'match_start': match_obj.start(),
@@ -744,11 +744,11 @@ def match_named_month_start_mid_end(
             group_res['date_parts'].append(EndDay(last_day, 'named_month_sme'))
 
         # Trim whitespace from match text and adjust span positions
-        full_text = group_res['match_text']
+        full_text: str = str(group_res['match_text'])
         trimmed_text = full_text.strip()
         if trimmed_text != full_text:
-            trimmed_start = group_res['match_start'] + len(full_text) - len(full_text.lstrip())
-            trimmed_end = group_res['match_end'] - len(full_text) + len(full_text.rstrip())
+            trimmed_start = int(group_res['match_start']) + len(full_text) - len(full_text.lstrip())
+            trimmed_end = int(group_res['match_end']) - len(full_text) + len(full_text.rstrip())
             group_res['match_text'] = trimmed_text
             group_res['match_start'] = trimmed_start
             group_res['match_end'] = trimmed_end

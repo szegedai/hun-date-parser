@@ -46,8 +46,8 @@ def _trim_to_temporal_content(text: str, match_start: int, match_end: int, match
     if first_temporal_start is None:
         return match_start, match_end, match_text
     
-    new_start = match_start + first_temporal_start
-    new_end = match_start + last_temporal_end
+    new_start = match_start + (first_temporal_start or 0)
+    new_end = match_start + (last_temporal_end or 0)
     new_match_text = text[new_start:new_end]
     
     return new_start, new_end, new_match_text
