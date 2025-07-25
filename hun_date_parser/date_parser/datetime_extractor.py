@@ -33,8 +33,8 @@ daypart_mapping = [
 
 
 def text2datetime_with_spans(input_sentence: str, now: datetime = datetime.now(),
-                            search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED,
-                            realistic_year_required: bool = True) -> List[Dict]:
+                             search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED,
+                             realistic_year_required: bool = True) -> List[Dict]:
     """
     Returns datetime intervals with span information found in the input sentence.
     :param input_sentence: Input sentence string.
@@ -44,28 +44,29 @@ def text2datetime_with_spans(input_sentence: str, now: datetime = datetime.now()
     :return: list of dictionaries with datetime intervals and span info
     """
     from hun_date_parser.date_parser.structure_parsers import match_multi_match
-    
+
     datetime_extractor = DatetimeExtractor(now=now, output_container='datetime',
-                                         search_scope=search_scope,
-                                         realistic_year_required=realistic_year_required)
-    
+                                           search_scope=search_scope,
+                                           realistic_year_required=realistic_year_required)
+
     sentence_parts = match_multi_match(input_sentence.lower())
-    
+
     if len(sentence_parts) > 1:
         all_results = []
         cumulative_offset = 0
-        
+
         for part in sentence_parts:
             part_start = input_sentence.lower().find(part, cumulative_offset)
             if part_start == -1:
                 continue
-                
+
             matches = match_rules_with_spans(now, part, search_scope, realistic_year_required)
-            filtered_matches = [{'match_text': m.get('match_text', ''), 
-                                'match_start': m.get('match_start', 0) + part_start, 
-                                'match_end': m.get('match_end', 0) + part_start,
-                                'date_parts': m['date_parts']} for m in matches if m.get('date_parts') and m.get('match_start', 0) != m.get('match_end', 0)]
-            
+            filtered_matches = [{'match_text': m.get('match_text', ''),
+                                 'match_start': m.get('match_start', 0) + part_start,
+                                 'match_end': m.get('match_end', 0) + part_start,
+                                 'date_parts': m['date_parts']} for m in matches
+                                if m.get('date_parts') and m.get('match_start', 0) != m.get('match_end', 0)]
+
             if len(filtered_matches) > 1:
                 min_start = min(m['match_start'] for m in filtered_matches)
                 max_end = max(m['match_end'] for m in filtered_matches)
@@ -73,7 +74,7 @@ def text2datetime_with_spans(input_sentence: str, now: datetime = datetime.now()
                 all_date_parts = []
                 for m in filtered_matches:
                     all_date_parts.extend(m['date_parts'])
-                
+
                 result_match = {
                     'match_text': merged_text,
                     'match_start': min_start,
@@ -82,11 +83,11 @@ def text2datetime_with_spans(input_sentence: str, now: datetime = datetime.now()
                 }
             else:
                 result_match = filtered_matches[0] if filtered_matches else {}
-            
+
             if result_match:
                 start_date = datetime_extractor.assemble_datetime(now, result_match['date_parts'], bottom=True)
                 end_date = datetime_extractor.assemble_datetime(now, result_match['date_parts'], bottom=False)
-                
+
                 final_result = {
                     'match_text': result_match['match_text'],
                     'match_start': result_match['match_start'],
@@ -95,17 +96,18 @@ def text2datetime_with_spans(input_sentence: str, now: datetime = datetime.now()
                     'end_date': end_date
                 }
                 all_results.append(final_result)
-                
+
             cumulative_offset = part_start + len(part)
-            
+
         return all_results
     else:
         matches = match_rules_with_spans(now, input_sentence, search_scope, realistic_year_required)
-        filtered_matches = [{'match_text': m.get('match_text', ''), 
-                            'match_start': m.get('match_start', 0), 
-                            'match_end': m.get('match_end', 0),
-                            'date_parts': m['date_parts']} for m in matches if m.get('date_parts') and m.get('match_start', 0) != m.get('match_end', 0)]
-        
+        filtered_matches = [{'match_text': m.get('match_text', ''),
+                             'match_start': m.get('match_start', 0),
+                             'match_end': m.get('match_end', 0),
+                             'date_parts': m['date_parts']} for m in matches
+                            if m.get('date_parts') and m.get('match_start', 0) != m.get('match_end', 0)]
+
         if len(filtered_matches) > 1:
             min_start = min(m['match_start'] for m in filtered_matches)
             max_end = max(m['match_end'] for m in filtered_matches)
@@ -113,7 +115,7 @@ def text2datetime_with_spans(input_sentence: str, now: datetime = datetime.now()
             all_date_parts = []
             for m in filtered_matches:
                 all_date_parts.extend(m['date_parts'])
-            
+
             result_match = {
                 'match_text': merged_text,
                 'match_start': min_start,
@@ -122,11 +124,11 @@ def text2datetime_with_spans(input_sentence: str, now: datetime = datetime.now()
             }
         else:
             result_match = filtered_matches[0] if filtered_matches else {}
-        
+
         if result_match:
             start_date = datetime_extractor.assemble_datetime(now, result_match['date_parts'], bottom=True)
             end_date = datetime_extractor.assemble_datetime(now, result_match['date_parts'], bottom=False)
-            
+
             final_result = {
                 'match_text': result_match['match_text'],
                 'match_start': result_match['match_start'],
@@ -135,7 +137,7 @@ def text2datetime_with_spans(input_sentence: str, now: datetime = datetime.now()
                 'end_date': end_date
             }
             return [final_result]
-        
+
         return []
 
 
@@ -158,8 +160,8 @@ def text2datetime(input_sentence: str, now: datetime = datetime.now(),
 
 
 def text2date_with_spans(input_sentence: str, now: datetime = datetime.now(),
-                        search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED,
-                        realistic_year_required: bool = True) -> List[Dict]:
+                         search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED,
+                         realistic_year_required: bool = True) -> List[Dict]:
     """
     Returns date intervals with span information found in the input sentence.
     :param input_sentence: Input sentence string.
@@ -169,8 +171,8 @@ def text2date_with_spans(input_sentence: str, now: datetime = datetime.now(),
     :return: list of dictionaries with date intervals and span info
     """
     matches = match_rules_with_spans(now, input_sentence, search_scope, realistic_year_required)
-    return [{'match_text': m.get('match_text', ''), 
-             'match_start': m.get('match_start', 0), 
+    return [{'match_text': m.get('match_text', ''),
+             'match_start': m.get('match_start', 0),
              'match_end': m.get('match_end', 0)} for m in matches if m.get('date_parts')]
 
 
@@ -209,8 +211,8 @@ def text2time(input_sentence: str, now: datetime = datetime.now(),
 
 
 def match_rules_with_spans(now: datetime, sentence: str,
-                          search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED,
-                          realistic_year_required: bool = True) -> List:
+                           search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED,
+                           realistic_year_required: bool = True) -> List:
     """
     Matches all rules against input text and returns both date parts and span information.
     :param now: Current timestamp to calculate relative dates.

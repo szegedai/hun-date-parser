@@ -37,7 +37,7 @@ def match_iso_date(s: str,
     match = re.finditer(R_ISO_DATE, s_cleaned)
 
     res = []
-    
+
     # Process reverse ISO date matches first
     for match_obj in match_rev:
         group = match_obj.groups()
@@ -53,7 +53,7 @@ def match_iso_date(s: str,
                     'date_parts': [Year(group_nums[2], 'match_iso_date'),
                                    Month(group_nums[1], 'match_iso_date'),
                                    Day(group_nums[0], 'match_iso_date')]})
-    
+
     # If no reverse matches, process regular ISO date matches
     if not res:
         for match_obj in match:
@@ -97,16 +97,16 @@ def match_named_month(s: str, now: datetime,
     months = ['jan', 'feb', 'mar', 'apr', 'maj', 'jun', 'jul', 'aug', 'szep', 'okt', 'nov', 'dec']
 
     res = []
-    
+
     for match_obj in matches:
         group = match_obj.groups()
         group = (group[0], group[1], group[2].lstrip('0')) if group[2] else (group[0], group[1], '')
-        
-        group_res: Dict[str, Any] = {'match': group, 
-                     'match_text': match_obj.group(0),
-                     'match_start': match_obj.start(),
-                     'match_end': match_obj.end(),
-                     'date_parts': []}
+
+        group_res: Dict[str, Any] = {'match': group,
+                                     'match_text': match_obj.group(0),
+                                     'match_start': match_obj.start(),
+                                     'match_end': match_obj.end(),
+                                     'date_parts': []}
 
         month_detected = None
         for i, month in enumerate(months):
@@ -162,7 +162,7 @@ def match_named_month(s: str, now: datetime,
 
 def match_relative_day(s: str, now: datetime) -> List[Dict[str, Any]]:
     patterns = [R_TODAY, R_TOMORROW, R_NTOMORROW, R_YESTERDAY, R_NYESTERDAY]
-    
+
     res = []
     for pattern in patterns:
         for match_obj in re.finditer(pattern, s):
@@ -182,23 +182,23 @@ def match_relative_day(s: str, now: datetime) -> List[Dict[str, Any]]:
 
             if 'ma' in group_text or 'má' in group_text:
                 match_data['date_parts'] = [Year(now.year, 'relative_day'), Month(now.month, 'relative_day'),
-                                           Day(now.day, 'relative_day')]
+                                            Day(now.day, 'relative_day')]
             elif 'holnapu' in group_text:
                 tom2 = now + timedelta(days=2)
                 match_data['date_parts'] = [Year(tom2.year, 'relative_day'), Month(tom2.month, 'relative_day'),
-                                           Day(tom2.day, 'relative_day')]
+                                            Day(tom2.day, 'relative_day')]
             elif 'holnap' in group_text:
                 tom = now + timedelta(days=1)
                 match_data['date_parts'] = [Year(tom.year, 'relative_day'), Month(tom.month, 'relative_day'),
-                                           Day(tom.day, 'relative_day')]
+                                            Day(tom.day, 'relative_day')]
             elif 'tegnapel' in group_text:
                 yes2 = now - timedelta(days=2)
                 match_data['date_parts'] = [Year(yes2.year, 'relative_day'), Month(yes2.month, 'relative_day'),
-                                           Day(yes2.day, 'relative_day')]
+                                            Day(yes2.day, 'relative_day')]
             elif 'tegnap' in group_text:
                 yes = now - timedelta(days=1)
                 match_data['date_parts'] = [Year(yes.year, 'relative_day'), Month(yes.month, 'relative_day'),
-                                           Day(yes.day, 'relative_day')]
+                                            Day(yes.day, 'relative_day')]
 
             res.append(match_data)
 
@@ -213,7 +213,7 @@ def match_weekday(s: str, now: datetime,
     for match_obj in matches:
         group = match_obj.groups()
         week, day = group
-        
+
         date_parts: Dict[str, Any] = {
             'match': group,
             'match_text': match_obj.group(0),
@@ -221,7 +221,7 @@ def match_weekday(s: str, now: datetime,
             'match_end': match_obj.end(),
             'date_parts': []
         }
-        
+
         n_weeks = 0
 
         if week and 'jovo' in remove_accent(week):
@@ -272,7 +272,9 @@ def match_weekday(s: str, now: datetime,
             else:
                 target_day = get_day_of_week(n_weeks, day_num)
 
-            date_parts['date_parts'] = [Year(target_day.year, 'weekday'), Month(target_day.month, 'weekday'), Day(target_day.day, 'weekday')]
+            date_parts['date_parts'] = [Year(target_day.year, 'weekday'),
+                                        Month(target_day.month, 'weekday'),
+                                        Day(target_day.day, 'weekday')]
 
         res.append(date_parts)
 
@@ -285,7 +287,7 @@ def match_week(s: str, now: datetime) -> List[Dict[str, Any]]:
     res = []
     for match_obj in matches:
         group = match_obj.group(0)
-        
+
         date_parts: Dict[str, Any] = {
             'match': group,
             'match_text': match_obj.group(0),
@@ -329,7 +331,7 @@ def match_n_periods_compared_to_now(s: str, now: datetime) -> List[Dict[str, Any
         matches = re.finditer(regex, s)
         for match_obj in matches:
             group = match_obj.groups()
-            
+
             date_parts: Dict[str, Any] = {
                 'match': group,
                 'match_text': match_obj.group(0),
@@ -374,7 +376,7 @@ def match_named_year(s: str, now: datetime) -> List[Dict[str, Any]]:
     res = []
     for match_obj in matches:
         group = match_obj.group(0)
-        
+
         date_parts: Dict[str, Any] = {
             'match': group,
             'match_text': match_obj.group(0),
@@ -426,7 +428,7 @@ def match_relative_month(s: str, now: datetime) -> List[Dict[str, Any]]:
     res = []
     for match_obj in matches:
         group = match_obj.group(0)
-        
+
         date_parts: Dict[str, Any] = {
             'match': group,
             'match_text': match_obj.group(0),
@@ -475,7 +477,7 @@ def match_in_past_n_periods(s: str, now: datetime) -> List[Dict[str, Any]]:
         matches = re.finditer(regex, s)
         for match_obj in matches:
             group = match_obj.groups()
-            
+
             date_parts: Dict[str, Any] = {
                 'match': group,
                 'match_text': match_obj.group(0),
@@ -625,7 +627,7 @@ def match_named_month_interval(s: str) -> List[Dict[str, Any]]:
 
     for match_obj in matches:
         group = match_obj.groups()
-        
+
         group_res: Dict[str, Any] = {
             'match': group,
             'match_text': match_obj.group(0),
@@ -678,7 +680,7 @@ def match_named_month_start_mid_end(
     for match_obj in matches:
         group = match_obj.groups()
         group = (group[0], group[1], group[2].lstrip('0')) if group[2] else (group[0], group[1], '')
-        
+
         group_res: Dict[str, Any] = {
             'match': group,
             'match_text': match_obj.group(0),

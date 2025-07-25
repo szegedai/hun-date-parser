@@ -14,10 +14,10 @@ def _trim_to_temporal_content(text: str, match_start: int, match_end: int, match
     """Trim match to start and end at relevant temporal words."""
     if not match_text or match_start == match_end:
         return match_start, match_end, match_text
-    
+
     # Temporal word patterns (accent-free, longer words first)
     temporal_patterns = [
-        r'\bharomnegyed\b', r'\bdelelo[to]*\b', r'\bdelutan\b', r'\bhajnal[i]?\b', 
+        r'\bharomnegyed\b', r'\bdelelo[to]*\b', r'\bdelutan\b', r'\bhajnal[i]?\b',
         r'\breggel\b', r'\beste\b', r'\bejjel\b',
         r'\bnegyed\b', r'\bfel\b', r'\bora\b', r'\bkor\b', r'\belott\b', r'\butan\b',
         r'\bperc\b', r'\bma\b', r'\bholnap\b', r'\btegnap\b',
@@ -26,30 +26,30 @@ def _trim_to_temporal_content(text: str, match_start: int, match_end: int, match
         r'\bjulius\b', r'\baugusztus\b', r'\bszeptember\b', r'\boktober\b', r'\bnovember\b', r'\bdecember\b',
         r'\b\d+\b'  # Any digit sequence
     ]
-    
+
     first_temporal_start = None
     last_temporal_end = None
-    
+
     match_text_lower = remove_accent(match_text.lower())
-    
+
     for pattern in temporal_patterns:
         for match in re.finditer(pattern, match_text_lower):
             start_pos = match.start()
             end_pos = match.end()
-            
+
             if first_temporal_start is None or start_pos < first_temporal_start:
                 first_temporal_start = start_pos
-            
+
             if last_temporal_end is None or end_pos > last_temporal_end:
                 last_temporal_end = end_pos
-    
+
     if first_temporal_start is None:
         return match_start, match_end, match_text
-    
+
     new_start = match_start + (first_temporal_start or 0)
     new_end = match_start + (last_temporal_end or 0)
     new_match_text = text[new_start:new_end]
-    
+
     return new_start, new_end, new_match_text
 
 
@@ -141,11 +141,11 @@ def _raw_match_time_words(s: str) -> Optional[Tuple[Any, Any, Any, Any, Any, Any
     """
     match_obj = None
     match_type = None
-    
+
     # Try regular pattern first
     matches = list(re.finditer(R_HOUR_MIN, s))
     group = [m.groups() for m in matches if ''.join([g for g in m.groups() if g])]
-    
+
     # Try reverse pattern
     matches_rev = list(re.finditer(R_HOUR_MIN_REV, s))
     group_rev = [m.groups() for m in matches_rev if ''.join([g for g in m.groups() if g])]
@@ -192,7 +192,7 @@ def match_time_words(s: str) -> List[Dict[str, Any]]:
         return []
     else:
         match_obj, daypart, hour_modifier, hour, minute, match_type = parts
-        
+
     # Handle the special case where no valid hour is found
     if match_type is None:
         return []
@@ -303,11 +303,11 @@ def match_time_words(s: str) -> List[Dict[str, Any]]:
         original_start = match_obj.start() if match_obj else 0
         original_end = match_obj.end() if match_obj else 0
         original_text = match_obj.group(0) if match_obj else ''
-        
+
         trimmed_start, trimmed_end, trimmed_text = _trim_to_temporal_content(
             s, original_start, original_end, original_text
         )
-        
+
         res.append({
             'match': match_obj.groups() if match_obj else [],
             'match_text': trimmed_text,
@@ -320,11 +320,11 @@ def match_time_words(s: str) -> List[Dict[str, Any]]:
         original_start = match_obj.start() if match_obj else 0
         original_end = match_obj.end() if match_obj else 0
         original_text = match_obj.group(0) if match_obj else ''
-        
+
         trimmed_start, trimmed_end, trimmed_text = _trim_to_temporal_content(
             s, original_start, original_end, original_text
         )
-        
+
         daypart_match = {
             'match': match_obj.groups() if match_obj else [],
             'match_text': trimmed_text,
@@ -332,7 +332,7 @@ def match_time_words(s: str) -> List[Dict[str, Any]]:
             'match_end': trimmed_end,
             'date_parts': []
         }
-        
+
         if 'hajnal' in daypart:
             daypart_match['date_parts'] = [Daypart(0, 'time_words')]
         elif 'reggel' in daypart:
@@ -345,7 +345,7 @@ def match_time_words(s: str) -> List[Dict[str, Any]]:
             daypart_match['date_parts'] = [Daypart(4, 'time_words')]
         elif 'ejjel' in remove_accent(daypart):
             daypart_match['date_parts'] = [Daypart(5, 'time_words')]
-            
+
         res.append(daypart_match)
 
     return res
