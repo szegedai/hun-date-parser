@@ -296,3 +296,52 @@ def test_parse_duration_with_spans(inp, exp_text, exp_start, exp_end, exp_minute
     assert result['match_start'] == exp_start
     assert result['match_end'] == exp_end
     assert result['minutes'] == exp_minutes
+
+
+# Test cases for MAX duration expressions
+tf_max_duration = [
+    ("ameddig lehet", "max"),
+    ("amíg lehet", "max"),
+    ("ameddig lehetséges", "max"),
+    ("amíg lehetséges", "max"),
+    ("ameddig csak lehet", "max"),
+    ("amíg csak lehet", "max"),
+    ("maximum időre", "max"),
+    ("max időre", "max"),
+    ("foglald le ameddig lehet", "max"),
+    ("maximum időre kérlek", "max"),
+    ("legfeljebb ameddig csak lehet", "max"),
+    
+    # These should not match
+    ("amíg", None),
+    ("lehet", None),
+    ("maximum", None),
+    ("max", None),
+]
+
+
+@pytest.mark.parametrize("inp, expected", tf_max_duration)
+def test_max_duration_recognition(inp, expected):
+    """Test recognition of maximum duration expressions"""
+    result = parse_duration(inp)
+    assert result == expected
+
+
+def test_max_duration_detailed():
+    """Test detailed MAX duration parsing"""
+    result = parse_duration("ameddig lehet", return_preferred_unit=True)
+    assert result is not None
+    assert result["value"] == "max"
+    assert result["unit"] == "max"
+    assert result["preferred_unit"] == "max"
+    assert result["minutes"] == "max"
+
+
+def test_max_duration_with_spans():
+    """Test MAX duration parsing with span information"""
+    result = parse_duration_with_spans("ameddig lehet")
+    assert result is not None
+    assert result["match_text"] == "ameddig lehet"
+    assert result["match_start"] == 0
+    assert result["match_end"] == 13
+    assert result["minutes"] == "max"

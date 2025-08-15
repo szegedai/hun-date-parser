@@ -7,6 +7,12 @@ from hun_date_parser.date_parser.patterns import (R_HOUR_MIN_D, R_HOUR_HOUR_D,
 from enum import Enum
 
 
+class MaxDuration(DateTimePartConatiner):
+    """Special duration class for maximum/indefinite duration expressions"""
+    def __init__(self, rule: str = "max_duration"):
+        super().__init__(value=None, rule=rule)
+
+
 class DurationUnit(str, Enum):
     """Enum for duration unit preferences"""
     MINUTES = "minutes"
@@ -15,6 +21,7 @@ class DurationUnit(str, Enum):
     WEEKS = "weeks"
     MONTHS = "months"
     YEARS = "years"
+    MAX = "max"
 
 
 class DateParts(TypedDict):
@@ -77,6 +84,14 @@ def duration_parser(s: str, return_preferred_unit: bool = False, with_spans: boo
     # Define all patterns
     year_pattern = (r'\b(\d+|egy|kett[oöő]|két|h[aá]rom|n[eé]gy|[öo]t|hat|h[eé]t|nyolc|kilenc|'
                     r't[ií]z|teljes)?\s*[eé]v(ese?[eé]?t?|re)\b')
+    
+    # Max frequency patterns
+    max_patterns = [
+        r'\b(ameddig|am[ií]g)\s+(csak\s+)?lehet(s[eé]ges)?\b',
+        r'\b(maximum|max)\s+id[oő]re\b',
+        r'\b(lehet[oő]leg\s+)?hossz[aá]n\b',
+        r'\bmaxim[aá]lis\s+(ideig|id[oő]re)\b'
+    ]
     week_pattern = (r'\b(\d+|egy|kett[oöő]|k[eé]t|k[eé]thetes|h[aá]rom|n[eé]gy|[öo]t|hat|h[eé]t|'
                    r'nyolc|kilenc|t[ií]z)\s*h[eé]t(ese?[eé]?t?|re)\b')
     day_pattern = (r'\b(\d+|egy|kett[oöő]|két|h[aá]rom|n[eé]gy|[öo]t|hat|h[eé]t|nyolc|kilenc|'
@@ -85,6 +100,25 @@ def duration_parser(s: str, return_preferred_unit: bool = False, with_spans: boo
                    r't[ií]z|\d{2})\s*[oó]r[aá](sa?[aá]?t?|ra)\b')
     minute_pattern = (r'\b(\d+|egy|kett[oöő]|két|h[aá]rom|n[eé]gy|[öo]t|hat|h[eé]t|nyolc|kilenc|'
                      r't[ií]z|húsz|harminc|negyven|ötven|\d{2,3})\s*perc[a-z]*\b')
+
+    # Check for max duration patterns first
+    for pattern in max_patterns:
+        if re.search(pattern, s_no_accent):
+            if with_spans:
+                match_start, match_end = _find_span_in_original(pattern, original_s)
+            
+            # Return MaxDuration result
+            res_date_parts = [MaxDuration("max_duration")]
+            preferred_unit = DurationUnit.MAX
+            
+            result: DateParts = {
+                "match": s,
+                "date_parts": res_date_parts,
+                "preferred_unit": preferred_unit if return_preferred_unit else None,
+                "match_start": match_start if with_spans else None,
+                "match_end": match_end if with_spans else None
+            }
+            return result
 
     # Year patterns
     year_search = re.search(year_pattern, s_no_accent)
@@ -275,12 +309,20 @@ def parse_duration_with_spans(s: str, return_preferred_unit: bool = False) -> Un
         date_part = results["date_parts"][0]
         preferred_unit = results.get("preferred_unit", DurationUnit.MINUTES)
 
-        result_dict.update({
-            "value": date_part.value,
-            "unit": type(date_part).__name__.lower(),
-            "preferred_unit": preferred_unit.value if preferred_unit else DurationUnit.MINUTES.value,
-            "minutes": _convert_to_minutes(date_part)
-        })
+        if isinstance(date_part, MaxDuration):
+            result_dict.update({
+                "value": "max",
+                "unit": "max",
+                "preferred_unit": DurationUnit.MAX.value,
+                "minutes": "max"
+            })
+        else:
+            result_dict.update({
+                "value": date_part.value,
+                "unit": type(date_part).__name__.lower(),
+                "preferred_unit": preferred_unit.value if preferred_unit else DurationUnit.MINUTES.value,
+                "minutes": _convert_to_minutes(date_part)
+            })
     else:
         # Return minutes for backward compatibility
         result_dict["minutes"] = _convert_to_minutes(results["date_parts"][0])
@@ -288,7 +330,7 @@ def parse_duration_with_spans(s: str, return_preferred_unit: bool = False) -> Un
     return result_dict
 
 
-def parse_duration(s: str, return_preferred_unit: bool = False) -> Union[Optional[int], Optional[dict]]:
+def parse_duration(s: str, return_preferred_unit: bool = False) -> Union[Optional[int], Optional[str], Optional[dict]]:
     """
     Returns the duration found in the input string.
     :param s: Input string containing the duration information.
@@ -306,21 +348,31 @@ def parse_duration(s: str, return_preferred_unit: bool = False) -> Union[Optiona
         date_part = results["date_parts"][0]
         preferred_unit = results.get("preferred_unit", DurationUnit.MINUTES)
 
-        return {
-            "value": date_part.value,
-            "unit": type(date_part).__name__.lower(),
-            "preferred_unit": preferred_unit.value if preferred_unit else DurationUnit.MINUTES.value,
-            "minutes": _convert_to_minutes(date_part)
-        }
+        if isinstance(date_part, MaxDuration):
+            return {
+                "value": "max",
+                "unit": "max",
+                "preferred_unit": DurationUnit.MAX.value,
+                "minutes": "max"
+            }
+        else:
+            return {
+                "value": date_part.value,
+                "unit": type(date_part).__name__.lower(),
+                "preferred_unit": preferred_unit.value if preferred_unit else DurationUnit.MINUTES.value,
+                "minutes": _convert_to_minutes(date_part)
+            }
     else:
         # Return minutes for backward compatibility
         return _convert_to_minutes(results["date_parts"][0])
 
 
-def _convert_to_minutes(date_part: DateTimePartConatiner) -> int:
+def _convert_to_minutes(date_part: DateTimePartConatiner) -> Union[int, str]:
     """
     Helper function to convert any date part to minutes.
     """
+    if isinstance(date_part, MaxDuration):
+        return "max"
     if date_part.value is None:
         return 0
     if isinstance(date_part, Minute):
