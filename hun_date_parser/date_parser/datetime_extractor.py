@@ -22,30 +22,20 @@ from hun_date_parser.utils import (Year, Month, Week, Day, Daypart, Hour, Minute
 
 datelike = Union[datetime, date, time, None]
 
-daypart_mapping = [
-    (3, 5),  # hajnal
-    (6, 10),  # reggel
-    (8, 11),  # délelőtt
-    (12, 18),  # délután
-    (18, 21),  # este
-    (22, 2)  # éjjel
-]
 
-
-def text2datetime_with_spans(input_sentence: str, now: datetime = datetime.now(),
-                             search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED,
-                             realistic_year_required: bool = True) -> List[Dict]:
+def _extract_with_spans(input_sentence: str, output_container: str, now: datetime = datetime.now(),
+                        search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED,
+                        realistic_year_required: bool = True) -> List[Dict]:
     """
-    Returns datetime intervals with span information found in the input sentence.
+    Shared implementation for extracting date/datetime intervals with span information.
     :param input_sentence: Input sentence string.
+    :param output_container: Either 'date' or 'datetime' to specify the extraction type.
     :param now: Current timestamp to calculate relative dates.
     :param search_scope: Defines whether the timeframe should be restricted to past or future.
     :param realistic_year_required: Defines whether to restrict year candidates to be between 1900 and 2100.
-    :return: list of dictionaries with datetime intervals and span info
+    :return: list of dictionaries with date/datetime intervals and span info
     """
-    from hun_date_parser.date_parser.structure_parsers import match_multi_match
-
-    datetime_extractor = DatetimeExtractor(now=now, output_container='datetime',
+    datetime_extractor = DatetimeExtractor(now=now, output_container=output_container,
                                            search_scope=search_scope,
                                            realistic_year_required=realistic_year_required)
 
@@ -140,6 +130,29 @@ def text2datetime_with_spans(input_sentence: str, now: datetime = datetime.now()
 
         return []
 
+daypart_mapping = [
+    (3, 5),  # hajnal
+    (6, 10),  # reggel
+    (8, 11),  # délelőtt
+    (12, 18),  # délután
+    (18, 21),  # este
+    (22, 2)  # éjjel
+]
+
+
+def text2datetime_with_spans(input_sentence: str, now: datetime = datetime.now(),
+                             search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED,
+                             realistic_year_required: bool = True) -> List[Dict]:
+    """
+    Returns datetime intervals with span information found in the input sentence.
+    :param input_sentence: Input sentence string.
+    :param now: Current timestamp to calculate relative dates.
+    :param search_scope: Defines whether the timeframe should be restricted to past or future.
+    :param realistic_year_required: Defines whether to restrict year candidates to be between 1900 and 2100.
+    :return: list of dictionaries with datetime intervals and span info
+    """
+    return _extract_with_spans(input_sentence, 'datetime', now, search_scope, realistic_year_required)
+
 
 def text2datetime(input_sentence: str, now: datetime = datetime.now(),
                   search_scope: SearchScopes = SearchScopes.NOT_RESTRICTED,
@@ -170,10 +183,7 @@ def text2date_with_spans(input_sentence: str, now: datetime = datetime.now(),
     :param realistic_year_required: Defines whether to restrict year candidates to be between 1900 and 2100.
     :return: list of dictionaries with date intervals and span info
     """
-    matches = match_rules_with_spans(now, input_sentence, search_scope, realistic_year_required)
-    return [{'match_text': m.get('match_text', ''),
-             'match_start': m.get('match_start', 0),
-             'match_end': m.get('match_end', 0)} for m in matches if m.get('date_parts')]
+    return _extract_with_spans(input_sentence, 'date', now, search_scope, realistic_year_required)
 
 
 def text2date(input_sentence: str, now: datetime = datetime.now(),

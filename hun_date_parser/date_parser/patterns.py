@@ -76,10 +76,10 @@ R_TOLIG_IMPLIED_END = r"(\bjan(?:uár)?|feb(?:ruár)?|márc(?:ius)?|ápr(?:ilis)
 R_START_STATED_END_IMPLIED = r"(?:[kK]ezd|[iI]ndul).{1,20}:\s*([^:]{1,50}?)\s*:\s*([^:]{1,50})$"
 
 # Duration
-R_HOUR_MIN_D = r'.*?(?:([0-9]{1,2}|nulla|egy|kett[oöő]|h[aá]rom|n[eé]gy|[öo]t|hat|h[eé]t|nyolc|kilenc|t[ií]z|tizenegy|tizenkett[oő]|tizenh[aá]rom|tizenn[eé]gy|tizen[oö]t|tizenhat|tizenh[eé]t|tizennyolc|tizenkilenc|h[uú]sz|huszonegy|huszonkett[oöő]|huszonkettő|huszonhárom) [óo]ra)? ?([a-zA-Z0-9]{1,15}) perc'
-R_SPECIAL_HOUR_D = r'.*?(negyed|h[aá]romnegyed|m[aá]sf[eé]l)(?:[oó]r[aá](?:[tr]?[aá]?)).*'  # e.g. negyedóra, másfélórát, másfélórára
-R_HOUR_D = r'.*?(?:([0-9]{1,2}|nulla|egy|kett[oöő]|h[aá]rom|n[eé]gy|[öo]t|hat|h[eé]t|nyolc|kilenc|t[ií]z|tizenegy|tizenkett[oő]|tizenh[aá]rom|tizenn[eé]gy|tizen[oö]t|tizenhat|tizenh[eé]t|tizennyolc|tizenkilenc|h[uú]sz|huszonegy|huszonkett[oöő]|huszonkettő|huszonhárom|[0-9],5)) ?[óo]r[aá]?'
-R_HOUR_HOUR_D = r'.*?(?:([0-9]{1,2}|egy|kett[oöő]|h[aá]rom|n[eé]gy|[öo]t|hat|h[eé]t|nyolc|kilenc|t[ií]z)?(?: [eé]s )? ?(h[aá]romnegyed|negyed|f[eé]l|m[aá]sf[eé]l) ?[oó]r[aá])'
+R_HOUR_MIN_D = r'\b(?:([0-9]{1,2}|nulla|egy|kett[oöő]|h[aá]rom|n[eé]gy|[öo]t|hat|h[eé]t|nyolc|kilenc|t[ií]z|tizenegy|tizenkett[oő]|tizenh[aá]rom|tizenn[eé]gy|tizen[oö]t|tizenhat|tizenh[eé]t|tizennyolc|tizenkilenc|h[uú]sz|huszonegy|huszonkett[oöő]|huszonkettő|huszonhárom) [óo]ra)? ?([a-zA-Z0-9]{1,15}) perc[a-z]*'
+R_SPECIAL_HOUR_D = r'\b(negyed|h[aá]romnegyed|m[aá]sf[eé]l)\s*[oó]r[aá][a-z]*'  # e.g. negyedóra, másfél órát, háromnegyed órára
+R_HOUR_D = r'\b(?:([0-9]{1,2}|nulla|egy|kett[oöő]|h[aá]rom|n[eé]gy|[öo]t|hat|h[eé]t|nyolc|kilenc|t[ií]z|tizenegy|tizenkett[oő]|tizenh[aá]rom|tizenn[eé]gy|tizen[oö]t|tizenhat|tizenh[eé]t|tizennyolc|tizenkilenc|h[uú]sz|huszonegy|huszonkett[oöő]|huszonkettő|huszonhárom|[0-9],5)) ?[óo]r[aá](?:[tr]?[aá]?[a-z]*)?'
+R_HOUR_HOUR_D = r'\b(?:([0-9]{1,2}|egy|kett[oöő]|h[aá]rom|n[eé]gy|[öo]t|hat|h[eé]t|nyolc|kilenc|t[ií]z)?(?: [eé]s )? ?(h[aá]romnegyed|negyed|f[eé]l|m[aá]sf[eé]l) ?[oó]r[aá](?:[tr]?[aá]?[a-z]*)?)'
 
 # Standalone days of month patterns
 R_DAYNUM_SUFFIX = r'(?<!\w)([1-9]|[12][0-9]|3[01])(?:\.|-)([aáeé][a-z]*|j[aáeé][a-z]*|[aáeé]t[oóöő]l|j[eé]t[oóöő]l|i(?!\w))(?!\d)'  # Match various Hungarian day suffixes including -i, -jén, -jei, -ától, -jétől etc.
