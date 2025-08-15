@@ -130,6 +130,7 @@ def _extract_with_spans(input_sentence: str, output_container: str, now: datetim
 
         return []
 
+
 daypart_mapping = [
     (3, 5),  # hajnal
     (6, 10),  # reggel

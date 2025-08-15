@@ -84,7 +84,7 @@ def duration_parser(s: str, return_preferred_unit: bool = False, with_spans: boo
     # Define all patterns
     year_pattern = (r'\b(\d+|egy|kett[oöő]|két|h[aá]rom|n[eé]gy|[öo]t|hat|h[eé]t|nyolc|kilenc|'
                     r't[ií]z|teljes)?\s*[eé]v(ese?[eé]?t?|re)\b')
-    
+
     # Max frequency patterns
     max_patterns = [
         r'\b(ameddig|am[ií]g)\s+(csak\s+)?lehet(s[eé]ges)?\b',
@@ -93,24 +93,24 @@ def duration_parser(s: str, return_preferred_unit: bool = False, with_spans: boo
         r'\bmaxim[aá]lis\s+(ideig|id[oő]re)\b'
     ]
     week_pattern = (r'\b(\d+|egy|kett[oöő]|k[eé]t|k[eé]thetes|h[aá]rom|n[eé]gy|[öo]t|hat|h[eé]t|'
-                   r'nyolc|kilenc|t[ií]z)\s*h[eé]t(ese?[eé]?t?|re)\b')
+                    r'nyolc|kilenc|t[ií]z)\s*h[eé]t(ese?[eé]?t?|re)\b')
     day_pattern = (r'\b(\d+|egy|kett[oöő]|két|h[aá]rom|n[eé]gy|[öo]t|hat|h[eé]t|nyolc|kilenc|'
                    r't[ií]z|harminc|\d{2,3})\s*nap(osa?[aá]?t?|ra)\b')
     hour_pattern = (r'\b(\d+|egy|kett[oöő]|két|h[aá]rom|n[eé]gy|[öo]t|hat|h[eé]t|nyolc|kilenc|'
-                   r't[ií]z|\d{2})\s*[oó]r[aá](sa?[aá]?t?|ra)\b')
+                    r't[ií]z|\d{2})\s*[oó]r[aá](sa?[aá]?t?|ra)\b')
     minute_pattern = (r'\b(\d+|egy|kett[oöő]|két|h[aá]rom|n[eé]gy|[öo]t|hat|h[eé]t|nyolc|kilenc|'
-                     r't[ií]z|húsz|harminc|negyven|ötven|\d{2,3})\s*perc[a-z]*\b')
+                      r't[ií]z|húsz|harminc|negyven|ötven|\d{2,3})\s*perc[a-z]*\b')
 
     # Check for max duration patterns first
     for pattern in max_patterns:
         if re.search(pattern, s_no_accent):
             if with_spans:
                 match_start, match_end = _find_span_in_original(pattern, original_s)
-            
+
             # Return MaxDuration result
             res_date_parts = [MaxDuration("max_duration")]
             preferred_unit = DurationUnit.MAX
-            
+
             result: DateParts = {
                 "match": s,
                 "date_parts": res_date_parts,
@@ -125,7 +125,7 @@ def duration_parser(s: str, return_preferred_unit: bool = False, with_spans: boo
     if year_search:
         if with_spans:
             match_start, match_end = _find_span_in_original(year_pattern, original_s)
-        
+
         year_match_pattern = (r'(\d+|egy|kett[oöő]|két|h[aá]rom|n[eé]gy|[öo]t|hat|h[eé]t|nyolc|'
                               r'kilenc|t[ií]z|teljes)\s*[eé]v(ese?[eé]?t?|re)')
         num_match = re.search(year_match_pattern, s_no_accent)
@@ -243,7 +243,7 @@ def duration_parser(s: str, return_preferred_unit: bool = False, with_spans: boo
                                 match_start, match_end = _find_span_in_original(R_SPECIAL_HOUR_D, original_s)
                             special_hour = match.groups()[0]
                             res_mins = convert_quarter_hour(special_hour)
-        
+
         # Handle simple minutes like "45 percre", "30 perc" as fallback
         if res_mins == 0:
             minute_match = re.search(minute_pattern, s_no_accent)
@@ -281,30 +281,30 @@ def parse_duration_with_spans(s: str, return_preferred_unit: bool = False) -> Un
     :return: Dict with match_text, match_start, match_end, and duration info, or None if no match.
     """
     results = duration_parser(s, return_preferred_unit=return_preferred_unit, with_spans=True)
-    
+
     if not results["date_parts"]:
         return None
-    
+
     if results["match_start"] is None or results["match_end"] is None:
         return None
-        
+
     # Extract the matched text and strip leading/trailing whitespace
     raw_match_text = s[results['match_start']:results['match_end']]
     stripped_match_text = raw_match_text.strip()
-    
+
     # Calculate the adjusted span positions after stripping
     leading_spaces = len(raw_match_text) - len(raw_match_text.lstrip())
     trailing_spaces = len(raw_match_text) - len(raw_match_text.rstrip())
-    
+
     adjusted_start = results['match_start'] + leading_spaces
     adjusted_end = results['match_end'] - trailing_spaces
-    
+
     result_dict = {
         'match_text': stripped_match_text,
         'match_start': adjusted_start,
         'match_end': adjusted_end
     }
-    
+
     if return_preferred_unit:
         date_part = results["date_parts"][0]
         preferred_unit = results.get("preferred_unit", DurationUnit.MINUTES)
@@ -326,7 +326,7 @@ def parse_duration_with_spans(s: str, return_preferred_unit: bool = False) -> Un
     else:
         # Return minutes for backward compatibility
         result_dict["minutes"] = _convert_to_minutes(results["date_parts"][0])
-        
+
     return result_dict
 
 
