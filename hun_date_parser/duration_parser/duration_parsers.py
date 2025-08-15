@@ -1,4 +1,4 @@
-from typing import TypedDict, Optional, Sequence, Union, List
+from typing import TypedDict, Optional, Sequence, Union, List, Tuple
 import re
 from hun_date_parser.utils import (DateTimePartConatiner, remove_accent, word_to_num,
                                    Minute, Hour, Day, Week, Month, Year)
@@ -32,7 +32,7 @@ class DateParts(TypedDict):
     match_end: Optional[int]
 
 
-def _find_span_in_original(pattern: str, original_s: str) -> tuple[int, int]:
+def _find_span_in_original(pattern: str, original_s: str) -> Tuple[int, int]:
     """Helper function to find span positions in original string."""
     match = re.search(pattern, original_s, re.IGNORECASE)
     if match:
@@ -262,7 +262,7 @@ def duration_parser(s: str, return_preferred_unit: bool = False, with_spans: boo
                 res_date_parts = [Minute(res_mins, "duration_parser")]
                 preferred_unit = DurationUnit.MINUTES
 
-    result: DateParts = {
+    final_result: DateParts = {
         "match": s,
         "date_parts": res_date_parts,
         "preferred_unit": preferred_unit if return_preferred_unit else None,
@@ -270,7 +270,7 @@ def duration_parser(s: str, return_preferred_unit: bool = False, with_spans: boo
         "match_end": match_end if with_spans else None
     }
 
-    return result
+    return final_result
 
 
 def parse_duration_with_spans(s: str, return_preferred_unit: bool = False) -> Union[Optional[dict], None]:
