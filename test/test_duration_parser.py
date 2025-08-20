@@ -298,21 +298,23 @@ def test_parse_duration_with_spans(inp, exp_text, exp_start, exp_end, exp_minute
     assert result['minutes'] == exp_minutes
 
 
-# Test cases for MAX duration expressions
 tf_max_duration = [
     ("ameddig lehet", "max"),
     ("amíg lehet", "max"),
     ("ameddig lehetséges", "max"),
     ("amíg lehetséges", "max"),
+    ("amig lehetseges", "max"),
     ("ameddig csak lehet", "max"),
     ("amíg csak lehet", "max"),
     ("maximum időre", "max"),
     ("max időre", "max"),
     ("foglald le ameddig lehet", "max"),
     ("maximum időre kérlek", "max"),
-    ("legfeljebb ameddig csak lehet", "max"),
+    ("max időre kérlek", "max"),
+    ("ameddig csak lehet", "max"),
+    ("   amíg csak lehet   ", "max"),
+    ("legyen amíg csak lehet", "max"),
     
-    # These should not match
     ("amíg", None),
     ("lehet", None),
     ("maximum", None),
