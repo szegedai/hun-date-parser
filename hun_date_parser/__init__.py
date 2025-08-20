@@ -8,4 +8,4 @@ __all__ = ["DatetimeTextualizer", "DatetimeExtractor", "datetime2text", "text2da
            "text2datetime_with_spans", "text2date_with_spans", "parse_duration", "parse_duration_with_spans",
            "parse_frequency"]
 
-__version__ = "0.3.1"
+__version__ = "0.3.2"
