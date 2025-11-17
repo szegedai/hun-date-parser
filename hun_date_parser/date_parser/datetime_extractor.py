@@ -22,6 +22,7 @@ from hun_date_parser.utils import (Year, Month, Week, Day, Daypart, Hour, Minute
 
 datelike = Union[datetime, date, time, None]
 
+
 daypart_mapping = [
     (3, 5),  # hajnal
     (6, 10),  # reggel
@@ -43,102 +44,10 @@ def text2datetime_with_spans(input_sentence: str, now: datetime = datetime.now()
     :param realistic_year_required: Defines whether to restrict year candidates to be between 1900 and 2100.
     :return: list of dictionaries with datetime intervals and span info
     """
-    from hun_date_parser.date_parser.structure_parsers import match_multi_match
-
     datetime_extractor = DatetimeExtractor(now=now, output_container='datetime',
                                            search_scope=search_scope,
                                            realistic_year_required=realistic_year_required)
-
-    sentence_parts = match_multi_match(input_sentence.lower())
-
-    if len(sentence_parts) > 1:
-        all_results = []
-        cumulative_offset = 0
-
-        for part in sentence_parts:
-            part_start = input_sentence.lower().find(part, cumulative_offset)
-            if part_start == -1:
-                continue
-
-            matches = match_rules_with_spans(now, part, search_scope, realistic_year_required)
-            filtered_matches = [{'match_text': m.get('match_text', ''),
-                                 'match_start': m.get('match_start', 0) + part_start,
-                                 'match_end': m.get('match_end', 0) + part_start,
-                                 'date_parts': m['date_parts']} for m in matches
-                                if m.get('date_parts') and m.get('match_start', 0) != m.get('match_end', 0)]
-
-            if len(filtered_matches) > 1:
-                min_start = min(m['match_start'] for m in filtered_matches)
-                max_end = max(m['match_end'] for m in filtered_matches)
-                merged_text = input_sentence[min_start:max_end]
-                all_date_parts = []
-                for m in filtered_matches:
-                    all_date_parts.extend(m['date_parts'])
-
-                result_match = {
-                    'match_text': merged_text,
-                    'match_start': min_start,
-                    'match_end': max_end,
-                    'date_parts': all_date_parts
-                }
-            else:
-                result_match = filtered_matches[0] if filtered_matches else {}
-
-            if result_match:
-                start_date = datetime_extractor.assemble_datetime(now, result_match['date_parts'], bottom=True)
-                end_date = datetime_extractor.assemble_datetime(now, result_match['date_parts'], bottom=False)
-
-                final_result = {
-                    'match_text': result_match['match_text'],
-                    'match_start': result_match['match_start'],
-                    'match_end': result_match['match_end'],
-                    'start_date': start_date,
-                    'end_date': end_date
-                }
-                all_results.append(final_result)
-
-            cumulative_offset = part_start + len(part)
-
-        return all_results
-    else:
-        matches = match_rules_with_spans(now, input_sentence, search_scope, realistic_year_required)
-        filtered_matches = [{'match_text': m.get('match_text', ''),
-                             'match_start': m.get('match_start', 0),
-                             'match_end': m.get('match_end', 0),
-                             'date_parts': m['date_parts']} for m in matches
-                            if m.get('date_parts') and m.get('match_start', 0) != m.get('match_end', 0)]
-
-        if len(filtered_matches) > 1:
-            min_start = min(m['match_start'] for m in filtered_matches)
-            max_end = max(m['match_end'] for m in filtered_matches)
-            merged_text = input_sentence[min_start:max_end]
-            all_date_parts = []
-            for m in filtered_matches:
-                all_date_parts.extend(m['date_parts'])
-
-            result_match = {
-                'match_text': merged_text,
-                'match_start': min_start,
-                'match_end': max_end,
-                'date_parts': all_date_parts
-            }
-        else:
-            result_match = filtered_matches[0] if filtered_matches else {}
-
-        if result_match:
-            start_date = datetime_extractor.assemble_datetime(now, result_match['date_parts'], bottom=True)
-            end_date = datetime_extractor.assemble_datetime(now, result_match['date_parts'], bottom=False)
-
-            final_result = {
-                'match_text': result_match['match_text'],
-                'match_start': result_match['match_start'],
-                'match_end': result_match['match_end'],
-                'start_date': start_date,
-                'end_date': end_date
-            }
-            return [final_result]
-
-        return []
+    return datetime_extractor._parse_datetime(input_sentence, include_spans=True)
 
 
 def text2datetime(input_sentence: str, now: datetime = datetime.now(),
@@ -170,10 +79,10 @@ def text2date_with_spans(input_sentence: str, now: datetime = datetime.now(),
     :param realistic_year_required: Defines whether to restrict year candidates to be between 1900 and 2100.
     :return: list of dictionaries with date intervals and span info
     """
-    matches = match_rules_with_spans(now, input_sentence, search_scope, realistic_year_required)
-    return [{'match_text': m.get('match_text', ''),
-             'match_start': m.get('match_start', 0),
-             'match_end': m.get('match_end', 0)} for m in matches if m.get('date_parts')]
+    datetime_extractor = DatetimeExtractor(now=now, output_container='date',
+                                           search_scope=search_scope,
+                                           realistic_year_required=realistic_year_required)
+    return datetime_extractor._parse_datetime(input_sentence, include_spans=True)
 
 
 def text2date(input_sentence: str, now: datetime = datetime.now(),
@@ -495,17 +404,22 @@ class DatetimeExtractor:
         except:
             return []
 
-    def _parse_datetime(self, sentence: str) -> List[Dict[str, datelike]]:
+    def _parse_datetime(self, sentence: str, include_spans: bool = False) -> List[Dict[str, datelike]]:
         """
         Extracts list of datetime intervals from input sentence.
         :param sentence: Input sentence string.
+        :param include_spans: If True, include span information in the results.
         :return: list of datetime interval dictionaries
         """
+        original_sentence = sentence  # Keep original case for span extraction
         sentence = sentence.lower()
         sentence_parts = match_multi_match(sentence)
         parsed_dates = []
 
         for sentence_part in sentence_parts:
+            # Calculate offset for this sentence part in the original sentence
+            part_offset = sentence.find(sentence_part)
+
             # Try to determine whether an explicit date interval has been provided
             # Something like holnap**tol** jovo kedd**ig**
             interval = match_interval(sentence_part)
@@ -518,10 +432,92 @@ class DatetimeExtractor:
             #       start_date: parse_date(holnap)
             #       end_date: parse_date(jovo kedd)
             if interval and not duration_parts:
-                interval['start_date'] = 'OPEN' if interval['start_date'] == 'OPEN' else match_rules(self.now, interval[
-                    'start_date'], self.search_scope, self.realistic_year_required)
-                interval['end_date'] = 'OPEN' if interval['end_date'] == 'OPEN' else match_rules(self.now, interval[
-                    'end_date'], self.search_scope, self.realistic_year_required)
+                if include_spans:
+                    # Use match_rules_with_spans and extract span information
+                    if interval['start_date'] == 'OPEN':
+                        interval['start_date'] = 'OPEN'
+                        interval['start_spans'] = []
+                    else:
+                        start_matches = match_rules_with_spans(
+                            self.now, interval['start_date'], self.search_scope, self.realistic_year_required)
+                        interval['start_date'] = list(chain(*[m['date_parts'] for m in start_matches]))
+                        interval['start_spans'] = start_matches
+
+                    if interval['end_date'] == 'OPEN':
+                        interval['end_date'] = 'OPEN'
+                        interval['end_spans'] = []
+                    else:
+                        end_matches = match_rules_with_spans(
+                            self.now, interval['end_date'], self.search_scope, self.realistic_year_required)
+                        interval['end_date'] = list(chain(*[m['date_parts'] for m in end_matches]))
+                        interval['end_spans'] = end_matches
+
+                    # Calculate overall span for the interval
+                    if interval['start_spans'] and interval['end_spans']:
+                        # Find positions of start and end parts in the original sentence
+                        start_part = interval.get('start_date_original', '')
+                        end_part = interval.get('end_date_original', '')
+
+                        # If we don't have original parts, reconstruct from match_interval result
+                        if not start_part:
+                            # Find the start and end parts from the original match_interval call
+                            from hun_date_parser.date_parser.structure_parsers import match_interval as parse_interval
+                            orig_interval = parse_interval(sentence_part)
+                            start_part = orig_interval.get('start_date', '')
+                            end_part = orig_interval.get('end_date', '')
+
+                        start_pos = sentence_part.find(start_part) if start_part else 0
+                        end_pos = sentence_part.find(end_part) if end_part else len(sentence_part)
+
+                        # Adjust spans based on position within sentence_part
+                        adjusted_start_spans = []
+                        for span in interval['start_spans']:
+                            adjusted_span = span.copy()
+                            adjusted_span['match_start'] = start_pos + span['match_start']
+                            adjusted_span['match_end'] = start_pos + span['match_end']
+                            adjusted_start_spans.append(adjusted_span)
+
+                        adjusted_end_spans = []
+                        for span in interval['end_spans']:
+                            adjusted_span = span.copy()
+                            adjusted_span['match_start'] = end_pos + span['match_start']
+                            adjusted_span['match_end'] = end_pos + span['match_end']
+                            adjusted_end_spans.append(adjusted_span)
+
+                        # Now calculate the overall span
+                        all_spans = adjusted_start_spans + adjusted_end_spans
+                        min_start = min(s['match_start'] for s in all_spans)
+                        max_end = max(s['match_end'] for s in all_spans)
+
+                        interval['match_text'] = sentence_part[min_start:max_end]
+                        interval['match_start'] = part_offset + min_start
+                        interval['match_end'] = part_offset + max_end
+                    elif interval['start_spans']:
+                        # For open intervals, use the span from the actual date match
+                        valid_start_spans = [
+                            m for m in interval['start_spans']
+                            if m.get('match_text') and m.get('match_start', 0) != m.get('match_end', 0)
+                        ]
+                        if valid_start_spans:
+                            span = valid_start_spans[0]
+                            # Use the span information directly
+                            interval['match_text'] = span['match_text']
+                            interval['match_start'] = part_offset + span['match_start']
+                            interval['match_end'] = part_offset + span['match_end']
+                        else:
+                            interval['match_text'] = sentence_part
+                            interval['match_start'] = part_offset
+                            interval['match_end'] = part_offset + len(sentence_part)
+                    else:
+                        interval['match_text'] = sentence_part
+                        interval['match_start'] = part_offset
+                        interval['match_end'] = part_offset + len(sentence_part)
+                else:
+                    interval['start_date'] = 'OPEN' if interval['start_date'] == 'OPEN' else match_rules(
+                        self.now, interval['start_date'], self.search_scope, self.realistic_year_required)
+                    interval['end_date'] = 'OPEN' if interval['end_date'] == 'OPEN' else match_rules(
+                        self.now, interval['end_date'], self.search_scope, self.realistic_year_required)
+
                 parsed_dates.append(interval)
 
             # ... another way of explicitly expressing time intervals is with a start date and a duration
@@ -532,12 +528,30 @@ class DatetimeExtractor:
             elif duration_parts:
                 from_part, duration_part = duration_parts
 
-                interval['start_date'] = match_rules(self.now, from_part, self.search_scope,
-                                                     self.realistic_year_required)
-                interval['end_date'] = match_rules(self.now, from_part,
-                                                   self.search_scope,
-                                                   self.realistic_year_required) + match_duration_rules(
-                    self.now, duration_part, self.search_scope, self.realistic_year_required)
+                if include_spans:
+                    from_matches = match_rules_with_spans(
+                        self.now, from_part, self.search_scope, self.realistic_year_required)
+                    interval['start_date'] = list(chain(*[m['date_parts'] for m in from_matches]))
+                    interval['end_date'] = interval['start_date'] + match_duration_rules(
+                        self.now, duration_part, self.search_scope, self.realistic_year_required)
+                    interval['from_spans'] = from_matches
+
+                    # Calculate span for duration interval
+                    if from_matches:
+                        interval['match_text'] = sentence_part
+                        interval['match_start'] = part_offset
+                        interval['match_end'] = part_offset + len(sentence_part)
+                    else:
+                        interval['match_text'] = sentence_part
+                        interval['match_start'] = part_offset
+                        interval['match_end'] = part_offset + len(sentence_part)
+                else:
+                    interval['start_date'] = match_rules(self.now, from_part, self.search_scope,
+                                                         self.realistic_year_required)
+                    interval['end_date'] = match_rules(self.now, from_part,
+                                                       self.search_scope,
+                                                       self.realistic_year_required) + match_duration_rules(
+                        self.now, duration_part, self.search_scope, self.realistic_year_required)
                 parsed_dates.append(interval)
 
             # ... else try to determine a time interval implicitly.
@@ -546,13 +560,67 @@ class DatetimeExtractor:
             #       start_date: parse_date(holnap, bottom=True) --> earliest datetime tomorrow
             #       end_date: parse_date(holnap, bottom=False)  --> latest datetime tomorrow
             else:
-                parsed_dates += self._get_implicit_intervall(sentence_part)
+                if include_spans:
+                    matches = match_rules_with_spans(
+                        self.now, sentence_part, self.search_scope, self.realistic_year_required)
+                    # Filter out invalid matches (empty text or invalid spans)
+                    valid_matches = [
+                        m for m in matches
+                        if m.get('match_text') and m.get('match_start', 0) != m.get('match_end', 0)
+                    ]
+
+                    if valid_matches:
+                        all_date_parts = list(chain(*[m['date_parts'] for m in valid_matches]))
+
+                        if len(valid_matches) == 1:
+                            # Single match - use its exact span
+                            match = valid_matches[0]
+                            implicit_interval = {
+                                'start_date': all_date_parts,
+                                'end_date': all_date_parts,
+                                'match_text': match['match_text'],
+                                'match_start': part_offset + match['match_start'],
+                                'match_end': part_offset + match['match_end'],
+                                'spans': valid_matches
+                            }
+                        else:
+                            # Multiple matches - merge them
+                            min_start = min(m.get('match_start', 0) for m in valid_matches)
+                            max_end = max(m.get('match_end', 0) for m in valid_matches)
+
+                            implicit_interval = {
+                                'start_date': all_date_parts,
+                                'end_date': all_date_parts,
+                                'match_text': original_sentence[part_offset + min_start:part_offset + max_end],
+                                'match_start': part_offset + min_start,
+                                'match_end': part_offset + max_end,
+                                'spans': valid_matches
+                            }
+                        parsed_dates.append(implicit_interval)
+                else:
+                    parsed_dates += self._get_implicit_intervall(sentence_part)
 
         parsed_dates = [extend_start_end(intv) for intv in parsed_dates]
 
-        parsed_dates = [{'start_date': self.assemble_datetime(self.now, parsed_date['start_date'], bottom=True),
-                         'end_date': self.assemble_datetime(self.now, parsed_date['end_date'], bottom=False)}
-                        for parsed_date in parsed_dates]
+        if include_spans:
+            # Preserve span information in the final results
+            final_results = []
+            for parsed_date in parsed_dates:
+                result = {
+                    'start_date': self.assemble_datetime(self.now, parsed_date['start_date'], bottom=True),
+                    'end_date': self.assemble_datetime(self.now, parsed_date['end_date'], bottom=False)
+                }
+                # Add span information if available
+                if 'match_text' in parsed_date:
+                    result['match_text'] = parsed_date['match_text']
+                    result['match_start'] = parsed_date['match_start']
+                    result['match_end'] = parsed_date['match_end']
+                final_results.append(result)
+            parsed_dates = final_results
+        else:
+            parsed_dates = [{'start_date': self.assemble_datetime(self.now, parsed_date['start_date'], bottom=True),
+                             'end_date': self.assemble_datetime(self.now, parsed_date['end_date'], bottom=False)}
+                            for parsed_date in parsed_dates]
 
         # remove results where
         # - both start and end dates are None

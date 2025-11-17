@@ -173,6 +173,72 @@ test_cases_with_spans = [
     ('vbn február közepén mnb', [
         {'match_text': 'február közep', 'match_start': 4, 'match_end': 17, 'datetime_range': [datetime(2020, 2, 10, 0, 0, 0), datetime(2020, 2, 20, 23, 59, 59)]}
     ]),
+    # Test cases for -tól/től suffix fix (open intervals)
+    ('ettől az évtől', [
+        {'match_text': 'ettől az évtől', 'match_start': 0, 'match_end': 14, 'datetime_range': [datetime(2020, 1, 1, 0, 0, 0), None]}
+    ]),
+    ('idei évtől', [
+        {'match_text': 'idei évtől', 'match_start': 0, 'match_end': 10, 'datetime_range': [datetime(2020, 1, 1, 0, 0, 0), None]}
+    ]),
+    ('ebben az évben találkozunk', [
+        {'match_text': 'ebben az évben', 'match_start': 0, 'match_end': 14, 'datetime_range': [datetime(2020, 1, 1, 0, 0, 0), datetime(2020, 12, 31, 23, 59, 59)]}
+    ]),
+    ('xyz ettől az évtől abc', [
+        {'match_text': 'ettől az évtől', 'match_start': 4, 'match_end': 18, 'datetime_range': [datetime(2020, 1, 1, 0, 0, 0), None]}
+    ]),
+    ('múlt évtől kezdve', [
+        {'match_text': 'múlt évtől', 'match_start': 0, 'match_end': 10, 'datetime_range': [datetime(2019, 1, 1, 0, 0, 0), None]}
+    ]),
+    ('jövő évtől', [
+        {'match_text': 'jövő évtől', 'match_start': 0, 'match_end': 10, 'datetime_range': [datetime(2021, 1, 1, 0, 0, 0), None]}
+    ]),
+    # Additional test cases for interval expressions
+    ('januártól februárig', [
+        {'match_text': 'januártól február', 'match_start': 0, 'match_end': 17, 'datetime_range': [datetime(2020, 1, 1, 0, 0, 0), datetime(2020, 2, 29, 23, 59, 59)]}
+    ]),
+    ('májusig', [
+        {'match_text': 'májusig', 'match_start': 0, 'match_end': 7, 'datetime_range': [None, datetime(2020, 5, 31, 23, 59, 59)]}
+    ]),
+    # Test cases for duration expressions
+    ('holnaptól 3 napig', [
+        {'match_text': 'holnaptól 3 napig', 'match_start': 0, 'match_end': 17, 'datetime_range': [datetime(2020, 12, 19, 0, 0, 0), datetime(2020, 12, 22, 23, 59, 59)]}
+    ]),
+    ('ma 2 órára', [
+        {'match_text': 'ma', 'match_start': 0, 'match_end': 2, 'datetime_range': [datetime(2020, 12, 18, 0, 0, 0), datetime(2020, 12, 18, 23, 59, 59)]}
+    ]),
+    # Test cases with unrealistic years for realistic_year_required testing
+    ('találkozzunk 1850 január 5-én', [
+        {'match_text': 'január 5-én', 'match_start': 18, 'match_end': 29, 'datetime_range': [datetime(2020, 1, 5, 0, 0, 0), datetime(2020, 1, 5, 23, 59, 59)]}
+    ]),
+    ('legyen 2150 december 31-én', [
+        {'match_text': 'december 31-én', 'match_start': 12, 'match_end': 26, 'datetime_range': [datetime(2020, 12, 31, 0, 0, 0), datetime(2020, 12, 31, 23, 59, 59)]}
+    ]),
+    # Test cases for multiple expressions in one sentence
+    ('ráérek kedden vagy szerdán', [
+        {'match_text': 'kedd', 'match_start': 7, 'match_end': 11, 'datetime_range': [datetime(2020, 12, 15, 0, 0, 0), datetime(2020, 12, 15, 23, 59, 59)]},
+        {'match_text': 'szerdá', 'match_start': 19, 'match_end': 25, 'datetime_range': [datetime(2020, 12, 16, 0, 0, 0), datetime(2020, 12, 16, 23, 59, 59)]}
+    ]),
+    ('találkozzunk februárban és augusztusban', [
+        {'match_text': 'február', 'match_start': 13, 'match_end': 20, 'datetime_range': [datetime(2020, 2, 1, 0, 0, 0), datetime(2020, 2, 29, 23, 59, 59)]},
+        {'match_text': 'augusztus', 'match_start': 27, 'match_end': 36, 'datetime_range': [datetime(2020, 8, 1, 0, 0, 0), datetime(2020, 8, 31, 23, 59, 59)]}
+    ]),
+    # Edge cases and boundary conditions
+    ('december 31-én éjfélkor', [
+        {'match_text': 'december 31-én', 'match_start': 0, 'match_end': 14, 'datetime_range': [datetime(2020, 12, 31, 0, 0, 0), datetime(2020, 12, 31, 23, 59, 59)]}
+    ]),
+    ('január 1-jén hajnalban', [
+        {'match_text': 'január 1-jén hajnal', 'match_start': 0, 'match_end': 19, 'datetime_range': [datetime(2020, 1, 1, 3, 0, 0), datetime(2020, 1, 1, 5, 59, 59)]}
+    ]),
+    # Test cases from other test files
+    ('ezen a héten', [
+        {'match_text': 'ezen a hét', 'match_start': 0, 'match_end': 10, 'datetime_range': [datetime(2020, 12, 14, 0, 0, 0), datetime(2020, 12, 20, 23, 59, 59)]}
+    ]),
+    ('előző két napban dolgozom', [
+        {'match_text': 'előző két napban', 'match_start': 0, 'match_end': 16, 'datetime_range': [datetime(2020, 12, 16, 0, 0, 0), datetime(2020, 12, 18, 0, 0, 0)]}
+    ]),
+    ('megelőző két hónap', [
+        {'match_text': 'megelőző két hónap', 'match_start': 0, 'match_end': 18, 'datetime_range': [datetime(2020, 10, 18, 0, 0, 0), datetime(2020, 12, 18, 0, 0, 0)]}
+    ]),
 
 ]
 
@@ -183,8 +249,6 @@ def test_text2datetime_with_spans(inp_txt, expected):
     now = datetime(2020, 12, 18)
     result = text2datetime_with_spans(inp_txt, now)
 
-    print(result)
-    
     assert len(result) == len(expected), f"Expected {len(expected)} matches, got {len(result)}"
     
     for i, (actual, exp) in enumerate(zip(result, expected)):
@@ -281,3 +345,88 @@ def test_text2datetime_with_spans_fields():
     
     # Check datetime logic
     assert match['start_date'] <= match['end_date'], "start_date should be <= end_date"
+
+
+# Test cases for different search scopes
+search_scope_cases = [
+    # (input_text, search_scope, expected_results)
+    ('hétfőn', 'PAST_SEARCH', [
+        {'match_text': 'hétfő', 'match_start': 0, 'match_end': 5, 'datetime_range': [datetime(2020, 12, 14, 0, 0, 0), datetime(2020, 12, 14, 23, 59, 59)]}
+    ]),
+    ('hétfőn', 'FUTURE_DAY', [
+        {'match_text': 'hétfő', 'match_start': 0, 'match_end': 5, 'datetime_range': [datetime(2020, 12, 21, 0, 0, 0), datetime(2020, 12, 21, 23, 59, 59)]}
+    ]),
+    ('kedden dolgozom', 'PAST_SEARCH', [
+        {'match_text': 'kedd', 'match_start': 0, 'match_end': 4, 'datetime_range': [datetime(2020, 12, 15, 0, 0, 0), datetime(2020, 12, 15, 23, 59, 59)]}
+    ]),
+    ('találkozzunk kedden', 'FUTURE_DAY', [
+        {'match_text': 'kedd', 'match_start': 13, 'match_end': 17, 'datetime_range': [datetime(2020, 12, 22, 0, 0, 0), datetime(2020, 12, 22, 23, 59, 59)]}
+    ]),
+    ('ráérek csütörtökön', 'PAST_SEARCH', [
+        {'match_text': 'csütörtök', 'match_start': 7, 'match_end': 16, 'datetime_range': [datetime(2020, 12, 17, 0, 0, 0), datetime(2020, 12, 17, 23, 59, 59)]}
+    ]),
+    ('legyen szerdán reggel', 'FUTURE_DAY', [
+        {'match_text': 'szerdán reggel', 'match_start': 7, 'match_end': 21, 'datetime_range': [datetime(2020, 12, 23, 6, 0, 0), datetime(2020, 12, 23, 10, 59, 59)]}
+    ]),
+]
+
+@pytest.mark.parametrize("inp_txt, scope_name, expected", search_scope_cases)
+def test_text2datetime_with_spans_search_scopes(inp_txt, scope_name, expected):
+    """Test that text2datetime_with_spans works with different search scopes."""
+    from hun_date_parser.utils import SearchScopes
+    now = datetime(2020, 12, 18)  # Friday
+    
+    scope = getattr(SearchScopes, scope_name)
+    result = text2datetime_with_spans(inp_txt, now, search_scope=scope)
+    
+    assert len(result) == len(expected), f"Expected {len(expected)} matches, got {len(result)}"
+    
+    for i, (actual, exp) in enumerate(zip(result, expected)):
+        assert actual['match_text'] == exp['match_text'], f"Match {i}: expected text '{exp['match_text']}', got '{actual['match_text']}'"
+        assert actual['match_start'] == exp['match_start'], f"Match {i}: expected start {exp['match_start']}, got {actual['match_start']}"
+        assert actual['match_end'] == exp['match_end'], f"Match {i}: expected end {exp['match_end']}, got {actual['match_end']}"
+        
+        expected_start, expected_end = exp['datetime_range']
+        assert actual['start_date'] == expected_start, f"Match {i}: expected start_date {expected_start}, got {actual['start_date']}"
+        assert actual['end_date'] == expected_end, f"Match {i}: expected end_date {expected_end}, got {actual['end_date']}"
+
+
+# Test cases for realistic_year_required parameter
+realistic_year_cases = [
+    # (input_text, realistic_year_required, expected_results)
+    ('találkozzunk 1850 január 5-én', False, [
+        {'match_text': '1850 január 5-én', 'match_start': 13, 'match_end': 29, 'datetime_range': [datetime(1850, 1, 5, 0, 0, 0), datetime(1850, 1, 5, 23, 59, 59)]}
+    ]),
+    ('találkozzunk 1850 január 5-én', True, [
+        {'match_text': 'január 5-én', 'match_start': 18, 'match_end': 29, 'datetime_range': [datetime(2020, 1, 5, 0, 0, 0), datetime(2020, 1, 5, 23, 59, 59)]}
+    ]),  # Year rejected, but month-day accepted
+    ('legyen 2150 december 31-én', False, [
+        {'match_text': '2150 december 31-én', 'match_start': 7, 'match_end': 26, 'datetime_range': [datetime(2150, 12, 31, 0, 0, 0), datetime(2150, 12, 31, 23, 59, 59)]}
+    ]),
+    ('legyen 2150 december 31-én', True, [
+        {'match_text': 'december 31-én', 'match_start': 12, 'match_end': 26, 'datetime_range': [datetime(2020, 12, 31, 0, 0, 0), datetime(2020, 12, 31, 23, 59, 59)]}
+    ]),  # Year rejected, but month-day accepted
+    ('ráérek 2021 március 15-én', False, [
+        {'match_text': '2021 március 15-én', 'match_start': 7, 'match_end': 25, 'datetime_range': [datetime(2021, 3, 15, 0, 0, 0), datetime(2021, 3, 15, 23, 59, 59)]}
+    ]),
+    ('ráérek 2021 március 15-én', True, [
+        {'match_text': '2021 március 15-én', 'match_start': 7, 'match_end': 25, 'datetime_range': [datetime(2021, 3, 15, 0, 0, 0), datetime(2021, 3, 15, 23, 59, 59)]}
+    ]),  # Should be accepted (realistic year)
+]
+
+@pytest.mark.parametrize("inp_txt, realistic_required, expected", realistic_year_cases)
+def test_text2datetime_with_spans_realistic_year_required(inp_txt, realistic_required, expected):
+    """Test that text2datetime_with_spans respects realistic_year_required parameter."""
+    now = datetime(2020, 12, 18)
+    result = text2datetime_with_spans(inp_txt, now, realistic_year_required=realistic_required)
+    
+    assert len(result) == len(expected), f"Expected {len(expected)} matches, got {len(result)}"
+    
+    for i, (actual, exp) in enumerate(zip(result, expected)):
+        assert actual['match_text'] == exp['match_text'], f"Match {i}: expected text '{exp['match_text']}', got '{actual['match_text']}'"
+        assert actual['match_start'] == exp['match_start'], f"Match {i}: expected start {exp['match_start']}, got {actual['match_start']}"
+        assert actual['match_end'] == exp['match_end'], f"Match {i}: expected end {exp['match_end']}, got {actual['match_end']}"
+        
+        expected_start, expected_end = exp['datetime_range']
+        assert actual['start_date'] == expected_start, f"Match {i}: expected start_date {expected_start}, got {actual['start_date']}"
+        assert actual['end_date'] == expected_end, f"Match {i}: expected end_date {expected_end}, got {actual['end_date']}"
