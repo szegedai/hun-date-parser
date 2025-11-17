@@ -188,6 +188,10 @@ tf_named_month = [
     # Non-matching cases
     ('janos', [], SearchScopes.NOT_RESTRICTED),
     ('', [], SearchScopes.NOT_RESTRICTED),
+    # Regression test: incomplete month abbreviations should not match (bug fix)
+    ('szep', [], SearchScopes.NOT_RESTRICTED),
+    ('szep kartya', [], SearchScopes.NOT_RESTRICTED),
+    ('szep kartya igenyles', [], SearchScopes.NOT_RESTRICTED),
 ]
 
 tf_named_month_start_mid_end = [
