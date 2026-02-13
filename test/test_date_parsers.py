@@ -61,7 +61,6 @@ tf_named_month = [
     # Abbreviated month names
     ('jan', [[Month(1, 'named_month')]], SearchScopes.NOT_RESTRICTED),
     ('feb', [[Month(2, 'named_month')]], SearchScopes.NOT_RESTRICTED),
-    ('már', [[Month(3, 'named_month')]], SearchScopes.NOT_RESTRICTED),
     ('márc', [[Month(3, 'named_month')]], SearchScopes.NOT_RESTRICTED),
     ('ápr', [[Month(4, 'named_month')]], SearchScopes.NOT_RESTRICTED),
     ('máj', [[Month(5, 'named_month')]], SearchScopes.NOT_RESTRICTED),
@@ -192,6 +191,11 @@ tf_named_month = [
     ('szep', [], SearchScopes.NOT_RESTRICTED),
     ('szep kartya', [], SearchScopes.NOT_RESTRICTED),
     ('szep kartya igenyles', [], SearchScopes.NOT_RESTRICTED),
+    # Regression test: incomplete month abbreviations, that are common words
+    #  should not match (bug fix)
+    ('már', [], SearchScopes.NOT_RESTRICTED),
+    ('már megnéztem', [], SearchScopes.NOT_RESTRICTED),
+    ('már beállítottam', [], SearchScopes.NOT_RESTRICTED),
 ]
 
 tf_named_month_start_mid_end = [
